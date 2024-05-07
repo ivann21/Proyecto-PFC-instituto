@@ -4,8 +4,27 @@
  */
 package instituto;
 
+import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.intellijthemes.FlatCyanLightIJTheme;
+import instituto.busquedas.Profesores;
+import instituto.aulas.A104;
+import instituto.aulas.A301;
+import instituto.aulas.A302;
+import instituto.aulas.A102;
+import instituto.aulas.A103;
+import instituto.aulas.A201;
+import instituto.aulas.A303;
+import instituto.aulas.A106;
+import instituto.aulas.A101;
+import instituto.aulas.A202;
+import instituto.aulas.A105;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -19,8 +38,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
-import jtatto.GUIProperties;
-import jtatto.IDemoApp;
 import login.Login;
 import login.LoginAndSignUp;
 
@@ -33,7 +50,6 @@ import login.LoginAndSignUp;
  */
 public class Principal extends javax.swing.JFrame {
 
-    private IDemoApp demoApp = null;
     /**
      * Creates new form Principal
      */
@@ -84,6 +100,9 @@ public class Principal extends javax.swing.JFrame {
         jTextField24 = new javax.swing.JTextField();
         jTextField25 = new javax.swing.JTextField();
         jMenuItem7 = new javax.swing.JMenuItem();
+        jMenu3 = new javax.swing.JMenu();
+        jMenuItem8 = new javax.swing.JMenuItem();
+        jMenuItem9 = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         A101 = new javax.swing.JButton();
@@ -119,6 +138,10 @@ public class Principal extends javax.swing.JFrame {
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jMenuItem12 = new javax.swing.JMenuItem();
+        jMenuItem11 = new javax.swing.JMenuItem();
+        jMenuItem10 = new javax.swing.JMenuItem();
 
         jMenuItem2.setText("jMenuItem2");
 
@@ -319,6 +342,12 @@ public class Principal extends javax.swing.JFrame {
 
         jMenuItem7.setText("jMenuItem7");
 
+        jMenu3.setText("jMenu3");
+
+        jMenuItem8.setText("jMenuItem8");
+
+        jMenuItem9.setText("jMenuItem9");
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
         setResizable(false);
@@ -417,11 +446,21 @@ public class Principal extends javax.swing.JFrame {
         A201.setBackground(new java.awt.Color(255, 224, 51));
         A201.setForeground(new java.awt.Color(255, 255, 255));
         A201.setText("A201");
+        A201.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                A201ActionPerformed(evt);
+            }
+        });
         jPanel4.add(A201, new org.netbeans.lib.awtextra.AbsoluteConstraints(2, 2, 120, 60));
 
         A202.setBackground(new java.awt.Color(255, 224, 51));
         A202.setForeground(new java.awt.Color(255, 255, 255));
         A202.setText("A202");
+        A202.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                A202ActionPerformed(evt);
+            }
+        });
         jPanel4.add(A202, new org.netbeans.lib.awtextra.AbsoluteConstraints(122, 2, 140, 60));
 
         jPanel5.setBackground(new java.awt.Color(255, 255, 255));
@@ -451,11 +490,21 @@ public class Principal extends javax.swing.JFrame {
         A302.setBackground(new java.awt.Color(125, 122, 188));
         A302.setForeground(new java.awt.Color(255, 255, 255));
         A302.setText("A302");
+        A302.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                A302ActionPerformed(evt);
+            }
+        });
         jPanel5.add(A302, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 2, 130, 200));
 
         A303.setBackground(new java.awt.Color(125, 122, 188));
         A303.setForeground(new java.awt.Color(255, 255, 255));
         A303.setText("A303");
+        A303.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                A303ActionPerformed(evt);
+            }
+        });
         jPanel5.add(A303, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 202, 130, 140));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/planta 2.png"))); // NOI18N
@@ -575,6 +624,34 @@ public class Principal extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu2);
 
+        jMenu4.setText("Modo");
+
+        jMenuItem12.setText("cyan");
+        jMenuItem12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem12ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem12);
+
+        jMenuItem11.setText("oscuro");
+        jMenuItem11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem11ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem11);
+
+        jMenuItem10.setText("claro");
+        jMenuItem10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem10ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem10);
+
+        jMenuBar1.add(jMenu4);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -658,7 +735,8 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField25ActionPerformed
 
     private void A301ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A301ActionPerformed
-        // TODO add your handling code here:
+        A301 a = new A301();
+       a.setVisible(true);
     }//GEN-LAST:event_A301ActionPerformed
 
     private void reunionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reunionesActionPerformed
@@ -707,6 +785,56 @@ public class Principal extends javax.swing.JFrame {
        a.setVisible(true);
     }//GEN-LAST:event_A106ActionPerformed
 
+    private void A201ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A201ActionPerformed
+        A201 a = new A201();
+       a.setVisible(true);
+    }//GEN-LAST:event_A201ActionPerformed
+
+    private void A202ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A202ActionPerformed
+       A202 a = new A202();
+       a.setVisible(true);
+    }//GEN-LAST:event_A202ActionPerformed
+
+    private void A302ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A302ActionPerformed
+        A302 a = new A302();
+       a.setVisible(true);
+    }//GEN-LAST:event_A302ActionPerformed
+
+    private void A303ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A303ActionPerformed
+        A303 a = new A303();
+       a.setVisible(true);
+    }//GEN-LAST:event_A303ActionPerformed
+
+    private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
+       EventQueue.invokeLater(new Runnable(){
+                @Override
+                public void run(){
+                    FlatLightLaf.setup();
+                    FlatLaf.updateUI();
+            }
+            });
+    }//GEN-LAST:event_jMenuItem10ActionPerformed
+
+    private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
+       EventQueue.invokeLater(new Runnable(){
+                @Override
+                public void run(){
+                    FlatDarkLaf.setup();
+                    FlatLaf.updateUI();
+            }
+            });
+    }//GEN-LAST:event_jMenuItem11ActionPerformed
+
+    private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
+       EventQueue.invokeLater(new Runnable(){
+                @Override
+                public void run(){
+                    FlatCyanLightIJTheme.setup();
+                    FlatLaf.updateUI();
+            }
+            });
+    }//GEN-LAST:event_jMenuItem12ActionPerformed
+
     
     /**
      * @param args the command line arguments
@@ -723,31 +851,8 @@ public class Principal extends javax.swing.JFrame {
 
         /* Create and display the form */
           
-        String look = "";
-
-        try {
-            //look = "com.jtattoo.plaf.acryl.AcrylLookAndFeel";
-            //look = "com.jtattoo.plaf.aero.AeroLookAndFeel";
-            //look = "com.jtattoo.plaf.aluminium.AluminiumLookAndFeel";
-            //look = "com.jtattoo.plaf.bernstein.BernsteinLookAndFeel";
-            //look = "com.jtattoo.plaf.fast.FastLookAndFeel";
-            //look = "com.jtattoo.plaf.graphite.GraphiteLookAndFeel";
-            //look = "com.jtattoo.plaf.hifi.HiFiLookAndFeel";
-            //look = "com.jtattoo.plaf.luna.LunaLookAndFeel";
-            //look = "com.jtattoo.plaf.mcwin.McWinLookAndFeel";
-            //look = "com.jtattoo.plaf.mint.MintLookAndFeel";
-            //look = "com.jtattoo.plaf.noire.NoireLookAndFeel";
-            //look = "com.jtattoo.plaf.smart.SmartLookAndFeel";
-            look = "com.jtattoo.plaf.texture.TextureLookAndFeel";
-            UIManager.setLookAndFeel(look);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Error al tratar de cargar el paquete '" + look + "'.\n\n"
-                    + "Se tomara el LookAndFeel por defecto.", "Error de paquete", JOptionPane.WARNING_MESSAGE);
-
-            JFrame.setDefaultLookAndFeelDecorated(false);
-            look = "";
-        }
-                  Login LoginFrame = new Login();
+                FlatCyanLightIJTheme.setup();
+                 Login LoginFrame = new Login();
                  LoginFrame.setVisible(true);
                  LoginFrame.pack();
                  LoginFrame.setLocationRelativeTo(null);
@@ -776,14 +881,21 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem10;
+    private javax.swing.JMenuItem jMenuItem11;
+    private javax.swing.JMenuItem jMenuItem12;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem7;
+    private javax.swing.JMenuItem jMenuItem8;
+    private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
