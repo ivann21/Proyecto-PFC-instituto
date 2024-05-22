@@ -23,6 +23,8 @@ import instituto.aulas.A101;
 import instituto.aulas.A202;
 import instituto.aulas.A105;
 import instituto.aulas.Laboratorio;
+import instituto.perfil.AulasReservadas;
+import instituto.perfil.ClasesAsignadas;
 import instituto.perfil.VerArchivos;
 import instituto.perfil.VerPerfil;
 import java.awt.BorderLayout;
@@ -714,9 +716,19 @@ public class Principal extends javax.swing.JFrame {
 
         jMenuItem5.setText("aulas reservadas");
         jMenuItem5.setToolTipText("");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
         jMenu5.add(jMenuItem5);
 
         jMenuItem13.setText("tus clases");
+        jMenuItem13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem13ActionPerformed(evt);
+            }
+        });
         jMenu5.add(jMenuItem13);
 
         jMenuBar1.add(jMenu5);
@@ -935,6 +947,28 @@ public class Principal extends javax.swing.JFrame {
         a.setVisible(true);
         this.setEnabled(false);
     }//GEN-LAST:event_laboratorioActionPerformed
+
+    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+         jPanel6.removeAll();
+        AulasReservadas pa = new AulasReservadas(idProfesor);
+        jPanel6.setLayout(new BorderLayout());
+        this.setSize(850, 600);
+        jPanel6.add(pa, BorderLayout.CENTER);
+        jPanel6.add(pa);
+        jPanel6.revalidate();
+        jPanel6.repaint();
+    }//GEN-LAST:event_jMenuItem5ActionPerformed
+
+    private void jMenuItem13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem13ActionPerformed
+        jPanel6.removeAll();
+        ClasesAsignadas pa = new ClasesAsignadas(idProfesor);
+        jPanel6.setLayout(new BorderLayout());
+        this.setSize(850, 600);
+        jPanel6.add(pa, BorderLayout.CENTER);
+        jPanel6.add(pa);
+        jPanel6.revalidate();
+        jPanel6.repaint();
+    }//GEN-LAST:event_jMenuItem13ActionPerformed
 
     
     /**

@@ -12,7 +12,7 @@ public class AulasReservadas extends javax.swing.JPanel {
 
     private int idProfesor;
      
-    public AulasReservadas() {
+    public AulasReservadas(int idProfesor) {
         this.idProfesor = idProfesor;
         initComponents();
     }
