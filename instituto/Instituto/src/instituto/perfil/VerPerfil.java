@@ -4,6 +4,7 @@
  */
 package instituto.perfil;
 
+import java.awt.Color;
 import java.awt.Image;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +19,8 @@ import java.sql.*;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-
+import java.sql.ResultSet;
+import java.sql.SQLException;
 /**
  *
  * @author ivan.castellano
@@ -27,11 +29,38 @@ public class VerPerfil extends javax.swing.JPanel {
 
     private int idProfesor;
     private String rutaImagen = "";
+      private static Connection connection = null;
+    private static Statement statement = null;
+    private static ResultSet resultSet = null;
+    
     public VerPerfil(int idProfesor) {
         this.idProfesor = idProfesor;
         initComponents();
          mostrarDatosProfesor();
+         connectToDatabase();
+        int rol = obtenerIdRolProfesor(idProfesor);
+        jTextField4.setText(String.valueOf(rol));
+}
+private static void connectToDatabase() {
+        try {
+            connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+            statement = connection.createStatement();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
+private int obtenerIdRolProfesor(int idProfesor) {
+    try {
+        String query = "SELECT ID_ROL FROM instituto.asignacion_roles WHERE ID_PROFESOR = " + idProfesor;
+        resultSet = statement.executeQuery(query);
+        if (resultSet.next()) {
+            return resultSet.getInt("ID_ROL");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return -1; // Retorna -1 si no se encuentra el rol
+}
   private void mostrarDatosProfesor() {
       try {
         // Conectar a la base de datos
@@ -70,6 +99,7 @@ public class VerPerfil extends javax.swing.JPanel {
         e.printStackTrace();
     }
 }
+  
        private void guardarCambiosProfesor() {
         try {
             // Conectar a la base de datos
@@ -162,15 +192,26 @@ public class VerPerfil extends javax.swing.JPanel {
         jLabel3 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jTextField4 = new javax.swing.JTextField();
+
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(204, 204, 204));
-        jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
+        jPanel1.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(102, 102, 102)));
+        jPanel1.setOpaque(false);
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jTextField3.setBackground(new java.awt.Color(204, 204, 204));
+        jTextField3.setForeground(new java.awt.Color(255, 255, 255));
         jPanel1.add(jTextField3, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 180, 290, -1));
 
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("nombre");
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 20, -1, -1));
+
+        jTextField1.setBackground(new java.awt.Color(204, 204, 204));
+        jTextField1.setForeground(new java.awt.Color(255, 255, 255));
         jPanel1.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 40, 290, -1));
 
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
@@ -191,7 +232,10 @@ public class VerPerfil extends javax.swing.JPanel {
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 220, -1, -1));
+        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 270, -1, -1));
+
+        jTextField2.setBackground(new java.awt.Color(204, 204, 204));
+        jTextField2.setForeground(new java.awt.Color(255, 255, 255));
         jPanel1.add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 110, 290, -1));
 
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
@@ -206,22 +250,16 @@ public class VerPerfil extends javax.swing.JPanel {
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(25, 35, 130, 130));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 486, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(28, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(19, 19, 19)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
-        );
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel4.setText("rol");
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 220, -1, -1));
+
+        jTextField4.setBackground(new java.awt.Color(204, 204, 204));
+        jTextField4.setForeground(new java.awt.Color(255, 255, 255));
+        jTextField4.setEnabled(false);
+        jPanel1.add(jTextField4, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 240, -1, -1));
+
+        add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(25, 40, 491, 314));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -239,11 +277,13 @@ public class VerPerfil extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField jTextField4;
     // End of variables declaration//GEN-END:variables
 }

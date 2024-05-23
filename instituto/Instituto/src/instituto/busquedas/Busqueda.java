@@ -9,6 +9,7 @@ import instituto.busquedas.añadir.AñadirAlumnos;
 import instituto.busquedas.añadir.AñadirAsignaturas;
 import instituto.busquedas.añadir.AñadirAulas;
 import instituto.busquedas.añadir.AñadirCiclos;
+import instituto.busquedas.añadir.AñadirHorarios;
 import instituto.busquedas.añadir.AñadirProfesores;
 import instituto.busquedas.añadir.CenterRenderer;
 import instituto.busquedas.añadir.ImageBooleanRenderer;
@@ -29,7 +30,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
@@ -46,7 +49,13 @@ public class Busqueda extends javax.swing.JPanel {
     public Busqueda(int Rol) {
         this.rol = rol;
         initComponents();
-        
+         jComboBox3.setVisible(false);
+         jComboBox4.setVisible(false);
+         jComboBox5.setVisible(false);
+         System.out.println(rol);
+        if (Rol == 1) {
+         jComboBox1.addItem("horarios");
+        }
       columnMapping = new HashMap<>();
         columnMapping.put("nombre", "NOMBRE");
         columnMapping.put("apellido", "APELLIDO");
@@ -55,7 +64,12 @@ public class Busqueda extends javax.swing.JPanel {
         columnMapping.put("año", "ANIO");
         columnMapping.put("año ciclo", "ANIO_CICLO");
         columnMapping.put("nombre ciclo", "NOMBRE_CICLO");
-        
+        columnMapping.put("profesor", "PROFESOR");
+        columnMapping.put("asignatura","ASIGNATURA");  
+        columnMapping.put("aula","AULA");  
+        columnMapping.put("dia de la semana","dia de la semana");  
+        columnMapping.put("hora de inicio","hora de inicio");  
+        columnMapping.put("hora de fin","hora de fin");  
         
         String selectedTable = "profesores";
         mostrarDatosEnJTable(selectedTable);
@@ -73,39 +87,107 @@ public class Busqueda extends javax.swing.JPanel {
         if (sorter != null) {
             sorter.setRowFilter(null);
         }
-        
-        // Agregar elementos al segundo ComboBox según la selección del primero
-        if (selectedValue.equals("profesores")) {
+        // Agregar elementos  al segundo ComboBox según la selección del primero
+     if (selectedValue.equals("profesores")) {
             jComboBox2.addItem("nombre");
             jComboBox2.addItem("apellido");
             jComboBox2.addItem("correo");
+            // Desactivar los JComboBox adicionales si estaban activados
+            jComboBox3.setVisible(false);
+            jComboBox4.setVisible(false);
+            jComboBox4.setVisible(false);
+             jButton4.setEnabled(true);
         } else if (selectedValue.equals("alumnos")) {
             jComboBox2.addItem("nombre");
             jComboBox2.addItem("apellido");
             jComboBox2.addItem("correo");
             jComboBox2.addItem("nombre ciclo");
             jComboBox2.addItem("año ciclo");
+            // Desactivar los JComboBox adicionales si estaban activados
+            jComboBox3.setVisible(false);
+            jComboBox4.setVisible(false);
+            jComboBox4.setVisible(false);
+             jButton4.setEnabled(true);
         } else if (selectedValue.equals("asignaturas")) {
             jComboBox2.addItem("nombre");
             jComboBox2.addItem("nombre ciclo");
             jComboBox2.addItem("año ciclo");
+            // Desactivar los JComboBox adicionales si estaban activados
+            jComboBox3.setVisible(false);
+            jComboBox4.setVisible(false);
+            jComboBox4.setVisible(false);
+             jButton4.setEnabled(true);
         } else if (selectedValue.equals("aulas")) {
             jComboBox2.addItem("nombre");
             jComboBox2.addItem("ubicacion");
             jComboBox2.addItem("capacidad");
-            jComboBox2.addItem("pizarra");
-            jComboBox2.addItem("ordenadores");
+            // Desactivar los JComboBox adicionales si estaban activados
+            jComboBox3.setVisible(false);
+            jComboBox4.setVisible(false);
+            jComboBox4.setVisible(false);
+             jButton4.setEnabled(true);
         } else if (selectedValue.equals("ciclos")) {
             jComboBox2.addItem("nombre");
             jComboBox2.addItem("año");
             jComboBox2.addItem("descripcion");
+            // Desactivar los JComboBox adicionales si estaban activados
+            jComboBox3.setVisible(false);
+            jComboBox4.setVisible(false);
+            jComboBox4.setVisible(false);
+             jButton4.setEnabled(true);
+        } else if (selectedValue.equals("horarios")) {
+           jComboBox2.addItem("asignatura");
+            jComboBox2.addItem("profesor");
+            jComboBox2.addItem("aula");
+            jComboBox2.addItem("dia de la semana");
+            jComboBox2.addItem("hora de inicio");
+            jComboBox2.addItem("hora de fin");
+            jComboBox3.setVisible(false);
+            jComboBox4.setVisible(false);
+            jComboBox4.setVisible(false);
+             jButton4.setEnabled(true);
         }
         
         // Mostrar datos en JTable
         mostrarDatosEnJTable(selectedValue);
     }
 });
+  jComboBox2.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String selectedValue = (String) jComboBox2.getSelectedItem();
+        if (selectedValue != null) {
+            if (selectedValue.equals("dia de la semana")) {
+                jComboBox3.setVisible(true);
+                jComboBox4.setVisible(false);
+                jComboBox5.setVisible(false);
+                txtBuscar.setVisible(false);
+                jButton4.setEnabled(false);
+            } else if (selectedValue.equals("hora de inicio")) {
+                jComboBox3.setVisible(false);
+                jComboBox4.setVisible(true);
+                jComboBox5.setVisible(false);
+                txtBuscar.setVisible(false);
+                 jButton4.setEnabled(false);
+            } else if (selectedValue.equals("hora de fin")) {
+                jComboBox3.setVisible(false);
+                jComboBox4.setVisible(false);
+                jComboBox5.setVisible(true);
+                txtBuscar.setVisible(false);
+               jButton4.setEnabled(false);
+            } else {
+                // Para otras opciones, hacer visible txtBuscar y jButton4, y ocultar jComboBox3, jComboBox4, y jComboBox5
+                jComboBox3.setVisible(false);
+                jComboBox4.setVisible(false);
+                jComboBox5.setVisible(false);
+                txtBuscar.setVisible(true);
+               jButton4.setEnabled(true);
+            }
+        }
     }
+});
+    }
+
 private void mostrarDatosEnJTable(String selectedTable) {
     int contador = 0;
     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
@@ -171,6 +253,13 @@ private String getSQLQueryForTable(String table) {
             return "SELECT NOMBRE, UBICACION, CAPACIDAD_AULA AS CAPACIDAD, PIZARRA, ORDENADORES FROM PUBLIC.INSTITUTO." + table;
         case "ciclos":
             return "SELECT NOMBRE, ANIO AS año FROM PUBLIC.INSTITUTO." + table;
+        case "horarios":
+            return "SELECT HORARIOS.\"dia de la semana\", HORARIOS.\"hora de inicio\", HORARIOS.\"hora de fin\", " +
+                   "ASIGNATURAS.NOMBRE AS ASIGNATURA, PROFESORES.NOMBRE AS PROFESOR, AULAS.NOMBRE AS AULA " +
+                   "FROM PUBLIC.INSTITUTO.HORARIOS " +
+                   "INNER JOIN PUBLIC.INSTITUTO.ASIGNATURAS ON HORARIOS.\"ID asignatura\" = ASIGNATURAS.\"ID Asignatura\" " +
+                   "INNER JOIN PUBLIC.INSTITUTO.PROFESORES ON HORARIOS.\"ID profesor\" = PROFESORES.\"ID profesor\" " +
+                   "INNER JOIN PUBLIC.INSTITUTO.AULAS ON HORARIOS.\"ID aula\" = AULAS.\"ID aula\"";
         default:
             return "";
     }
@@ -181,41 +270,36 @@ private void configureTableColumns(String table, DefaultTableModel model) {
     ImageIcon deleteIcon = new ImageIcon(getClass().getResource("/imagenes/delete.png"));
     switch (table) {
         case "alumnos":
-            jTable1.getColumnModel().getColumn(2).setPreferredWidth(270);
-            jTable1.getColumnModel().getColumn(3).setPreferredWidth(300);
-            jTable1.getColumnModel().getColumn(4).setPreferredWidth(100);
-            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-            centerRenderer.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-            jTable1.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
             model.addColumn("EDITAR");
             model.addColumn("ELIMINAR");
+            setColumnWidths(jTable1, new int[]{150, 150, 270, 350, 80, 80, 80});
+            setColumnCenterAlignment(jTable1, new int[]{4});
             break;
         case "asignaturas":
-            jTable1.getColumnModel().getColumn(0).setPreferredWidth(280);
-            jTable1.getColumnModel().getColumn(1).setPreferredWidth(270);
-            jTable1.getColumnModel().getColumn(2).setPreferredWidth(90);
-            jTable1.getColumnModel().getColumn(3).setPreferredWidth(90);
-            DefaultTableCellRenderer centerRenderer2 = new DefaultTableCellRenderer();
-            centerRenderer2.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-            jTable1.getColumnModel().getColumn(2).setCellRenderer(centerRenderer2);
             model.addColumn("EDITAR");
             model.addColumn("ELIMINAR");
+            setColumnWidths(jTable1, new int[]{280, 270, 90, 90, 80, 80});
+            setColumnCenterAlignment(jTable1, new int[]{2});
             break;
         case "aulas":
-            DefaultTableCellRenderer centerRenderer3 = new DefaultTableCellRenderer();
-            centerRenderer3.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-            jTable1.getColumnModel().getColumn(2).setCellRenderer(centerRenderer3);
             model.addColumn("EDITAR");
             model.addColumn("ELIMINAR");
+            setColumnWidths(jTable1, new int[]{150, 150, 150, 80, 80, 80, 80});
+            setColumnCenterAlignment(jTable1, new int[]{2});
+            configureAulasTableColumns();
             break;
         case "ciclos":
             model.addColumn("DESCRIPCIÓN");
-            jTable1.getColumnModel().getColumn(0).setPreferredWidth(170);
-            DefaultTableCellRenderer centerRenderer4 = new DefaultTableCellRenderer();
-            centerRenderer4.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-            jTable1.getColumnModel().getColumn(1).setCellRenderer(centerRenderer4);
             model.addColumn("EDITAR");
             model.addColumn("ELIMINAR");
+            setColumnWidths(jTable1, new int[]{170, 150, 80, 80, 80});
+            setColumnCenterAlignment(jTable1, new int[]{1});
+            break;
+        case "horarios":
+            model.addColumn("EDITAR");
+            model.addColumn("ELIMINAR");
+            setColumnWidths(jTable1, new int[]{150, 150, 150, 400, 150, 150, 80, 80});
+            setColumnCenterAlignment(jTable1, new int[]{0, 1, 2,3,4,5});
             break;
         case "profesores":
         default:
@@ -233,16 +317,30 @@ private void configureTableColumns(String table, DefaultTableModel model) {
     }
 }
 
-private boolean isEditableAndDeletable(String table) {
-    return table.equals("profesores") || table.equals("alumnos") || table.equals("asignaturas") || table.equals("aulas") || table.equals("ciclos");
+private void setColumnWidths(JTable table, int[] widths) {
+    for (int i = 0; i < widths.length; i++) {
+        if (i < table.getColumnModel().getColumnCount()) {
+            table.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
+        }
+    }
 }
 
+private void setColumnCenterAlignment(JTable table, int[] columns) {
+    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+    for (int column : columns) {
+        if (column < table.getColumnModel().getColumnCount()) {
+            table.getColumnModel().getColumn(column).setCellRenderer(centerRenderer);
+        }
+    }
+}
 private void configureAulasTableColumns() {
     ImageBooleanRenderer pizarraRenderer = new ImageBooleanRenderer(
         new ImageIcon(getClass().getResource("/imagenes/pizarra_true.png")),
         new ImageIcon(getClass().getResource("/imagenes/pizarra_false.png")),
         20
-    );    jTable1.getColumnModel().getColumn(3).setCellRenderer(pizarraRenderer);
+    );
+    jTable1.getColumnModel().getColumn(3).setCellRenderer(pizarraRenderer);
 
     ImageBooleanRenderer ordenadoresRenderer = new ImageBooleanRenderer(
         new ImageIcon(getClass().getResource("/imagenes/ordenadores_true.png")),
@@ -252,6 +350,9 @@ private void configureAulasTableColumns() {
     jTable1.getColumnModel().getColumn(4).setCellRenderer(ordenadoresRenderer);
 }
 
+private boolean isEditableAndDeletable(String table) {
+    return table.equals("profesores") || table.equals("alumnos") || table.equals("asignaturas") || table.equals("aulas") || table.equals("ciclos") || table.equals("horarios");
+}
 private void addTableMouseListener(String selectedTable) {
     jTable1.addMouseListener(new MouseAdapter() {
         @Override
@@ -311,206 +412,6 @@ private void eliminarFila(String selectedTable, int row) {
 }
 
 
-   private void mostrarDatosEnJTable2(String selectedTable) {
-    int contador = 0;
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    jTable1.setRowSorter(new TableRowSorter<>(model)); 
-    model.setRowCount(0); 
-    model.setColumnCount(0);
-    jTable1.setDefaultEditor(Object.class, null); 
-    ImageIcon editIcon = new ImageIcon(getClass().getResource("/imagenes/editar.png"));
-    ImageIcon deleteIcon = new ImageIcon(getClass().getResource("/imagenes/delete.png"));
-    ImageIcon moreinfoIcon = new ImageIcon(getClass().getResource("/imagenes/informacion.png"));
-    try {
-        Class.forName("org.hsqldb.jdbc.JDBCDriver");
-
-        try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
-            String consultaSQL = "";
-            switch (selectedTable) {
-                case "profesores":
-                    consultaSQL = "SELECT NOMBRE, APELLIDO, CORREOELECTRONICO FROM PUBLIC.INSTITUTO." + selectedTable;
-                    break;
-                case "alumnos":
-                consultaSQL = "SELECT ALUMNOS.NOMBRE, ALUMNOS.APELLIDO, ALUMNOS.CORREOELECTRONICO, CICLOS.NOMBRE AS NOMBRE_CICLO, CICLOS.ANIO AS ANIO_CICLO " +
-                                "FROM PUBLIC.INSTITUTO.ALUMNOS " +
-                                "INNER JOIN PUBLIC.INSTITUTO.CICLOS ON ALUMNOS.\"ID ciclos\" = CICLOS.\"ID Ciclos\"";
-                break;
-                case "asignaturas":
-                   consultaSQL = "SELECT ASIGNATURAS.NOMBRE, CICLOS.NOMBRE AS NOMBRE_CICLO, CICLOS.ANIO AS ANIO_CICLO " +
-                                    "FROM PUBLIC.INSTITUTO.ASIGNATURAS " +
-                                    "INNER JOIN PUBLIC.INSTITUTO.CICLOS ON ASIGNATURAS.ID_CICLOS = CICLOS.\"ID Ciclos\"";
-                    break;
-                case "aulas":
-                    consultaSQL = "SELECT NOMBRE, UBICACION, CAPACIDAD_AULA AS CAPACIDAD, PIZARRA, ORDENADORES FROM PUBLIC.INSTITUTO." + selectedTable;
-                    break;
-                case "ciclos":
-                    consultaSQL = "SELECT NOMBRE, ANIO AS año FROM PUBLIC.INSTITUTO." + selectedTable;
-                    break;
-            }
-            
-            try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
-                try (ResultSet rs = stmt.executeQuery()) {
-                    ResultSetMetaData metaData = rs.getMetaData();
-                    int columnCount = metaData.getColumnCount();
-                    
-                    // Agregar las columnas obtenidas de la consulta SQL
-                    for (int i = 1; i <= columnCount; i++) {
-                        String columnName = metaData.getColumnLabel(i);
-                        if (!columnName.toLowerCase().startsWith("id")) {
-                            model.addColumn(columnName);
-                        }
-                    }
-                    
-                  switch (selectedTable) {
-                    case "profesores":
-                        model.addColumn("EDITAR");
-                        model.addColumn("ELIMINAR");
-                        break;
-                    case "alumnos":
-                        model.addColumn("EDITAR");
-                        model.addColumn("ELIMINAR");
-                         jTable1.getColumnModel().getColumn(2).setPreferredWidth(270); 
-                         jTable1.getColumnModel().getColumn(3).setPreferredWidth(300); 
-                         jTable1.getColumnModel().getColumn(4).setPreferredWidth(100); 
-                         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-                         centerRenderer.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-                         jTable1.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
-                        break;
-                    case "asignaturas":
-                        model.addColumn("DESCRIPCION");
-                        model.addColumn("EDITAR");
-                        model.addColumn("ELIMINAR");
-                        jTable1.getColumnModel().getColumn(0).setPreferredWidth(280); 
-                         jTable1.getColumnModel().getColumn(1).setPreferredWidth(270); 
-                         jTable1.getColumnModel().getColumn(2).setPreferredWidth(90); 
-                         jTable1.getColumnModel().getColumn(3).setPreferredWidth(90); 
-                         DefaultTableCellRenderer centerRenderer2 = new DefaultTableCellRenderer();
-                         centerRenderer2.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-                         jTable1.getColumnModel().getColumn(2).setCellRenderer(centerRenderer2);
-                         centerRenderer2.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-                         jTable1.getColumnModel().getColumn(2).setCellRenderer(centerRenderer2);
-                        break;
-                    case "aulas":
-                        model.addColumn("EDITAR");
-                        model.addColumn("ELIMINAR");
-                        DefaultTableCellRenderer centerRenderer3 = new DefaultTableCellRenderer();
-                         centerRenderer3.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-                         jTable1.getColumnModel().getColumn(2).setCellRenderer(centerRenderer3);
-                         centerRenderer3.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-                         jTable1.getColumnModel().getColumn(2).setCellRenderer(centerRenderer3);
-                        break;
-                    case "ciclos":
-                        model.addColumn("DESCRIPCION");
-                        model.addColumn("EDITAR");
-                        model.addColumn("ELIMINAR");
-                        jTable1.getColumnModel().getColumn(0).setPreferredWidth(170); 
-                        DefaultTableCellRenderer centerRenderer4 = new DefaultTableCellRenderer();
-                         centerRenderer4.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-                         jTable1.getColumnModel().getColumn(1).setCellRenderer(centerRenderer4);
-                         centerRenderer4.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-                         jTable1.getColumnModel().getColumn(1).setCellRenderer(centerRenderer4);
-                        break;
-                }
-
-                // Establecer el renderizador personalizado para las columnas "editar" y "eliminar"
-                if (selectedTable.equals("profesores") || selectedTable.equals("alumnos") || selectedTable.equals("asignaturas") || selectedTable.equals("aulas") || selectedTable.equals("ciclos")) {
-                    int editColumnIndex = model.getColumnCount() - 2; // Índice de la columna "editar"
-                    int deleteColumnIndex = model.getColumnCount() - 1; // Índice de la columna "eliminar"
-                    jTable1.getColumnModel().getColumn(editColumnIndex).setCellRenderer(new ImageRenderer(editIcon,20));
-                    jTable1.getColumnModel().getColumn(deleteColumnIndex).setCellRenderer(new ImageRenderer(deleteIcon,20));
-                }
-               // Establecer el TableCellRenderer personalizado para la columna de descripción
-               if (selectedTable.equals("asignaturas")) {
-                int descriptionColumnIndex = model.getColumnCount() - 3; // Índice de la columna de descripción
-                jTable1.getColumnModel().getColumn(descriptionColumnIndex).setCellRenderer(new ImageRenderer(moreinfoIcon, 20)); // Usar el icono correspondiente y el tamaño de imagen: 20
-            } else if (selectedTable.equals("ciclos")) {
-                int descriptionColumnIndex = model.getColumnCount() - 3; // Índice de la columna de descripción
-                jTable1.getColumnModel().getColumn(descriptionColumnIndex).setCellRenderer(new ImageRenderer(moreinfoIcon, 20)); // Usar el icono correspondiente y el tamaño de imagen: 20
-            }else if (selectedTable.equals("aulas")) {
-            // Crear una instancia del ImageRenderer para la columna de PIZARRA
-            ImageBooleanRenderer pizarraRenderer = new ImageBooleanRenderer(new ImageIcon(getClass().getResource("/imagenes/pizarra_true.png")), new ImageIcon(getClass().getResource("/imagenes/pizarra_false.png")), 20); // Ajusta el tamaño según necesites
-            jTable1.getColumnModel().getColumn(3).setCellRenderer(pizarraRenderer);
-
-            // Crear una instancia del ImageRenderer para la columna de ORDENADORES
-            ImageBooleanRenderer ordenadoresRenderer = new ImageBooleanRenderer(new ImageIcon(getClass().getResource("/imagenes/ordenadores_true.png")), new ImageIcon(getClass().getResource("/imagenes/ordenadores_false.png")), 20); // Ajusta el tamaño según necesites
-            jTable1.getColumnModel().getColumn(4).setCellRenderer(ordenadoresRenderer);
-            }
-                jTable1.setRowHeight(30); // Establecer el tamaño de fila personalizado
-                    while (rs.next()) {
-                        Object[] rowData = new Object[columnCount];
-                        for (int i = 0; i < columnCount; i++) {
-                            rowData[i] = rs.getObject(i + 1);
-                        }
-                        contador++; // Incrementar el contador
-                        model.addRow(rowData);
-                    }
-                }
-            }
-        }
-    } catch (ClassNotFoundException | SQLException e) {
-        e.printStackTrace();
-    }
-    jTable1.addMouseListener(new MouseAdapter() {
-    @Override
-  public void mouseClicked(MouseEvent e) {
-    System.out.println("Mouse clicked on table");
-    int column = jTable1.getColumnModel().getColumnIndexAtX(e.getX()); // Obtener el índice de la columna clicada
-    int row = e.getY() / jTable1.getRowHeight(); // Obtener el índice de la fila clicada
-
-    if (row < jTable1.getRowCount() && row >= 0 && column < jTable1.getColumnCount() && column >= 0) {
-        int id = row;
-        System.out.println(id);
-        // Verificar si la columna es "Editar" o "Eliminar" basándonos en la posición de la columna
-        if (column == jTable1.getColumnCount() - 2) { // Penúltima columna: EDITAR
-            System.out.println("Edit icon clicked");
-            // Lógica para editar
-        } else if (column == jTable1.getColumnCount() - 1) { // Última columna: ELIMINAR
-            System.out.println("Delete icon clicked");
-            int opcion = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que deseas eliminar esta fila?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-        if(selectedTable.equals("alumnos")){
-        if (opcion == JOptionPane.YES_OPTION) {
-            int selectedRow = jTable1.convertRowIndexToModel(row); // Convertir el índice de la vista a modelo
-            String nombreProf = (String) jTable1.getModel().getValueAt(selectedRow, 0); // Suponiendo que el nombre está en la primera columna
-            String apellidoProf = (String) jTable1.getModel().getValueAt(selectedRow, 1); // Suponiendo que el apellido está en la segunda columna
-            String correoProf = (String) jTable1.getModel().getValueAt(selectedRow, 2); // Suponiendo que el correo está en la tercera columna
-
-            int idProfesor = -1; // Declarar la variable fuera del bloque try-catch
-
-            try {
-                // Buscar el ID del profesor
-                idProfesor = buscarIDProfesores(nombreProf, apellidoProf, correoProf);
-            } catch (SQLException ex) {
-                Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                // Aquí deberías cerrar cualquier recurso de conexión, si es necesario
-            }
-
-            if (idProfesor != -1) { // Se encontró el ID del profesor
-                // Eliminar la fila del JTable
-                DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-                model.removeRow(row);
-                try {
-                    eliminarProfesor(idProfesor);
-                    // Aquí puedes realizar cualquier acción adicional necesaria, como eliminar el registro de la base de datos
-                } catch (SQLException ex) {
-                    Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            } else {
-                // Mostrar un mensaje de error si no se encuentra el ID del profesor
-                JOptionPane.showMessageDialog(null, "No se pudo encontrar el ID del profesor", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } else if (opcion == JOptionPane.NO_OPTION) {
-
-            System.out.println("Operación de eliminación cancelada.");
-        }
-        }
-        }
-    }else{
-        System.out.println("se ha ido");
-    }
-  }
-        });
-        }
    public void eliminarProfesor(int idProfesor) throws SQLException {
     Connection conn = null;
     PreparedStatement stmt = null;
@@ -677,10 +578,11 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
 
     if (sorter != null) {
         // Si el texto a buscar es nulo o está vacío, eliminar el filtro y mostrar todos los datos
-        if (textoABuscar == null || textoABuscar.isEmpty()) {
+        if (textoABuscar == null || textoABuscar.isEmpty() || textoABuscar.equalsIgnoreCase("seleccione una hora") || textoABuscar.equalsIgnoreCase("seleccione un dia")) {
             sorter.setRowFilter(null);
-        } else {
+        }  else {
             String regex = "(?i)" + textoABuscar; // Ignorar mayúsculas y minúsculas
+            System.out.println("columnaSeleccionada: " + columnaSeleccionada);
             int columnIndex = jTable1.getColumnModel().getColumnIndex(columnaSeleccionada);
             sorter.setRowFilter(RowFilter.regexFilter(regex, columnIndex)); // Aplicar el filtro de búsqueda en la columna seleccionada
         }
@@ -703,6 +605,9 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
         jComboBox1 = new javax.swing.JComboBox<>();
         jComboBox2 = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
+        jComboBox3 = new javax.swing.JComboBox<>();
+        jComboBox4 = new javax.swing.JComboBox<>();
+        jComboBox5 = new javax.swing.JComboBox<>();
 
         setPreferredSize(new java.awt.Dimension(1372, 627));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -713,7 +618,7 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
                 addButtonActionPerformed(evt);
             }
         });
-        add(addButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 510, -1, -1));
+        add(addButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 500, -1, -1));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -728,14 +633,14 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
         ));
         jScrollPane1.setViewportView(jTable1);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 70, 850, -1));
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 850, -1));
 
         txtBuscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtBuscarActionPerformed(evt);
             }
         });
-        add(txtBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 30, 530, -1));
+        add(txtBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 20, 490, -1));
 
         jButton4.setText("buscar");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -743,13 +648,23 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
                 jButton4ActionPerformed(evt);
             }
         });
-        add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 30, -1, -1));
+        add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 20, -1, -1));
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "profesores", "alumnos", "asignaturas", "aulas", "ciclos" }));
-        add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, 100, -1));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+        add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 100, -1));
 
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "nombre", "apellido", "correo" }));
-        add(jComboBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 30, 110, -1));
+        jComboBox2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox2ActionPerformed(evt);
+            }
+        });
+        add(jComboBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 20, 150, -1));
 
         jButton1.setText("reiniciar tabla");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -757,13 +672,38 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
                 jButton1ActionPerformed(evt);
             }
         });
-        add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 510, -1, -1));
+        add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 500, -1, -1));
+
+        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione un dia", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes" }));
+        jComboBox3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox3ActionPerformed(evt);
+            }
+        });
+        add(jComboBox3, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 20, 490, -1));
+
+        jComboBox4.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione una hora", "8:30:00", "9:30:00", "10:25:00", "11:45:00", "12:40:00", "13:35:00" }));
+        jComboBox4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox4ActionPerformed(evt);
+            }
+        });
+        add(jComboBox4, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 20, 490, -1));
+
+        jComboBox5.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione una hora", "09:25:00", "10:20:00", "11:15:00", "12:35:00", "13:30:00", "14:25:00" }));
+        jComboBox5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox5ActionPerformed(evt);
+            }
+        });
+        add(jComboBox5, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 20, 490, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarActionPerformed
          String opcionSeleccionada = (String) jComboBox2.getSelectedItem();
-    String columnaSeleccionada = columnMapping.get(opcionSeleccionada);
-      buscarEnTabla(txtBuscar.getText(),columnaSeleccionada);
+         System.out.println(opcionSeleccionada);
+         String columnaSeleccionada = columnMapping.get(opcionSeleccionada);
+         buscarEnTabla(txtBuscar.getText(),columnaSeleccionada);
     }//GEN-LAST:event_txtBuscarActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -816,11 +756,52 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
                this.setEnabled(false);
                mostrarDatosEnJTable(selectedTable);
                 break;
+            case "horarios":
+                AñadirHorarios ah = new AñadirHorarios();
+                 ah.setVisible(true);
+               this.setEnabled(false);
+               mostrarDatosEnJTable(selectedTable);
+                break;
             default:
               
                 break;
         }
     }//GEN-LAST:event_addButtonActionPerformed
+
+    private void jComboBox3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox3ActionPerformed
+            String opcionSeleccionada = (String) jComboBox2.getSelectedItem();
+            System.out.println("seleccionado" + opcionSeleccionada);
+     if (opcionSeleccionada != null) {
+         String columnaSeleccionada = columnMapping.get(opcionSeleccionada);
+         buscarEnTabla((String) jComboBox3.getSelectedItem(), columnaSeleccionada);
+     }
+    }//GEN-LAST:event_jComboBox3ActionPerformed
+
+    private void jComboBox4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox4ActionPerformed
+        String opcionSeleccionada = (String) jComboBox2.getSelectedItem();
+            System.out.println("seleccionado" + opcionSeleccionada);
+     if (opcionSeleccionada != null) {
+         String columnaSeleccionada = columnMapping.get(opcionSeleccionada);
+         buscarEnTabla((String) jComboBox4.getSelectedItem(), columnaSeleccionada);
+     }
+    }//GEN-LAST:event_jComboBox4ActionPerformed
+
+    private void jComboBox5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox5ActionPerformed
+        String opcionSeleccionada = (String) jComboBox2.getSelectedItem();
+            System.out.println("seleccionado" + opcionSeleccionada);
+     if (opcionSeleccionada != null) {
+         String columnaSeleccionada = columnMapping.get(opcionSeleccionada);
+         buscarEnTabla((String) jComboBox5.getSelectedItem(), columnaSeleccionada);
+     }
+    }//GEN-LAST:event_jComboBox5ActionPerformed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBox2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -829,6 +810,9 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
     private javax.swing.JButton jButton4;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JComboBox<String> jComboBox2;
+    private javax.swing.JComboBox<String> jComboBox3;
+    private javax.swing.JComboBox<String> jComboBox4;
+    private javax.swing.JComboBox<String> jComboBox5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField txtBuscar;

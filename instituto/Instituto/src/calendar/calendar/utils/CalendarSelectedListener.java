@@ -1,7 +1,7 @@
-package raven.calendar.utils;
+package calendar.calendar.utils;
 
 import java.awt.event.MouseEvent;
-import raven.calendar.model.ModelDate;
+import calendar.calendar.model.ModelDate;
 
 /**
  *

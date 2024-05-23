@@ -5,6 +5,7 @@
 package instituto.perfil;
 
 import instituto.busquedas.añadir.ImageRenderer;
+import instituto.busquedas.añadir.ImageRenderer2;
 import java.awt.Desktop;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -15,9 +16,11 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -46,23 +49,60 @@ private void addTableMouseListener() {
     jTable1.addMouseListener(new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent e) {
-            if (e.getClickCount() == 2) { // Detectar doble clic
-                JTable table = (JTable) e.getSource();
-                int row = table.getSelectedRow();
-                int column = table.getSelectedColumn();
-                if (column == 3) { // Si se hace clic en la columna "Descargar"
-                    int response = JOptionPane.showConfirmDialog(null, "¿Desea descargar el archivo?", "Confirmar descarga", JOptionPane.YES_NO_OPTION);
-                    if (response == JOptionPane.YES_OPTION) {
-                        System.out.println("Descargando archivo...");
-                        String nombreArchivo = (String) table.getValueAt(row, 1); // Obtener el nombre del archivo real
-                        descargarArchivo(nombreArchivo); // Llamar al método para descargar el archivo
-                    }
+            JTable table = (JTable) e.getSource();
+            int row = table.getSelectedRow();
+            int column = table.getSelectedColumn();
+
+            if (column == 2 && e.getClickCount() == 2) { // Doble clic en la columna "Descargar"
+                int response = JOptionPane.showConfirmDialog(null, "¿Desea descargar el archivo?", "Confirmar descarga", JOptionPane.YES_NO_OPTION);
+                if (response == JOptionPane.YES_OPTION) {
+                    String nombreArchivo = (String) table.getValueAt(row, 0); // Obtener el nombre del archivo personalizado
+                    descargarArchivo(nombreArchivo); // Llamar al método para descargar el archivo
+                }
+            } else if (column == 3 && e.getClickCount() == 1) { // Un clic en la columna "ELIMINAR"
+                int response = JOptionPane.showConfirmDialog(null, "¿Desea eliminar el archivo?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+                if (response == JOptionPane.YES_OPTION) {
+                    String nombreArchivo = (String) table.getValueAt(row, 0); // Obtener el nombre del archivo personalizado
+                    eliminarArchivo(nombreArchivo); // Llamar al método para eliminar el archivo
                 }
             }
         }
     });
 }
+private void eliminarArchivo(String nombreArchivoPersonalizado) {
+    // Buscar el archivo en la lista de archivos del usuario basado en el nombre personalizado
+    List<?> archivosUsuario = gestorArchivos.obtenerArchivosUsuario(idProfesor, true); // Devuelve objetos Archivo
+    Archivo archivoAEliminar = null;
 
+    for (Object archivo : archivosUsuario) {
+        if (archivo instanceof Archivo) {
+            Archivo archivoObj = (Archivo) archivo;
+            if (archivoObj.getNombrePersonalizado().equals(nombreArchivoPersonalizado)) {
+                archivoAEliminar = archivoObj;
+                break;
+            }
+        }
+    }
+
+    if (archivoAEliminar != null) {
+        String nombreArchivoReal = archivoAEliminar.getNombreReal();
+        String rutaArchivo = CARPETA_ARCHIVOS + idProfesor + "/" + nombreArchivoReal;
+        File archivo = new File(rutaArchivo);
+        if (archivo.exists()) {
+            if (archivo.delete()) {
+                gestorArchivos.eliminarArchivo(idProfesor, nombreArchivoReal); // Eliminar registro del archivo en el gestor
+                JOptionPane.showMessageDialog(this, "Archivo eliminado exitosamente.");
+                mostrarArchivos(); // Actualizar la tabla de archivos después de eliminar el archivo
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al eliminar el archivo.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "El archivo no existe.");
+        }
+    } else {
+        JOptionPane.showMessageDialog(this, "Archivo no encontrado.");
+    }
+}
 private void descargarArchivo(String nombreArchivo) {
     String rutaArchivo = CARPETA_ARCHIVOS + idProfesor + "/" + nombreArchivo;
     File archivo = new File(rutaArchivo);
@@ -79,13 +119,12 @@ private void descargarArchivo(String nombreArchivo) {
 }
  private void mostrarArchivos() {
     ImageIcon downloadIcon = new ImageIcon(getClass().getResource("/imagenes/download.png"));
-    ImageIcon editIcon = new ImageIcon(getClass().getResource("/imagenes/editar.png"));
     ImageIcon deleteIcon = new ImageIcon(getClass().getResource("/imagenes/delete.png"));
     
     // Obtener la lista de archivos del usuario
     List<?> archivosUsuario = gestorArchivos.obtenerArchivosUsuario(idProfesor, true); // Devuelve objetos Archivo
 
-    // Crear modelo de tabla con cuatro columnas
+    // Crear modelo de tabla con tres columnas
     DefaultTableModel model = new DefaultTableModel() {
         @Override
         public boolean isCellEditable(int row, int column) {
@@ -94,46 +133,58 @@ private void descargarArchivo(String nombreArchivo) {
         }
     };
     model.addColumn("Nombre del Archivo Personalizado");
-    model.addColumn("Nombre del Archivo Real");
     model.addColumn("Extensión");
     model.addColumn("Descargar");
-    model.addColumn("EDITAR");
     model.addColumn("ELIMINAR");
 
     // Agregar archivos al modelo de tabla
     for (Object archivo : archivosUsuario) {
         if (archivo instanceof Archivo) {
             Archivo archivoObj = (Archivo) archivo;
-            model.addRow(new Object[]{archivoObj.getNombrePersonalizado(), archivoObj.getNombreReal(), archivoObj.getExtension(), downloadIcon, editIcon, deleteIcon}); // true indica que hay un archivo descargable
+            model.addRow(new Object[]{
+                archivoObj.getNombrePersonalizado(),
+                archivoObj.getExtension(),
+                downloadIcon,
+                deleteIcon
+            });
         }
     }
 
     // Establecer modelo de tabla
     jTable1.setModel(model);
 
-    // Configurar ImageRenderer para la columna "Descargar"
-//    int columnIndexDescargar = 3; // Índice de la columna "Descargar"
-//    TableColumn columnDescargar = jTable1.getColumnModel().getColumn(columnIndexDescargar);
-//    columnDescargar.setCellRenderer(new ImageRenderer(downloadIcon, 20));
-//
-//    // Configurar ImageRenderer para la columna "EDITAR" y "ELIMINAR"
-//    int columnIndexEditar = 4; // Índice de la columna "EDITAR"
-//    TableColumn columnEditar = jTable1.getColumnModel().getColumn(columnIndexEditar);
-//    columnEditar.setCellRenderer(new ImageRenderer(editIcon, 20));
-//
-//    int columnIndexEliminar = 5; // Índice de la columna "ELIMINAR"
-//    TableColumn columnEliminar = jTable1.getColumnModel().getColumn(columnIndexEliminar);
-//    columnEliminar.setCellRenderer(new ImageRenderer(deleteIcon, 20));
+    // Configurar ImageRenderer para las columnas "Descargar" y "ELIMINAR"
+    int columnIndexDescargar = 2; // Índice de la columna "Descargar"
+    TableColumn columnDescargar = jTable1.getColumnModel().getColumn(columnIndexDescargar);
+    columnDescargar.setCellRenderer(new ImageRenderer2(downloadIcon, 20));
+
+    int columnIndexEliminar = 3; // Índice de la columna "ELIMINAR"
+    TableColumn columnEliminar = jTable1.getColumnModel().getColumn(columnIndexEliminar);
+    columnEliminar.setCellRenderer(new ImageRenderer2(deleteIcon, 20));
+
+    // Centrar el contenido de la columna "Extensión"
+    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+    jTable1.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+
+    // Ajustar el tamaño de las columnas
+    jTable1.getColumnModel().getColumn(0).setPreferredWidth(300); // Ampliar la columna del nombre del archivo personalizado
+    jTable1.getColumnModel().getColumn(1).setPreferredWidth(50);  // Ajustar la columna de extensión
+    jTable1.getColumnModel().getColumn(2).setPreferredWidth(100); // Ajustar la columna de descargar
+    jTable1.getColumnModel().getColumn(3).setPreferredWidth(100); // Ajustar la columna de eliminar
 }
-      private void buscarEnTabla(String textoBusqueda) {
+private void buscarEnTabla(String textoBusqueda) {
     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
     TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
     jTable1.setRowSorter(sorter);
-    
-    RowFilter<DefaultTableModel, Object> rowFilter = RowFilter.regexFilter("(?i)" + Pattern.quote(textoBusqueda));
+
+    int columnIndex = jComboBox1.getSelectedIndex() == 0 ? 0 : 1; // 0 para Nombre, 1 para Extensión
+
+    RowFilter<DefaultTableModel, Object> rowFilter = RowFilter.regexFilter("(?i)" + Pattern.quote(textoBusqueda), columnIndex);
     sorter.setRowFilter(rowFilter);
 }
-      private void reiniciarBusqueda() {
+
+private void reiniciarBusqueda() {
     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
     TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
     jTable1.setRowSorter(sorter);
@@ -154,6 +205,7 @@ private void descargarArchivo(String nombreArchivo) {
         jTable1 = new javax.swing.JTable();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        jComboBox1 = new javax.swing.JComboBox<>();
 
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -196,6 +248,13 @@ private void descargarArchivo(String nombreArchivo) {
             }
         });
 
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "nombre", "extension" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -209,18 +268,21 @@ private void descargarArchivo(String nombreArchivo) {
                         .addComponent(jButton2))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jTextField1)
+                        .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 515, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton1)))
-                .addContainerGap(74, Short.MAX_VALUE))
+                .addContainerGap(72, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(50, 50, 50)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
+                    .addComponent(jButton1)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 391, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -266,7 +328,7 @@ private void descargarArchivo(String nombreArchivo) {
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-     String textoBusqueda = jTextField1.getText().trim();
+  String textoBusqueda = jTextField1.getText().trim();
     if (textoBusqueda.isEmpty()) {
         reiniciarBusqueda();
     } else {
@@ -278,11 +340,16 @@ private void descargarArchivo(String nombreArchivo) {
          reiniciarBusqueda();
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        
+    }//GEN-LAST:event_jComboBox1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;

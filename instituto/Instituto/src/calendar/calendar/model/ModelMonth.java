@@ -1,4 +1,4 @@
-package raven.calendar.model;
+package calendar.calendar.model;
 
 import java.util.Calendar;
 

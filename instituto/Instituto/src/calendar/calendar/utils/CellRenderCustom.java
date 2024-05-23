@@ -1,4 +1,4 @@
-package raven.calendar.utils;
+package calendar.calendar.utils;
 
 import com.formdev.flatlaf.ui.FlatUIUtils;
 import com.formdev.flatlaf.util.UIScale;
@@ -12,8 +12,8 @@ import java.awt.Rectangle;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import raven.swing.DynamicCell;
-import raven.swing.DynamicCellRender;
+import calendar.swing.DynamicCell;
+import calendar.swing.DynamicCellRender;
 
 /**
  *

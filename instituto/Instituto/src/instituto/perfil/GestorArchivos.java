@@ -70,4 +70,14 @@ public class GestorArchivos {
         return archivosUsuario;
     }
 }
+   public boolean eliminarArchivo(int idUsuario, String nombreArchivoReal) {
+        String rutaArchivo = CARPETA_ARCHIVOS + idUsuario + "/" + nombreArchivoReal;
+        File archivo = new File(rutaArchivo);
+
+        if (archivo.exists()) {
+            return archivo.delete();
+        } else {
+            return false;
+        }
+    }
 }

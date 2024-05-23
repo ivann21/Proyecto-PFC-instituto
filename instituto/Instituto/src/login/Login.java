@@ -58,7 +58,19 @@ public class Login extends javax.swing.JFrame {
         }
         return -1; // Retorna -1 si no se encuentra la ID
     }
-
+     private int obtenerIdRolProfesor(int idProfesor) {
+    try {
+        String query = "SELECT ID_ROL FROM instituto.asignacion_roles WHERE ID_PROFESOR = " + idProfesor;
+        resultSet = statement.executeQuery(query);
+        if (resultSet.next()) {
+            return resultSet.getInt("ID_ROL");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return -1; // Retorna -1 si no se encuentra el rol
+}
+    
     private String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -237,7 +249,8 @@ public class Login extends javax.swing.JFrame {
 
         if (verificarCredenciales(correo, contraseñaHasheada)) {
             int idProfesor = obtenerIdProfesor(correo);
-            Principal p = new Principal(idProfesor);
+            int idRol = obtenerIdRolProfesor(idProfesor);
+            Principal p = new Principal(idProfesor,idRol);
             p.setVisible(true);
             dispose();
         } else {
@@ -253,7 +266,8 @@ public class Login extends javax.swing.JFrame {
 
         if (verificarCredenciales(correo, contraseñaHasheada)) {
             int idProfesor = obtenerIdProfesor(correo);
-            Principal p = new Principal(idProfesor);
+            int idRol = obtenerIdRolProfesor(idProfesor);
+            Principal p = new Principal(idProfesor,idRol);
             p.setVisible(true);
             dispose();
         } else {

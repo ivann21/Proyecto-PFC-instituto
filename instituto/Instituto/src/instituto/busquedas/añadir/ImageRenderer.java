@@ -41,4 +41,5 @@ public class ImageRenderer extends DefaultTableCellRenderer {
         
         return label;
     }
+  
 }
