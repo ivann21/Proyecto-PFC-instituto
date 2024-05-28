@@ -38,8 +38,8 @@ public class VerPerfil extends javax.swing.JPanel {
         initComponents();
          mostrarDatosProfesor();
          connectToDatabase();
-        int rol = obtenerIdRolProfesor(idProfesor);
-        jTextField4.setText(String.valueOf(rol));
+        String rol = obtenerNombreRolProfesor(idProfesor);
+        jTextField4.setText(rol);
 }
 private static void connectToDatabase() {
         try {
@@ -49,17 +49,20 @@ private static void connectToDatabase() {
             e.printStackTrace();
         }
     }
-private int obtenerIdRolProfesor(int idProfesor) {
+private String obtenerNombreRolProfesor(int idProfesor) {
     try {
-        String query = "SELECT ID_ROL FROM instituto.asignacion_roles WHERE ID_PROFESOR = " + idProfesor;
+        String query = "SELECT r.NOMBRE_ROL " +
+                       "FROM PUBLIC.INSTITUTO.ASIGNACION_ROLES ar " +
+                       "INNER JOIN PUBLIC.INSTITUTO.ROLES r ON ar.ID_ROL = r.ID_ROL " +
+                       "WHERE ar.ID_PROFESOR = " + idProfesor;
         resultSet = statement.executeQuery(query);
         if (resultSet.next()) {
-            return resultSet.getInt("ID_ROL");
+            return resultSet.getString("NOMBRE_ROL");
         }
     } catch (SQLException e) {
         e.printStackTrace();
     }
-    return -1; // Retorna -1 si no se encuentra el rol
+    return null; // Retorna null si no se encuentra el nombre del rol
 }
   private void mostrarDatosProfesor() {
       try {
@@ -182,39 +185,31 @@ private int obtenerIdRolProfesor(int idProfesor) {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jTextField3 = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jTextField2 = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jTextField4 = new javax.swing.JTextField();
+        jTextField1 = new javax.swing.JTextField();
+        jTextField2 = new javax.swing.JTextField();
+        jTextField3 = new javax.swing.JTextField();
 
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel1.setBackground(new java.awt.Color(204, 204, 204));
+        jPanel1.setBackground(new java.awt.Color(232, 228, 236));
         jPanel1.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(102, 102, 102)));
-        jPanel1.setOpaque(false);
+        jPanel1.setForeground(new java.awt.Color(232, 228, 236));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jTextField3.setBackground(new java.awt.Color(204, 204, 204));
-        jTextField3.setForeground(new java.awt.Color(255, 255, 255));
-        jPanel1.add(jTextField3, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 180, 290, -1));
-
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setForeground(new java.awt.Color(102, 102, 102));
         jLabel1.setText("nombre");
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 20, -1, -1));
 
-        jTextField1.setBackground(new java.awt.Color(204, 204, 204));
-        jTextField1.setForeground(new java.awt.Color(255, 255, 255));
-        jPanel1.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 40, 290, -1));
-
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setForeground(new java.awt.Color(102, 102, 102));
         jLabel2.setText("apellidos");
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 80, -1, -1));
 
@@ -234,11 +229,7 @@ private int obtenerIdRolProfesor(int idProfesor) {
         });
         jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 270, -1, -1));
 
-        jTextField2.setBackground(new java.awt.Color(204, 204, 204));
-        jTextField2.setForeground(new java.awt.Color(255, 255, 255));
-        jPanel1.add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 110, 290, -1));
-
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setForeground(new java.awt.Color(102, 102, 102));
         jLabel3.setText("correo electronico");
         jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 150, -1, -1));
 
@@ -250,16 +241,29 @@ private int obtenerIdRolProfesor(int idProfesor) {
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(25, 35, 130, 130));
 
-        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel4.setForeground(new java.awt.Color(102, 102, 102));
         jLabel4.setText("rol");
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 220, -1, -1));
 
-        jTextField4.setBackground(new java.awt.Color(204, 204, 204));
-        jTextField4.setForeground(new java.awt.Color(255, 255, 255));
+        jTextField4.setForeground(new java.awt.Color(102, 102, 102));
         jTextField4.setEnabled(false);
-        jPanel1.add(jTextField4, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 240, -1, -1));
+        jPanel1.add(jTextField4, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 240, 100, 25));
 
-        add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(25, 40, 491, 314));
+        jTextField1.setForeground(new java.awt.Color(102, 102, 102));
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 50, 290, 25));
+
+        jTextField2.setForeground(new java.awt.Color(102, 102, 102));
+        jPanel1.add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 110, 290, 25));
+
+        jTextField3.setForeground(new java.awt.Color(102, 102, 102));
+        jPanel1.add(jTextField3, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 180, 290, 25));
+
+        add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, 491, 314));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -269,6 +273,10 @@ private int obtenerIdRolProfesor(int idProfesor) {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
       seleccionarImagen();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

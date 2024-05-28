@@ -268,6 +268,7 @@ public class Login extends javax.swing.JFrame {
             int idProfesor = obtenerIdProfesor(correo);
             int idRol = obtenerIdRolProfesor(idProfesor);
             Principal p = new Principal(idProfesor,idRol);
+            p.setLocationRelativeTo(null);
             p.setVisible(true);
             dispose();
         } else {

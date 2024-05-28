@@ -35,7 +35,6 @@ public class ImageRenderer2 extends DefaultTableCellRenderer {
         // Verificar si el valor es un ImageIcon
         if (value instanceof ImageIcon) {
             ImageIcon icon = (ImageIcon) value;
-            // Ajustar el tamaño del ícono
             ImageIcon scaledIcon = new ImageIcon(icon.getImage().getScaledInstance(defaultSize, defaultSize, java.awt.Image.SCALE_SMOOTH));
             label.setIcon(scaledIcon);
             label.setHorizontalAlignment(JLabel.CENTER);

@@ -5,21 +5,25 @@
 package instituto.busquedas.añadir;
 
 import instituto.Principal;
+import instituto.busquedas.Busqueda;
 import javax.swing.JOptionPane;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import javax.swing.JOptionPane;
 import java.sql.*;
 import java.util.Base64;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 /**
  *
  * @author icast
  */
 public class AñadirProfesores extends javax.swing.JFrame {
  
-   private static Principal principalRef;
+     private Busqueda parentPanel;
         
-    public AñadirProfesores() {
+    public AñadirProfesores(Busqueda parentPanel) {
+        this.parentPanel = parentPanel;
         initComponents();
         
     }
@@ -127,52 +131,58 @@ public  String hashPassword(String password) {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String nombre = nameTextField.getText().trim();
-        String apellido = apellidoTextField.getText().trim();
-        String correo = correoTextField.getText().trim();
-        String contrasenia = jPasswordField1.getText().trim();
+   String nombre = nameTextField.getText().trim();
+String apellido = apellidoTextField.getText().trim();
+String correo = correoTextField.getText().trim();
+String contrasenia = jPasswordField1.getText().trim();
 
-        // Verificar si alguno de los campos está vacío
-        if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty() || contrasenia.isEmpty()) {
-            // Mostrar un mensaje de error al usuario
-            JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
-        } else {
-            // Hashear la contraseña ingresada por el usuario
-            String contraseniaHasheada = hashPassword(contrasenia);
+if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty() || contrasenia.isEmpty()) {
+    JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
+} else {
 
-            // Todos los campos están llenos, guardar los datos en la base de datos
-            try {
-                Class.forName("org.hsqldb.jdbc.JDBCDriver");
-                try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
-                    String consultaSQL = "INSERT INTO PUBLIC.INSTITUTO.PROFESORES (NOMBRE, APELLIDO, CORREOELECTRONICO, CONTRASENIA) VALUES (?, ?, ?, ?)";
-                    try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
-                        stmt.setString(1, nombre);
-                        stmt.setString(2, apellido);
-                        stmt.setString(3, correo);
-                        stmt.setString(4, contraseniaHasheada); // Guardar la contraseña hasheada
+    String correoRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+    Pattern pattern = Pattern.compile(correoRegex);
+    Matcher matcher = pattern.matcher(correo);
 
-                        int filasAfectadas = stmt.executeUpdate();
-                        if (filasAfectadas > 0) {
-                            // Mostrar un mensaje de éxito al usuario
-                            JOptionPane.showMessageDialog(null, "Los datos se han guardado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                            dispose();
-                            if (this.getParent() != null && this.getParent().isEnabled()) {
-                            this.getParent().setEnabled(true); // Si el frame principal existe y está habilitado
-                            }
+    if (!matcher.matches()) {
+        JOptionPane.showMessageDialog(null, "Por favor, ingrese un correo electrónico válido.", "Correo No Válido", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    String contraseniaHasheada = hashPassword(contrasenia);
+    try {
+        Class.forName("org.hsqldb.jdbc.JDBCDriver");
+        try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
+            String consultaSQL = "INSERT INTO PUBLIC.INSTITUTO.PROFESORES (NOMBRE, APELLIDO, CORREOELECTRONICO, CONTRASENIA) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
+                stmt.setString(1, nombre);
+                stmt.setString(2, apellido);
+                stmt.setString(3, correo);
+                stmt.setString(4, contraseniaHasheada);
 
-                        } else {
-                            // Mostrar un mensaje de error al usuario si no se guardaron los datos correctamente
-                            JOptionPane.showMessageDialog(null, "Hubo un error al guardar los datos", "Error", JOptionPane.ERROR_MESSAGE);
-                        }
+                int filasAfectadas = stmt.executeUpdate();
+                if (filasAfectadas > 0) {
+                    // Mostrar un mensaje de éxito al usuario
+                    JOptionPane.showMessageDialog(null, "Los datos se han guardado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                    dispose();
+                    if (parentPanel != null) {
+                        String selectedTable = "profesores";
+                        parentPanel.mostrarDatosEnJTable(selectedTable);
                     }
+                    if (this.getParent() != null && this.getParent().isEnabled()) {
+                        this.getParent().setEnabled(true); // Si el frame principal existe y está habilitado
+                    }
+
+                } else {
+                    // Mostrar un mensaje de error al usuario si no se guardaron los datos correctamente
+                    JOptionPane.showMessageDialog(null, "Hubo un error al guardar los datos", "Error", JOptionPane.ERROR_MESSAGE);
                 }
-            } catch (ClassNotFoundException | SQLException ex) {
-                ex.printStackTrace();
             }
         }
-
+    } catch (ClassNotFoundException | SQLException ex) {
+        ex.printStackTrace();
     }//GEN-LAST:event_jButton1ActionPerformed
-
+    }
+    }
     /**
      * @param args the command line arguments
      */
@@ -204,7 +214,7 @@ public  String hashPassword(String password) {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new AñadirProfesores().setVisible(true);
+                new AñadirProfesores(null).setVisible(true);
             }
         });
     }

@@ -5,23 +5,23 @@
 package instituto.busquedas.añadir;
 
 import instituto.Principal;
-import javax.swing.JOptionPane;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import instituto.busquedas.Busqueda;
 import javax.swing.JOptionPane;
 import java.sql.*;
 import java.util.Base64;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 /**
  *
  * @author icast
  */
 public class AñadirAlumnos extends javax.swing.JFrame {
 
-    private static Principal principalRef;
+     private Busqueda parentPanel;
     
-    public AñadirAlumnos() {
+    public AñadirAlumnos(Busqueda parentPanel) {
+        this.parentPanel = parentPanel;
         initComponents();
-        
         cargarCiclos();
     }
 
@@ -138,6 +138,14 @@ public class AñadirAlumnos extends javax.swing.JFrame {
         // Mostrar un mensaje de error al usuario
         JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
     } else {
+        String correoRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        Pattern pattern = Pattern.compile(correoRegex);
+        Matcher matcher = pattern.matcher(correo);
+
+        if (!matcher.matches()) {
+            JOptionPane.showMessageDialog(null, "Por favor, ingrese un correo electrónico válido.", "Correo No Válido", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         int idCicloSeleccionado = obtenerIdCiclo(nombreCiclo, anioCiclo);
         if (idCicloSeleccionado != -1) {
             // Todos los campos están llenos, guardar los datos en la base de datos
@@ -156,6 +164,10 @@ public class AñadirAlumnos extends javax.swing.JFrame {
                             // Mostrar un mensaje de éxito al usuario
                             JOptionPane.showMessageDialog(null, "Los datos se han guardado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                             dispose();
+                             if (parentPanel != null) {
+                                  String selectedTable = "alumnos";
+                                parentPanel. mostrarDatosEnJTable(selectedTable);
+                            }
                             if (this.getParent() != null && this.getParent().isEnabled()) {
                                 this.getParent().setEnabled(true); // Si el frame principal existe y está habilitado
                             }
@@ -246,7 +258,7 @@ public class AñadirAlumnos extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new AñadirAlumnos().setVisible(true);
+                new AñadirAlumnos(null).setVisible(true);
             }
         });
     }

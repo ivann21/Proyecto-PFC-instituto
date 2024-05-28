@@ -5,6 +5,7 @@
 package instituto.busquedas.añadir;
 
 import instituto.Principal;
+import instituto.busquedas.Busqueda;
 import javax.swing.JOptionPane;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -17,9 +18,10 @@ import java.util.Base64;
  */
 public class AñadirCiclos extends javax.swing.JFrame {
 
-     private static Principal principalRef;
+      private Busqueda parentPanel;
      
-    public AñadirCiclos() {
+    public AñadirCiclos(Busqueda parentPanel) {
+        this.parentPanel = parentPanel;
         initComponents();
         
     }
@@ -133,6 +135,10 @@ public class AñadirCiclos extends javax.swing.JFrame {
                         // Mostrar un mensaje de éxito al usuario
                         JOptionPane.showMessageDialog(null, "Los datos se han guardado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                         dispose();
+                         if (parentPanel != null) {
+                                  String selectedTable = "ciclos";
+                                parentPanel. mostrarDatosEnJTable(selectedTable);
+                            }
                         if (this.getParent() != null && this.getParent().isEnabled()) {
                             this.getParent().setEnabled(true); // Si el frame principal existe y está habilitado
                         }
@@ -186,7 +192,7 @@ public class AñadirCiclos extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new AñadirCiclos().setVisible(true);
+                new AñadirCiclos(null).setVisible(true);
             }
         });
     }

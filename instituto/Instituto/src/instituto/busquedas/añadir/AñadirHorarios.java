@@ -4,24 +4,24 @@
  */
 package instituto.busquedas.añadir;
 
+import instituto.busquedas.Busqueda;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AñadirHorarios extends javax.swing.JFrame {
 
-    /**
-     * Creates new form AñadirHorarios
-     */
-    public AñadirHorarios() {
+      private Busqueda parentPanel;
+      
+    public AñadirHorarios(Busqueda parentPanel) {
+        this.parentPanel = parentPanel;
         initComponents();
-        jComboBox5 = new javax.swing.JComboBox<>(getHours());
-        jComboBox6 = new javax.swing.JComboBox<>(getHours());
          populateComboBoxes();
     }
      private void populateComboBoxes() {
@@ -54,21 +54,46 @@ public class AñadirHorarios extends javax.swing.JFrame {
         }
         return hours.toArray(new String[0]);
     }
-        private boolean isDuplicate(Connection conn, int aulaId, String dia, LocalTime horaInicio, LocalTime horaFin) throws SQLException {
-        String query = "SELECT COUNT(*) FROM PUBLIC.INSTITUTO.HORARIOS WHERE \"ID aula\" = ? AND \"dia de la semana\" = ? AND \"hora de inicio\" = ? AND \"hora de fin\" = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setInt(1, aulaId);
-            pstmt.setString(2, dia);
-            pstmt.setTime(3, Time.valueOf(horaInicio));
-            pstmt.setTime(4, Time.valueOf(horaFin));
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
+private boolean isDuplicate(Connection conn, int profesorId, String dia, String horaInicio, String horaFin) throws SQLException {
+    String query = "SELECT COUNT(*) FROM PUBLIC.INSTITUTO.HORARIOS WHERE \"ID profesor\" = ? AND " +
+                   "((\"dia de la semana\" = ? AND " +
+                   "((\"hora de inicio\" >= ? AND \"hora de inicio\" < ?) OR " +
+                   "(\"hora de fin\" > ? AND \"hora de fin\" <= ?) OR " +
+                   "(\"hora de inicio\" <= ? AND \"hora de fin\" >= ?))) OR " +
+                   "(\"dia de la semana\" <> ? AND " +
+                   "((\"hora de inicio\" >= ? AND \"hora de inicio\" < ?) OR " +
+                   "(\"hora de fin\" > ? AND \"hora de fin\" <= ?) OR " +
+                   "(\"hora de inicio\" <= ? AND \"hora de fin\" >= ?))))";
+    try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+        pstmt.setInt(1, profesorId);
+        pstmt.setString(2, dia);
+        pstmt.setTime(3, Time.valueOf(horaInicio));
+        pstmt.setTime(4, Time.valueOf(horaFin));
+        pstmt.setTime(5, Time.valueOf(horaInicio));
+        pstmt.setTime(6, Time.valueOf(horaFin));
+        pstmt.setTime(7, Time.valueOf(horaInicio));
+        pstmt.setTime(8, Time.valueOf(horaFin));
+        pstmt.setString(9, dia);
+        pstmt.setTime(10, Time.valueOf(horaInicio));
+        pstmt.setTime(11, Time.valueOf(horaFin));
+        pstmt.setTime(12, Time.valueOf(horaInicio));
+        pstmt.setTime(13, Time.valueOf(horaFin));
+        pstmt.setTime(14, Time.valueOf(horaInicio));
+        pstmt.setTime(15, Time.valueOf(horaFin));
+        try (ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
             }
         }
-        return false;
     }
+    return false;
+}
+       
+private String sumarMinutos(String hora, int minutos) {
+    LocalTime localTime = LocalTime.parse(hora);
+    localTime = localTime.plusMinutes(minutos);
+    return localTime.toString();
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -92,31 +117,46 @@ public class AñadirHorarios extends javax.swing.JFrame {
         jComboBox6 = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Añadir Horiario");
+        setResizable(false);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        getContentPane().add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(19, 48, 244, -1));
 
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        getContentPane().add(jComboBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(19, 102, 244, -1));
 
         jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        getContentPane().add(jComboBox3, new org.netbeans.lib.awtextra.AbsoluteConstraints(19, 156, 244, -1));
 
         jLabel1.setText("Asignatura");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(19, 26, -1, -1));
 
         jLabel2.setText("Profesor");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(19, 82, -1, -1));
 
         jLabel3.setText("Aula");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(19, 134, -1, -1));
 
         jComboBox4.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Lunes", "Martes", "Miercoles", "Jueves", "Viernes" }));
+        getContentPane().add(jComboBox4, new org.netbeans.lib.awtextra.AbsoluteConstraints(297, 50, 244, -1));
 
         jLabel4.setText("Dia de la semana");
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(297, 28, -1, -1));
 
         jComboBox5.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "8:30:00", "9:30:00", "10:25:00", "11:45:00", "12:40:00", "13:35:00" }));
+        getContentPane().add(jComboBox5, new org.netbeans.lib.awtextra.AbsoluteConstraints(297, 106, 244, -1));
 
         jLabel5.setText("hora de inicio");
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(297, 84, -1, -1));
 
         jLabel6.setText("hora de fin");
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(297, 134, -1, -1));
 
         jComboBox6.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "09:25:00", "10:20:00", "11:15:00", "12:35:00", "13:30:00", "14:25:00" }));
+        getContentPane().add(jComboBox6, new org.netbeans.lib.awtextra.AbsoluteConstraints(297, 156, 244, -1));
 
         jButton1.setText("añadir");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -124,110 +164,79 @@ public class AñadirHorarios extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(19, 19, 19)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel1)
-                            .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jComboBox2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 34, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel5)
-                            .addComponent(jComboBox4, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jComboBox5, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jComboBox6, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(38, 38, 38))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(26, 26, 26)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel2)
-                        .addGap(4, 4, 4)
-                        .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10, 10, 10)
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(12, 12, 12)
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
-                .addComponent(jButton1)
-                .addContainerGap(18, Short.MAX_VALUE))
-        );
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(469, 196, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        int asignaturaId = Integer.parseInt(jComboBox1.getSelectedItem().toString().split(" ")[0]);
-        int profesorId = Integer.parseInt(jComboBox2.getSelectedItem().toString().split(" ")[0]);
-        int aulaId = Integer.parseInt(jComboBox3.getSelectedItem().toString().split(" ")[0]);
-        String dia = jComboBox4.getSelectedItem().toString();
-        LocalTime horaInicio = LocalTime.parse(jComboBox5.getSelectedItem().toString());
-        LocalTime horaFin = LocalTime.parse(jComboBox6.getSelectedItem().toString());
+   int asignaturaId = Integer.parseInt(jComboBox1.getSelectedItem().toString().split(" ")[0]);
+    int profesorId = Integer.parseInt(jComboBox2.getSelectedItem().toString().split(" ")[0]);
+    int aulaId = Integer.parseInt(jComboBox3.getSelectedItem().toString().split(" ")[0]);
+    String dia = jComboBox4.getSelectedItem().toString();
+    String horaInicio = jComboBox5.getSelectedItem().toString();
+    String horaFin = jComboBox6.getSelectedItem().toString();
 
-        try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
-            while (horaInicio.isBefore(horaFin)) {
-                LocalTime horaFinClase = horaInicio.plusMinutes(55);
-                if (horaFinClase.isAfter(horaFin)) {
-                    horaFinClase = horaFin;
-                }
+    try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
+        // Definir el formateador de tiempo para el formato "H:mm:ss"
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm:ss");
 
-                if (isDuplicate(conn, aulaId, dia, horaInicio, horaFinClase)) {
-                    JOptionPane.showMessageDialog(this, "Horario duplicado. No se ha añadido.");
-                    return;
-                }
+        // Convertir las horas de inicio y fin a LocalTime para manejar el tiempo fácilmente
+        LocalTime horaInicioTime = LocalTime.parse(horaInicio, formatter);
+        LocalTime horaFinTime = LocalTime.parse(horaFin, formatter);
+        
+        while (horaInicioTime.isBefore(horaFinTime)) {
+            System.out.println("Hora de inicio: " + horaInicioTime);
 
-                String insertSQL = "INSERT INTO PUBLIC.INSTITUTO.HORARIOS (\"ID asignatura\", \"ID profesor\", \"ID aula\", \"dia de la semana\", \"hora de inicio\", \"hora de fin\") VALUES (?, ?, ?, ?, ?, ?)";
-                try (PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
-                    pstmt.setInt(1, asignaturaId);
-                    pstmt.setInt(2, profesorId);
-                    pstmt.setInt(3, aulaId);
-                    pstmt.setString(4, dia);
-                    pstmt.setTime(5, Time.valueOf(horaInicio));
-                    pstmt.setTime(6, Time.valueOf(horaFinClase));
-                    pstmt.executeUpdate();
-                }
-                horaInicio = horaFinClase;
+            // Añadir 55 minutos a la horaInicio
+            LocalTime horaFinClaseTime = horaInicioTime.plusMinutes(55);
+            System.out.println("Hora de fin de clase: " + horaFinClaseTime);
+
+            // Ajustar horaFinClase si excede la horaFin
+            if (horaFinClaseTime.isAfter(horaFinTime)) {
+                horaFinClaseTime = horaFinTime;
+                System.out.println("Ajustando hora de fin de clase: " + horaFinClaseTime);
             }
-            JOptionPane.showMessageDialog(this, "Horario añadido correctamente.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }//GEN-LAST:event_jButton1ActionPerformed
 
+            // Convertir LocalTime a String para las consultas SQL
+            String horaInicioStr = horaInicioTime.format(formatter);
+            String horaFinClaseStr = horaFinClaseTime.format(formatter);
+
+            if (isDuplicate(conn, profesorId, dia, horaInicioStr, horaFinClaseStr)) {
+                JOptionPane.showMessageDialog(this, "Horario duplicado. No se ha añadido.");
+                return;
+            }
+
+            System.out.println("|" + asignaturaId + "|" + profesorId + "|" + aulaId + "|" + dia + "|" + horaInicioStr + "|" + horaFinClaseStr);
+
+            String insertSQL = "INSERT INTO PUBLIC.INSTITUTO.HORARIOS (\"ID asignatura\", \"ID profesor\", \"ID aula\", \"dia de la semana\", \"hora de inicio\", \"hora de fin\") VALUES (?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
+                pstmt.setInt(1, asignaturaId);
+                pstmt.setInt(2, profesorId);
+                pstmt.setInt(3, aulaId);
+                pstmt.setString(4, dia);
+                pstmt.setString(5, horaInicioStr);
+                pstmt.setString(6, horaFinClaseStr);
+                pstmt.executeUpdate();
+                System.out.println("Consulta SQL: " + pstmt.toString());
+            }
+
+            // Actualizar horaInicio para el siguiente intervalo
+            horaInicioTime = horaFinClaseTime;
+        }
+        JOptionPane.showMessageDialog(this, "Horario añadido correctamente.");
+        dispose();
+        if (parentPanel != null) {
+            String selectedTable = "horarios";
+            parentPanel.mostrarDatosEnJTable(selectedTable);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    } catch (DateTimeParseException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al parsear las horas: " + e.getMessage());
+    }//GEN-LAST:event_jButton1ActionPerformed
+    }
     /**
      * @param args the command line arguments
      */
@@ -258,7 +267,7 @@ public class AñadirHorarios extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new AñadirHorarios().setVisible(true);
+                new AñadirHorarios(null).setVisible(true);
             }
         });
     }

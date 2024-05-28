@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -23,10 +24,12 @@ public class AulasReservadas extends javax.swing.JPanel {
 
     private int idProfesor;
     private DefaultTableModel tableModel;
+    private DefaultComboBoxModel comboBoxModel;
     
     public AulasReservadas(int idProfesor) {
         this.idProfesor = idProfesor;
         initComponents();
+        cargarSitiosReservados();
         cargarReservas();
          // Agregar un ActionListener al JComboBox
         jComboBox1.addActionListener(new ActionListener() {
@@ -55,7 +58,7 @@ public class AulasReservadas extends javax.swing.JPanel {
                             if (idReserva != -1) {
                                 // Eliminar de la base de datos
                                 eliminarReserva
-        (idReserva);
+                                  (idReserva);
                                 // Eliminar de la tabla
                                 tableModel.removeRow(row);
                             } else {
@@ -68,6 +71,39 @@ public class AulasReservadas extends javax.swing.JPanel {
                 }
             }
         });
+    }
+     private void cargarSitiosReservados() {
+       comboBoxModel = new DefaultComboBoxModel();
+       
+        try {
+            // Conectar a la base de datos
+            Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+
+            // Consulta SQL para obtener los sitios reservados del profesor
+            String query = "SELECT DISTINCT NOMBRE FROM INSTITUTO.AULAS "
+                    + "WHERE \"ID aula\" IN (SELECT ID_AULA FROM INSTITUTO.RESERVAS WHERE ID_PROFESOR = ?)";
+            PreparedStatement pst = con.prepareStatement(query);
+            pst.setInt(1, idProfesor);
+            
+            // Ejecutar la consulta
+            ResultSet rs = pst.executeQuery();
+            
+            // Iterar sobre los resultados y agregarlos al modelo del JComboBox
+            while (rs.next()) {
+                String nombreAula = rs.getString("NOMBRE");
+                comboBoxModel.addElement(nombreAula);
+            }
+            
+            // Cerrar la conexión y liberar recursos
+            rs.close();
+            pst.close();
+            con.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        // Establecer el modelo del JComboBox
+        jComboBox1.setModel(comboBoxModel);
     }
      private int obtenerIdAula(String nombreAula) {
         int idAula = -1;
@@ -213,6 +249,8 @@ private void cargarReservas() {
         jComboBox1 = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
 
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -226,36 +264,12 @@ private void cargarReservas() {
         ));
         jScrollPane1.setViewportView(jTable1);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Laboratorio", "Sala de Conferencias", "Sala de Reuniones" }));
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 60, 587, 170));
+
+        add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 30, -1, -1));
 
         jLabel1.setText("Sitio : ");
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(35, 35, 35)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 587, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(41, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(13, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 319, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(25, 25, 25))
-        );
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 32, -1, -1));
     }// </editor-fold>//GEN-END:initComponents
 
 

@@ -26,20 +26,24 @@ public class ImageRenderer extends DefaultTableCellRenderer {
         this.falseIcon = falseIcon;
         this.defaultSize = defaultSize;
     }
-    @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        
-        // Seleccionar la imagen según el valor booleano
-       boolean boolValue = value != null && (Boolean) value;
-        ImageIcon icon = boolValue ? trueIcon : falseIcon;
-        
-        // Ajustar el tamaño del ícono
+   @Override
+public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+    JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+    
+    if (value != null && !value.toString().isEmpty()) {
+        // Si la celda no está vacía, mostrar la imagen
+        ImageIcon icon = new ImageIcon(value.toString());
         ImageIcon scaledIcon = new ImageIcon(icon.getImage().getScaledInstance(defaultSize, defaultSize, java.awt.Image.SCALE_SMOOTH));
         label.setIcon(scaledIcon);
-        label.setHorizontalAlignment(JLabel.CENTER);
-        
-        return label;
+    } else {
+        // Si la celda está vacía, mostrar la imagen basada en el valor booleano
+        boolean boolValue = value != null && (Boolean) value;
+        ImageIcon icon = boolValue ? trueIcon : falseIcon;
+        ImageIcon scaledIcon = new ImageIcon(icon.getImage().getScaledInstance(defaultSize, defaultSize, java.awt.Image.SCALE_SMOOTH));
+        label.setIcon(scaledIcon);
     }
-  
+    
+    label.setHorizontalAlignment(JLabel.CENTER);
+    return label;
+}
 }

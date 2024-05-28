@@ -53,13 +53,13 @@ private void addTableMouseListener() {
             int row = table.getSelectedRow();
             int column = table.getSelectedColumn();
 
-            if (column == 2 && e.getClickCount() == 2) { // Doble clic en la columna "Descargar"
+            if (column == 3 && e.getClickCount() == 2) { // Doble clic en la columna "Descargar"
                 int response = JOptionPane.showConfirmDialog(null, "¿Desea descargar el archivo?", "Confirmar descarga", JOptionPane.YES_NO_OPTION);
                 if (response == JOptionPane.YES_OPTION) {
                     String nombreArchivo = (String) table.getValueAt(row, 0); // Obtener el nombre del archivo personalizado
                     descargarArchivo(nombreArchivo); // Llamar al método para descargar el archivo
                 }
-            } else if (column == 3 && e.getClickCount() == 1) { // Un clic en la columna "ELIMINAR"
+            } else if (column == 4 && e.getClickCount() == 1) { // Un clic en la columna "ELIMINAR"
                 int response = JOptionPane.showConfirmDialog(null, "¿Desea eliminar el archivo?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
                 if (response == JOptionPane.YES_OPTION) {
                     String nombreArchivo = (String) table.getValueAt(row, 0); // Obtener el nombre del archivo personalizado
@@ -69,38 +69,21 @@ private void addTableMouseListener() {
         }
     });
 }
-private void eliminarArchivo(String nombreArchivoPersonalizado) {
-    // Buscar el archivo en la lista de archivos del usuario basado en el nombre personalizado
-    List<?> archivosUsuario = gestorArchivos.obtenerArchivosUsuario(idProfesor, true); // Devuelve objetos Archivo
-    Archivo archivoAEliminar = null;
-
-    for (Object archivo : archivosUsuario) {
-        if (archivo instanceof Archivo) {
-            Archivo archivoObj = (Archivo) archivo;
-            if (archivoObj.getNombrePersonalizado().equals(nombreArchivoPersonalizado)) {
-                archivoAEliminar = archivoObj;
-                break;
-            }
-        }
-    }
-
-    if (archivoAEliminar != null) {
-        String nombreArchivoReal = archivoAEliminar.getNombreReal();
-        String rutaArchivo = CARPETA_ARCHIVOS + idProfesor + "/" + nombreArchivoReal;
-        File archivo = new File(rutaArchivo);
-        if (archivo.exists()) {
-            if (archivo.delete()) {
-                gestorArchivos.eliminarArchivo(idProfesor, nombreArchivoReal); // Eliminar registro del archivo en el gestor
-                JOptionPane.showMessageDialog(this, "Archivo eliminado exitosamente.");
-                mostrarArchivos(); // Actualizar la tabla de archivos después de eliminar el archivo
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al eliminar el archivo.");
-            }
+private void eliminarArchivo(String nombreArchivo) {
+    String rutaArchivo = CARPETA_ARCHIVOS + idProfesor + "/" + nombreArchivo;
+    File archivo = new File(rutaArchivo);
+    
+    if (archivo.exists()) {
+        if (archivo.delete()) {
+            gestorArchivos.eliminarArchivo(idProfesor, rutaArchivo); 
+            System.out.println("Archivo eliminado: " + rutaArchivo);
+            JOptionPane.showMessageDialog(this, "Archivo eliminado exitosamente.");
+            mostrarArchivos();
         } else {
-            JOptionPane.showMessageDialog(this, "El archivo no existe.");
+            JOptionPane.showMessageDialog(this, "Error al eliminar el archivo.");
         }
     } else {
-        JOptionPane.showMessageDialog(this, "Archivo no encontrado.");
+        JOptionPane.showMessageDialog(this, "El archivo no existe.");
     }
 }
 private void descargarArchivo(String nombreArchivo) {
@@ -133,6 +116,7 @@ private void descargarArchivo(String nombreArchivo) {
         }
     };
     model.addColumn("Nombre del Archivo Personalizado");
+    model.addColumn("Nombre del Archivo");
     model.addColumn("Extensión");
     model.addColumn("Descargar");
     model.addColumn("ELIMINAR");
@@ -142,6 +126,7 @@ private void descargarArchivo(String nombreArchivo) {
         if (archivo instanceof Archivo) {
             Archivo archivoObj = (Archivo) archivo;
             model.addRow(new Object[]{
+                archivoObj.getNombreReal(),
                 archivoObj.getNombrePersonalizado(),
                 archivoObj.getExtension(),
                 downloadIcon,
@@ -154,23 +139,23 @@ private void descargarArchivo(String nombreArchivo) {
     jTable1.setModel(model);
 
     // Configurar ImageRenderer para las columnas "Descargar" y "ELIMINAR"
-    int columnIndexDescargar = 2; // Índice de la columna "Descargar"
+    int columnIndexDescargar = 3; // Índice de la columna "Descargar"
     TableColumn columnDescargar = jTable1.getColumnModel().getColumn(columnIndexDescargar);
     columnDescargar.setCellRenderer(new ImageRenderer2(downloadIcon, 20));
 
-    int columnIndexEliminar = 3; // Índice de la columna "ELIMINAR"
+    int columnIndexEliminar = 4; // Índice de la columna "ELIMINAR"
     TableColumn columnEliminar = jTable1.getColumnModel().getColumn(columnIndexEliminar);
     columnEliminar.setCellRenderer(new ImageRenderer2(deleteIcon, 20));
 
     // Centrar el contenido de la columna "Extensión"
     DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
     centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-    jTable1.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+    jTable1.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
 
     // Ajustar el tamaño de las columnas
     jTable1.getColumnModel().getColumn(0).setPreferredWidth(300); // Ampliar la columna del nombre del archivo personalizado
-    jTable1.getColumnModel().getColumn(1).setPreferredWidth(50);  // Ajustar la columna de extensión
-    jTable1.getColumnModel().getColumn(2).setPreferredWidth(100); // Ajustar la columna de descargar
+    jTable1.getColumnModel().getColumn(1).setPreferredWidth(200);  // Ajustar la columna de extensión
+    jTable1.getColumnModel().getColumn(2).setPreferredWidth(90); // Ajustar la columna de descargar
     jTable1.getColumnModel().getColumn(3).setPreferredWidth(100); // Ajustar la columna de eliminar
 }
 private void buscarEnTabla(String textoBusqueda) {
@@ -178,7 +163,7 @@ private void buscarEnTabla(String textoBusqueda) {
     TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
     jTable1.setRowSorter(sorter);
 
-    int columnIndex = jComboBox1.getSelectedIndex() == 0 ? 0 : 1; // 0 para Nombre, 1 para Extensión
+    int columnIndex = jComboBox1.getSelectedIndex() == 0 ? 1 : 2; 
 
     RowFilter<DefaultTableModel, Object> rowFilter = RowFilter.regexFilter("(?i)" + Pattern.quote(textoBusqueda), columnIndex);
     sorter.setRowFilter(rowFilter);
@@ -207,6 +192,7 @@ private void reiniciarBusqueda() {
         jButton3 = new javax.swing.JButton();
         jComboBox1 = new javax.swing.JComboBox<>();
 
+        jTextField1.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField1ActionPerformed(evt);
@@ -279,10 +265,11 @@ private void reiniciarBusqueda() {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(50, 50, 50)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jButton1)
+                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 391, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)

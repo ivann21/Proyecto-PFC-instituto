@@ -20,7 +20,9 @@ public class ImageBooleanRenderer extends DefaultTableCellRenderer {
         this.falseIcon = falseIcon;
         this.defaultSize = defaultSize;
     }
-
+    public ImageIcon getTrueIcon() {
+    return trueIcon;
+    }
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);

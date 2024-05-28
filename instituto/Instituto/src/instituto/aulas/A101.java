@@ -238,6 +238,7 @@ jTable2.setRowSelectionAllowed(false);
         jLabel13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/ordenadores_false.png"))); // NOI18N
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("A101");
         setResizable(false);
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(

@@ -218,6 +218,7 @@ jTable2.setRowSelectionAllowed(false);
         jTable2 = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("A104");
         setResizable(false);
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(

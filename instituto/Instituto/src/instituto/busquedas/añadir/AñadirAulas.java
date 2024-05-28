@@ -5,6 +5,7 @@
 package instituto.busquedas.añadir;
 
 import instituto.Principal;
+import instituto.busquedas.Busqueda;
 import javax.swing.JOptionPane;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -17,10 +18,11 @@ import java.util.Base64;
  */
 public class AñadirAulas extends javax.swing.JFrame {
 
-      private static Principal principalRef;
+     private Busqueda parentPanel;
       
-    public AñadirAulas() {
-        initComponents();
+    public AñadirAulas(Busqueda parentPanel) {
+         this.parentPanel = parentPanel;
+         initComponents();
        
     }
 public  String hashPassword(String password) {
@@ -159,6 +161,10 @@ public  String hashPassword(String password) {
                         // Mostrar un mensaje de éxito al usuario
                         JOptionPane.showMessageDialog(null, "Los datos se han guardado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                         dispose();
+                         if (parentPanel != null) {
+                                  String selectedTable = "aulas";
+                                parentPanel. mostrarDatosEnJTable(selectedTable);
+                            }
                         if (this.getParent() != null && this.getParent().isEnabled()) {
                             this.getParent().setEnabled(true); // Si el frame principal existe y está habilitado
                         }
@@ -207,7 +213,7 @@ public  String hashPassword(String password) {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new AñadirAulas().setVisible(true);
+                new AñadirAulas(null).setVisible(true);
             }
         });
     }

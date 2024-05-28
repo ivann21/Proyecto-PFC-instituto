@@ -10,11 +10,14 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
+import java.util.regex.Pattern;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableRowSorter;
 /**
  *
  * @author ivan.castellano
@@ -23,6 +26,8 @@ public class AsignarRoles extends javax.swing.JPanel {
 
       private int rol;
       private DefaultTableModel tableModel;
+      private String nombreProfesorSeleccionado;
+      private String apellidoProfesorSeleccionado;
       
     public AsignarRoles(int Rol) {
         this.rol = rol;
@@ -40,24 +45,66 @@ public class AsignarRoles extends javax.swing.JPanel {
                     if (opcion == JOptionPane.YES_OPTION) {
                         // Obtener valores de la fila seleccionada
                         String nombreProfesor = (String) tableModel.getValueAt(row, 0);
-                        String nombreRol = (String) tableModel.getValueAt(row, 1);
+                        String apellidoProfesor = (String) tableModel.getValueAt(row, 1);
+                        String nombreRol = (String) tableModel.getValueAt(row, 2);
                         // Obtener IDs correspondientes
-                        int idProfesor = obtenerIdProfesor(nombreProfesor);
+                        int idProfesor = obtenerIdProfesor(nombreProfesor,apellidoProfesor);
                         int idRol = obtenerIdRol(nombreRol);
                         if (idProfesor != -1 && idRol != -1) {
                             // Eliminar de la base de datos
                             eliminarAsignacion(idProfesor, idRol);
-                            // Eliminar de la tabla
                             tableModel.removeRow(row);
                         } else {
                             JOptionPane.showMessageDialog(null, "Error al obtener el ID del profesor o del rol.");
                         }
                     }
                 }
+                if(column == jTable1.getColumnCount() - 2){
+                    
+                   nombreProfesorSeleccionado = (String) tableModel.getValueAt(row, 0);
+                    apellidoProfesorSeleccionado = (String) tableModel.getValueAt(row, 1);
+                    
+                    // Abrir el diálogo de selección de rol
+                    SeleccionarRolDialog2 dialog = new SeleccionarRolDialog2(null, true, nombreProfesorSeleccionado, apellidoProfesorSeleccionado);
+                    dialog.setLocationRelativeTo(null);
+                    dialog.setVisible(true);
+                    if (dialog.isRolAgregado()) {
+                        // Actualizar la tabla
+                        cargarAsignaciones();
+                    }
+                }
             }
         });
     }
-      // Añadir el MouseListener para detectar clics en la columna de eliminación
+   private void buscarEnTabla(String textoBusqueda) {
+    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+    TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+    jTable1.setRowSorter(sorter);
+
+    int columnIndex;
+    switch (jComboBox1.getSelectedIndex()) {
+        case 0: // Nombre
+            columnIndex = 0;
+            break;
+        case 1: // Apellido
+            columnIndex = 1;
+            break;
+        case 2: // Rol
+            columnIndex = 2;
+            break;
+        default:
+            columnIndex = 0;
+            break;
+    }
+
+    RowFilter<DefaultTableModel, Object> rowFilter = RowFilter.regexFilter("(?i)" + Pattern.quote(textoBusqueda), columnIndex);
+    sorter.setRowFilter(rowFilter);
+}
+    private void reiniciarBusqueda() {
+    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+    TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+    jTable1.setRowSorter(sorter);
+}
        
     /**
      * This method is called from within the constructor to initialize the form.
@@ -87,9 +134,20 @@ public class AsignarRoles extends javax.swing.JPanel {
         ));
         jScrollPane1.setViewportView(jTable1);
 
-        jButton1.setText("buscar");
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "profesor", "rol" }));
+        jButton1.setText("buscar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Nombre", "apellido", "rol" }));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -110,33 +168,53 @@ public class AsignarRoles extends javax.swing.JPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(71, Short.MAX_VALUE)
+                .addContainerGap(23, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1)
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(75, 75, 75))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(24, 24, 24))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-        private void cargarAsignaciones() {
-        ImageIcon deleteIcon = new ImageIcon(getClass().getResource("/imagenes/delete.png"));
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        String textoBusqueda = jTextField1.getText().trim();
+    if (textoBusqueda.isEmpty()) {
+        reiniciarBusqueda();
+    } else {
+        buscarEnTabla(textoBusqueda);
+    }
+    }//GEN-LAST:event_jTextField1ActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+      String textoBusqueda = jTextField1.getText().trim();
+    if (textoBusqueda.isEmpty()) {
+        reiniciarBusqueda();
+    } else {
+        buscarEnTabla(textoBusqueda);
+    }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+        void cargarAsignaciones() {
+        ImageIcon deleteIcon = new ImageIcon(getClass().getResource("/imagenes/delete.png"));
+        ImageIcon editIcon = new ImageIcon(getClass().getResource("/imagenes/editar.png"));
         // Limpiar la tabla antes de cargar nuevas asignaciones
         tableModel = new DefaultTableModel();
         jTable1.setModel(tableModel);
-        tableModel.addColumn("Nombre Profesor");
+        tableModel.addColumn("Nombre");
+        tableModel.addColumn("Apellido");
         tableModel.addColumn("Nombre Rol");
-        tableModel.addColumn("Eliminar"); // Agregar columna de "Eliminar" con imagen
+        tableModel.addColumn("Editar");
+        tableModel.addColumn("Eliminar");
 
         try {
             // Conectar a la base de datos
             Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
 
             // Consulta SQL para obtener las asignaciones de roles
-            String query = "SELECT P.NOMBRE, R.NOMBRE_ROL FROM INSTITUTO.ASIGNACION_ROLES AR "
+            String query = "SELECT P.NOMBRE,P.APELLIDO, R.NOMBRE_ROL FROM INSTITUTO.ASIGNACION_ROLES AR "
                     + "JOIN INSTITUTO.PROFESORES P ON AR.ID_PROFESOR = P.\"ID profesor\" "
                     + "JOIN INSTITUTO.ROLES R ON AR.ID_ROL = R.ID_ROL";
             PreparedStatement pst = con.prepareStatement(query);
@@ -147,8 +225,9 @@ public class AsignarRoles extends javax.swing.JPanel {
             // Iterar sobre los resultados y agregarlos a la tabla
             while (rs.next()) {
                 String nombreProfesor = rs.getString("NOMBRE");
+                String apellidoProfesor = rs.getString("APELLIDO");
                 String nombreRol = rs.getString("NOMBRE_ROL");
-                tableModel.addRow(new Object[]{nombreProfesor, nombreRol, deleteIcon});
+                tableModel.addRow(new Object[]{nombreProfesor,apellidoProfesor, nombreRol, editIcon,deleteIcon});
             }
 
             // Centrar las celdas de todas las columnas
@@ -161,7 +240,9 @@ public class AsignarRoles extends javax.swing.JPanel {
             // Configurar la columna de eliminación para mostrar el icono correctamente
             int deleteColumnIndex = tableModel.getColumnCount() - 1;
             jTable1.getColumnModel().getColumn(deleteColumnIndex).setCellRenderer(new ImageRenderer2(deleteIcon, 20));
-
+            int editColumnIndex = tableModel.getColumnCount() - 2;
+            jTable1.getColumnModel().getColumn(editColumnIndex).setCellRenderer(new ImageRenderer2(editIcon, 20));
+            jTable1.setRowHeight(30);
             // Cerrar la conexión y liberar recursos
             rs.close();
             pst.close();
@@ -170,65 +251,68 @@ public class AsignarRoles extends javax.swing.JPanel {
             e.printStackTrace();
         }
     }
-            private void verificarProfesoresSinRol() {
-        try {
-            // Conectar a la base de datos
-            Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+       private void verificarProfesoresSinRol() {
+    try {
+        // Conectar a la base de datos
+        Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
 
-            // Consulta SQL para verificar profesores sin rol asignado
-            String query = "SELECT P.NOMBRE FROM INSTITUTO.PROFESORES P WHERE P.\"ID profesor\" NOT IN "
-                    + "(SELECT ID_PROFESOR FROM INSTITUTO.ASIGNACION_ROLES)";
+        // Consulta SQL para verificar profesores sin rol asignado
+        String query = "SELECT P.NOMBRE FROM INSTITUTO.PROFESORES P WHERE P.\"ID profesor\" NOT IN "
+                + "(SELECT ID_PROFESOR FROM INSTITUTO.ASIGNACION_ROLES)";
 
-            PreparedStatement pst = con.prepareStatement(query);
+        PreparedStatement pst = con.prepareStatement(query);
 
-            ResultSet rs = pst.executeQuery();
+        ResultSet rs = pst.executeQuery();
 
-            if (rs.next()) {
-                // Hay profesores sin rol asignado, mostrar aviso
-                JOptionPane.showMessageDialog(null, "¡Hay profesores sin rol asignado!", "Aviso", JOptionPane.WARNING_MESSAGE);
+        if (rs.next()) {
+            // Hay profesores sin rol asignado, mostrar aviso
+            JOptionPane.showMessageDialog(null, "¡Hay profesores sin rol asignado!", "Aviso", JOptionPane.WARNING_MESSAGE);
 
-                // Crear instancia del JFrame para mostrar los profesores sin rol
-                ProfesoresSinRol frame = new ProfesoresSinRol();
-                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                frame.setVisible(true);
-                frame.setLocationRelativeTo(null); // Centrar en la pantalla
-            }
-
-            // Cerrar la conexión y liberar recursos
-            rs.close();
-            pst.close();
-            con.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
+            // Crear instancia del JFrame para mostrar los profesores sin rol
+          ProfesoresSinRol frame = new ProfesoresSinRol(this, this::reloadTable);
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.setVisible(true);
+            frame.setLocationRelativeTo(null); // Centrar en la pantalla
         }
+
+        // Cerrar la conexión y liberar recursos
+        rs.close();
+        pst.close();
+        con.close();
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
-    private int obtenerIdProfesor(String nombreProfesor) {
-        int idProfesor = -1;
-        try {
-            // Conectar a la base de datos
-            Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+}
+       private void reloadTable() {
+        cargarAsignaciones(); // Vuelve a cargar las asignaciones de roles en la tabla
+    }
+   private int obtenerIdProfesor(String nombreProfesor, String apellidoProfesor) {
+    int idProfesor = -1;
+    try {
+        // Conectar a la base de datos
+        Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
 
-            // Consulta SQL para obtener el ID del profesor
-            String query = "SELECT \"ID profesor\" FROM INSTITUTO.PROFESORES WHERE NOMBRE = ?";
-            PreparedStatement pst = con.prepareStatement(query);
-            pst.setString(1, nombreProfesor);
+        // Consulta SQL para obtener el ID del profesor
+        String query = "SELECT \"ID profesor\" FROM INSTITUTO.PROFESORES WHERE NOMBRE = ? AND APELLIDO = ?";
+        PreparedStatement pst = con.prepareStatement(query);
+        pst.setString(1, nombreProfesor);
+        pst.setString(2, apellidoProfesor);
 
-            // Ejecutar la consulta
-            ResultSet rs = pst.executeQuery();
-            if (rs.next()) {
-                idProfesor = rs.getInt(1);
-            }
-
-            // Cerrar la conexión y liberar recursos
-            rs.close();
-            pst.close();
-            con.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        // Ejecutar la consulta
+        ResultSet rs = pst.executeQuery();
+        if (rs.next()) {
+            idProfesor = rs.getInt(1);
         }
-        return idProfesor;
-    }
 
+        // Cerrar la conexión y liberar recursos
+        rs.close();
+        pst.close();
+        con.close();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return idProfesor;
+}
     private int obtenerIdRol(String nombreRol) {
         int idRol = -1;
         try {
@@ -276,6 +360,7 @@ public class AsignarRoles extends javax.swing.JPanel {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

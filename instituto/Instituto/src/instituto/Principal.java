@@ -4,9 +4,7 @@
  */
 package instituto;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.intellijthemes.FlatCyanLightIJTheme;
@@ -24,6 +22,7 @@ import instituto.aulas.A202;
 import instituto.aulas.A105;
 import instituto.aulas.Laboratorio;
 import instituto.aulas.SalaDeConferencias;
+import instituto.aulas.SalaDeReuniones;
 import instituto.perfil.AsignarRoles;
 import instituto.perfil.AulasReservadas;
 import instituto.perfil.ClasesAsignadas;
@@ -37,12 +36,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 
-
-
-/**
- *
- * @author ivan.castellano
- */
 public class Principal extends javax.swing.JFrame {
 
     private int idProfesor;
@@ -50,88 +43,72 @@ public class Principal extends javax.swing.JFrame {
     private String nombre;
     private String apellido;
     private String correo;
+    private Connection connection;
+    
     public Principal(int idProfesor,int idRol) {
         this.idProfesor = idProfesor;
         this.idRol = idRol;
         initComponents();
+        initializeConnection();
         mostrarDatosProfesor();
         if(idRol == 0){
         jMenuItem15.setVisible(false);
         }
     }
-        private void mostrarDatosProfesor() {
+    private void initializeConnection() {
         try {
-            // Conectar a la base de datos
-            Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-            Statement statement = connection.createStatement();
+            connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
-            // Consultar los datos del profesor
-            String query = "SELECT * FROM instituto.profesores WHERE \"ID profesor\" = " + idProfesor;
-            ResultSet resultSet = statement.executeQuery(query);
-
-            if (resultSet.next()) {
-                String nombre = resultSet.getString("NOMBRE");
-                String apellido = resultSet.getString("APELLIDO");
-                String correo = resultSet.getString("CORREOELECTRONICO");
-
-                // Actualizar el JLabel o cualquier otro componente con los datos del profesor
-                nombre = this.nombre;
-                apellido = this.apellido;
-                correo = this.correo;
+    private void mostrarDatosProfesor() {
+        String query = "SELECT * FROM instituto.profesores WHERE \"ID profesor\" = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, idProfesor);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    nombre = resultSet.getString("NOMBRE");
+                    apellido = resultSet.getString("APELLIDO");
+                    correo = resultSet.getString("CORREOELECTRONICO");
+                }
             }
-
-            resultSet.close();
-            statement.close();
-            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     private boolean profesorTieneClasesAsignadas(int idProfesor) {
-    try {
-        Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
         String query = "SELECT COUNT(*) AS total FROM PUBLIC.INSTITUTO.HORARIOS WHERE \"ID profesor\" = ?";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, idProfesor);
-        ResultSet resultSet = statement.executeQuery();
-
-        if (resultSet.next()) {
-            int total = resultSet.getInt("total");
-            return total > 0;
-        }
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-    }
-
-    return false;
-}
-      private boolean tieneReservas(int idProfesor) {
-        boolean tieneReservas = false;
-        try {
-            // Conectar a la base de datos
-            Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-
-            // Consulta SQL para verificar si el profesor tiene reservas
-            String query = "SELECT COUNT(*) FROM INSTITUTO.RESERVAS WHERE ID_PROFESOR = ?";
-            PreparedStatement pst = con.prepareStatement(query);
-            pst.setInt(1, idProfesor);
-
-            // Ejecutar la consulta
-            ResultSet rs = pst.executeQuery();
-            if (rs.next() && rs.getInt(1) > 0) {
-                tieneReservas = true;
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, idProfesor);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt("total") > 0;
+                }
             }
-
-            // Cerrar la conexión y liberar recursos
-            rs.close();
-            pst.close();
-            con.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return tieneReservas;
+        return false;
     }
+
+    private boolean tieneReservas(int idProfesor) {
+        String query = "SELECT COUNT(*) FROM INSTITUTO.RESERVAS WHERE ID_PROFESOR = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, idProfesor);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next() && resultSet.getInt(1) > 0) {
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -198,15 +175,15 @@ public class Principal extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem5 = new javax.swing.JMenuItem();
+        jMenuItem13 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem12 = new javax.swing.JMenuItem();
         jMenuItem11 = new javax.swing.JMenuItem();
         jMenuItem10 = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
-        jMenuItem5 = new javax.swing.JMenuItem();
-        jMenuItem13 = new javax.swing.JMenuItem();
         jMenuItem15 = new javax.swing.JMenuItem();
         jMenuItem14 = new javax.swing.JMenuItem();
 
@@ -522,12 +499,12 @@ public class Principal extends javax.swing.JFrame {
         });
         jPanel4.add(conferencias, new org.netbeans.lib.awtextra.AbsoluteConstraints(262, 2, 290, 60));
 
-        baños2.setBackground(new java.awt.Color(255, 224, 51));
+        baños2.setBackground(new java.awt.Color(255, 214, 10));
         baños2.setForeground(new java.awt.Color(255, 255, 255));
         baños2.setText("baños");
         jPanel4.add(baños2, new org.netbeans.lib.awtextra.AbsoluteConstraints(552, 2, 100, 60));
 
-        A201.setBackground(new java.awt.Color(255, 224, 51));
+        A201.setBackground(new java.awt.Color(255, 214, 10));
         A201.setForeground(new java.awt.Color(255, 255, 255));
         A201.setText("A201");
         A201.addActionListener(new java.awt.event.ActionListener() {
@@ -537,7 +514,7 @@ public class Principal extends javax.swing.JFrame {
         });
         jPanel4.add(A201, new org.netbeans.lib.awtextra.AbsoluteConstraints(2, 2, 120, 60));
 
-        A202.setBackground(new java.awt.Color(255, 224, 51));
+        A202.setBackground(new java.awt.Color(255, 214, 10));
         A202.setForeground(new java.awt.Color(255, 255, 255));
         A202.setText("A202");
         A202.addActionListener(new java.awt.event.ActionListener() {
@@ -701,6 +678,31 @@ public class Principal extends javax.swing.JFrame {
         });
         jMenu2.add(jMenuItem1);
 
+        jMenuItem3.setText("ver archivos");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem3);
+
+        jMenuItem5.setText("aulas reservadas");
+        jMenuItem5.setToolTipText("");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem5);
+
+        jMenuItem13.setText("tus clases");
+        jMenuItem13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem13ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem13);
+
         jMenuBar1.add(jMenu2);
 
         jMenu4.setText("Modo");
@@ -733,38 +735,13 @@ public class Principal extends javax.swing.JFrame {
 
         jMenu5.setText("Perfil");
 
-        jMenuItem4.setText("ver");
+        jMenuItem4.setText("ver Perfil");
         jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem4ActionPerformed(evt);
             }
         });
         jMenu5.add(jMenuItem4);
-
-        jMenuItem3.setText("ver archivos");
-        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem3ActionPerformed(evt);
-            }
-        });
-        jMenu5.add(jMenuItem3);
-
-        jMenuItem5.setText("aulas reservadas");
-        jMenuItem5.setToolTipText("");
-        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem5ActionPerformed(evt);
-            }
-        });
-        jMenu5.add(jMenuItem5);
-
-        jMenuItem13.setText("tus clases");
-        jMenuItem13.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem13ActionPerformed(evt);
-            }
-        });
-        jMenu5.add(jMenuItem13);
 
         jMenuItem15.setText("asignar roles");
         jMenuItem15.addActionListener(new java.awt.event.ActionListener() {
@@ -857,13 +834,16 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_A301ActionPerformed
 
     private void reunionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reunionesActionPerformed
-        // TODO add your handling code here:
+        SalaDeReuniones s = new SalaDeReuniones(this,idProfesor);
+        s.setLocationRelativeTo(null);
+        s.setVisible(true);
+        this.setEnabled(false);
     }//GEN-LAST:event_reunionesActionPerformed
 
     private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
         jPanel6.removeAll();
         jPanel6.setLayout(new BorderLayout());
-        this.setSize(1375, 652);
+        this.setSize(1370, 670);
         jPanel6.add(this.jPanel1);
         jPanel6.revalidate();
         jPanel6.repaint();
@@ -872,60 +852,70 @@ public class Principal extends javax.swing.JFrame {
 
     private void A101ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A101ActionPerformed
      A101 a = new A101(this);
-    a.setVisible(true);
-    this.setEnabled(false);
+     a.setLocationRelativeTo(null);
+     a.setVisible(true);
+     this.setEnabled(false);
     }//GEN-LAST:event_A101ActionPerformed
 
     private void A102ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A102ActionPerformed
       A102 a = new A102(this);
-    a.setVisible(true);
-    this.setEnabled(false);
+      a.setLocationRelativeTo(null);
+      a.setVisible(true);
+      this.setEnabled(false);
     }//GEN-LAST:event_A102ActionPerformed
 
     private void A103ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A103ActionPerformed
       A103 a = new A103(this);
-    a.setVisible(true);
-    this.setEnabled(false);
+      a.setLocationRelativeTo(null);
+      a.setVisible(true);
+      this.setEnabled(false);
     }//GEN-LAST:event_A103ActionPerformed
 
     private void A104ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A104ActionPerformed
      A104 a = new A104(this);
-    a.setVisible(true);
-    this.setEnabled(false);
+     a.setLocationRelativeTo(null);
+     a.setVisible(true);
+     this.setEnabled(false);
     }//GEN-LAST:event_A104ActionPerformed
 
     private void A105ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A105ActionPerformed
        A105 a = new A105(this);
-    a.setVisible(true);
-    this.setEnabled(false);
+       a.setLocationRelativeTo(null);
+        a.setVisible(true);
+        this.setEnabled(false);
     }//GEN-LAST:event_A105ActionPerformed
 
     private void A106ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A106ActionPerformed
       A106 a = new A106(this);
+      a.setLocationRelativeTo(null);
     a.setVisible(true);
     this.setEnabled(false);
     }//GEN-LAST:event_A106ActionPerformed
 
     private void A201ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A201ActionPerformed
        A201 a = new A201(this);
+       a.setLocationRelativeTo(null);
     a.setVisible(true);
     this.setEnabled(false);
     }//GEN-LAST:event_A201ActionPerformed
 
     private void A202ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A202ActionPerformed
      A202 a = new A202(this);
+     a.setLocationRelativeTo(null);
     a.setVisible(true);
     this.setEnabled(false);
     }//GEN-LAST:event_A202ActionPerformed
 
     private void A302ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A302ActionPerformed
-       A301 a = new A301(this);
+       A302 a = new A302(this);
+       a.setLocationRelativeTo(null);
         a.setVisible(true);
         this.setEnabled(false);
     }//GEN-LAST:event_A302ActionPerformed
 
     private void A303ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A303ActionPerformed
         A303 a = new A303(this);
+        a.setLocationRelativeTo(null);
        a.setVisible(true);
        this.setEnabled(false);
     }//GEN-LAST:event_A303ActionPerformed
@@ -964,7 +954,7 @@ public class Principal extends javax.swing.JFrame {
         jPanel6.removeAll();
         Busqueda pa = new Busqueda(idRol);
         jPanel6.setLayout(new BorderLayout());
-        this.setSize(950, 600);
+        this.setSize(910, 627);
         jPanel6.add(pa, BorderLayout.CENTER);
         jPanel6.add(pa);
         jPanel6.revalidate();
@@ -996,6 +986,7 @@ public class Principal extends javax.swing.JFrame {
 
     private void laboratorioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_laboratorioActionPerformed
         Laboratorio a = new Laboratorio(this,idProfesor);
+        a.setLocationRelativeTo(null);
         a.setVisible(true);
         this.setEnabled(false);
     }//GEN-LAST:event_laboratorioActionPerformed
@@ -1005,7 +996,7 @@ public class Principal extends javax.swing.JFrame {
         jPanel6.removeAll();
         AulasReservadas pa = new AulasReservadas(idProfesor);
         jPanel6.setLayout(new BorderLayout());
-        this.setSize(700, 450);
+        this.setSize(700, 300);
         jPanel6.add(pa, BorderLayout.CENTER);
         jPanel6.add(pa);
         jPanel6.revalidate();
@@ -1018,16 +1009,15 @@ public class Principal extends javax.swing.JFrame {
     private void jMenuItem13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem13ActionPerformed
        jPanel6.removeAll();
         if (profesorTieneClasesAsignadas(idProfesor)) {
-    ClasesAsignadas pa = new ClasesAsignadas(idProfesor);
-    jPanel6.setLayout(new BorderLayout());
-    this.setSize(850, 600);
-    jPanel6.add(pa, BorderLayout.CENTER);
-    jPanel6.revalidate();
-    jPanel6.repaint();
-} else {
-    // Mostrar un mensaje indicando que el profesor no tiene clases asignadas
-    JOptionPane.showMessageDialog(this, "El profesor no tiene clases asignadas.");
-}
+        ClasesAsignadas pa = new ClasesAsignadas(idProfesor);
+        jPanel6.setLayout(new BorderLayout());
+        this.setSize(850, 600);
+        jPanel6.add(pa, BorderLayout.CENTER);
+        jPanel6.revalidate();
+        jPanel6.repaint();
+        } else {
+            JOptionPane.showMessageDialog(this, "El profesor no tiene clases asignadas.");
+        }
     }//GEN-LAST:event_jMenuItem13ActionPerformed
 
     private void jMenuItem14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem14ActionPerformed
@@ -1035,11 +1025,11 @@ public class Principal extends javax.swing.JFrame {
             int opcion = JOptionPane.showConfirmDialog(this, "¿Estás seguro de querer cerrar sesión?",
                     "Cerrar Sesión", JOptionPane.YES_NO_OPTION);
             if (opcion == JOptionPane.YES_OPTION) {
-                // Código para cerrar la sesión
-                // Por ejemplo, reiniciar el JFrame de login
-                this.dispose(); // Cierra el JFrame actual
-                JFrame login = new Login(); // Reemplaza con el nombre de tu JFrame de login
+                this.dispose();
+                JFrame login = new Login(); 
+                login.setLocationRelativeTo(null);
                 login.setVisible(true);
+               
             }
         }
     }//GEN-LAST:event_jMenuItem14ActionPerformed
@@ -1048,7 +1038,7 @@ public class Principal extends javax.swing.JFrame {
         jPanel6.removeAll();
         AsignarRoles ar = new AsignarRoles(idRol);
         jPanel6.setLayout(new BorderLayout());
-        this.setSize(850, 600);
+        this.setSize(650, 400);
         jPanel6.add(ar, BorderLayout.CENTER);
         jPanel6.add(ar);
         jPanel6.revalidate();
@@ -1057,6 +1047,7 @@ public class Principal extends javax.swing.JFrame {
 
     private void conferenciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_conferenciasActionPerformed
         SalaDeConferencias a = new SalaDeConferencias(this,idProfesor);
+        a.setLocationRelativeTo(null);
         a.setVisible(true);
         this.setEnabled(false);
     }//GEN-LAST:event_conferenciasActionPerformed

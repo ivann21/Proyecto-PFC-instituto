@@ -1,0 +1,234 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
+ */
+package instituto.perfil;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+/**
+ *
+ * @author icast
+ */
+public class SeleccionarRolDialog2 extends javax.swing.JDialog {
+
+    private boolean rolAgregado = false;
+    private String nombreProfesor;
+    private String apellidoProfesor;
+    private int idProfesor;
+   public SeleccionarRolDialog2(java.awt.Frame parent, boolean modal, String nombreProfesor, String apellidoProfesor) {
+    super(parent, modal);
+    this.nombreProfesor = nombreProfesor;
+    this.apellidoProfesor = apellidoProfesor;
+    initComponents();
+    
+    agregarButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            agregarRol();
+        }
+    });
+
+    cancelarButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            dispose();
+        }
+    });
+    cargarRoles();
+    obtenerIdProfesor();
+}
+        private void cargarRoles() {
+        try {
+            Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+            String query = "SELECT NOMBRE_ROL FROM INSTITUTO.ROLES";
+            PreparedStatement pst = con.prepareStatement(query);
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
+                rolComboBox.addItem(rs.getString("NOMBRE_ROL"));
+            }
+
+            rs.close();
+            pst.close();
+            con.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void obtenerIdProfesor() {
+        try {
+            Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+            String query = "SELECT \"ID profesor\" FROM INSTITUTO.PROFESORES WHERE NOMBRE = ? AND APELLIDO = ?";
+            PreparedStatement pst = con.prepareStatement(query);
+            pst.setString(1, nombreProfesor);
+            pst.setString(2, apellidoProfesor);
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                idProfesor = rs.getInt("ID profesor");
+            }
+
+            rs.close();
+            pst.close();
+            con.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+  private void agregarRol() {
+    String rolSeleccionado = (String) rolComboBox.getSelectedItem();
+
+    try {
+        Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+
+        // Obtener el ID del rol seleccionado
+        String query = "SELECT ID_ROL FROM INSTITUTO.ROLES WHERE NOMBRE_ROL = ?";
+        PreparedStatement pst = con.prepareStatement(query);
+        pst.setString(1, rolSeleccionado);
+        ResultSet rs = pst.executeQuery();
+        
+        int idRol = -1;
+        if (rs.next()) {
+            idRol = rs.getInt("ID_ROL");
+        }
+        
+        if (idRol != -1) {
+            // Verificar si el profesor ya tiene un rol asignado
+            query = "SELECT COUNT(*) FROM INSTITUTO.ASIGNACION_ROLES WHERE ID_PROFESOR = ?";
+            pst = con.prepareStatement(query);
+            pst.setInt(1, idProfesor);
+            rs = pst.executeQuery();
+            
+            rs.next();
+            int count = rs.getInt(1);
+            
+            if (count > 0) {
+                // Si el profesor ya tiene un rol asignado, realizar una actualización (alter) en lugar de una inserción
+                query = "UPDATE INSTITUTO.ASIGNACION_ROLES SET ID_ROL = ? WHERE ID_PROFESOR = ?";
+                pst = con.prepareStatement(query);
+                pst.setInt(1, idRol);
+                pst.setInt(2, idProfesor);
+                pst.executeUpdate();
+            } else {
+                // Si el profesor no tiene un rol asignado, realizar la inserción
+                query = "INSERT INTO INSTITUTO.ASIGNACION_ROLES (ID_PROFESOR, ID_ROL) VALUES (?, ?)";
+                pst = con.prepareStatement(query);
+                pst.setInt(1, idProfesor);
+                pst.setInt(2, idRol);
+                pst.executeUpdate();
+            }
+
+            rolAgregado = true;
+            dispose();
+        }
+
+        rs.close();
+        pst.close();
+        con.close();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+    public boolean isRolAgregado() {
+        return rolAgregado;
+    }
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jLabel1 = new javax.swing.JLabel();
+        rolComboBox = new javax.swing.JComboBox<>();
+        agregarButton = new javax.swing.JButton();
+        cancelarButton = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Que rol quieres ponerle?");
+        setResizable(false);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel1.setText("rol:");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 23, -1, -1));
+
+        getContentPane().add(rolComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 20, 191, -1));
+
+        agregarButton.setText("aceptar");
+        agregarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                agregarButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(agregarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, -1, -1));
+
+        cancelarButton.setText("cancelar");
+        getContentPane().add(cancelarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 60, -1, -1));
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void agregarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarButtonActionPerformed
+        // Eliminar de la tabla
+    }//GEN-LAST:event_agregarButtonActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(SeleccionarRolDialog2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(SeleccionarRolDialog2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(SeleccionarRolDialog2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(SeleccionarRolDialog2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the dialog */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                SeleccionarRolDialog2 dialog = new SeleccionarRolDialog2(new javax.swing.JFrame(), true,"nombre","apellido");
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton agregarButton;
+    private javax.swing.JButton cancelarButton;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JComboBox<String> rolComboBox;
+    // End of variables declaration//GEN-END:variables
+}
