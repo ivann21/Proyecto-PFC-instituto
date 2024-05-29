@@ -6,8 +6,6 @@ package instituto.busquedas.añadir;
 
 import instituto.busquedas.Busqueda;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -29,21 +27,21 @@ public class EditarHorarios extends javax.swing.JFrame {
     this.parentPanel = parentPanel;
     initComponents();
     populateComboBoxes();
-    asignaturaSeleccionada = horariosData[3].toString(); // Asignatura
-    profesorSeleccionado = horariosData[4].toString(); // Profesor
-    aulaSeleccionada = horariosData[5].toString(); // Aula
-    diaSeleccionado = horariosData[0].toString(); // Día de la semana
-    horaInicioSeleccionada = horariosData[1].toString(); // Hora de inicio
-    horaFinSeleccionada = horariosData[2].toString(); // Hora de fin
+    asignaturaSeleccionada = horariosData[3].toString();
+    profesorSeleccionado = horariosData[4].toString();
+    aulaSeleccionada = horariosData[5].toString(); 
+    diaSeleccionado = horariosData[0].toString(); 
+    horaInicioSeleccionada = horariosData[1].toString();
+    horaFinSeleccionada = horariosData[2].toString();
     
     System.out.println(asignaturaSeleccionada + " - " + profesorSeleccionado + " - " + aulaSeleccionada + " - " + diaSeleccionado + " - " + horaInicioSeleccionada + " - " + horaFinSeleccionada);
     
-    setSelectedItem(jComboBox1, asignaturaSeleccionada); // Asignatura
-    setSelectedItem(jComboBox2, profesorSeleccionado); // Profesor
-    setSelectedItem(jComboBox3, aulaSeleccionada); // Aula
-    jComboBox4.setSelectedItem(diaSeleccionado); // Día de la semana
-    jComboBox5.setSelectedItem(horaInicioSeleccionada); // Hora de inicio
-    jComboBox6.setSelectedItem(horaFinSeleccionada); // Hora de fin
+    setSelectedItem(jComboBox1, asignaturaSeleccionada);
+    setSelectedItem(jComboBox2, profesorSeleccionado); 
+    setSelectedItem(jComboBox3, aulaSeleccionada);
+    jComboBox4.setSelectedItem(diaSeleccionado); 
+    jComboBox5.setSelectedItem(horaInicioSeleccionada); 
+    jComboBox6.setSelectedItem(horaFinSeleccionada); 
 
     String asignatura = asignaturaSeleccionada.split(" ")[0];
     String profesor = profesorSeleccionado.split(" ")[0];
@@ -113,7 +111,7 @@ private String[] getItems(String tableName) {
     return false;
 }
   private int obtenerIdHorario(String nombreAsignatura, String nombreProfesor, String nombreAula, String dia, LocalTime horaInicio, LocalTime horaFin) {
-    int idHorario = -1; // Valor por defecto en caso de que no se encuentre ningún horario con los datos especificados
+    int idHorario = -1;
     try {
         Class.forName("org.hsqldb.jdbc.JDBCDriver");
         try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {

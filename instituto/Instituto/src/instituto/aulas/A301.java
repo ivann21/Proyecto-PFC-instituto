@@ -21,11 +21,6 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-
-/**
- *
- * @author ivan.castellano
- */
 public class A301 extends javax.swing.JFrame {
     
     private static Connection connection = null;
@@ -39,26 +34,21 @@ public class A301 extends javax.swing.JFrame {
                 comboBoxDiaSemana.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Cuando se selecciona un nuevo día de la semana, actualiza los datos en la JTable
                 mostrarDatosEnJTable();
             }
         });
         addWindowListener(new java.awt.event.WindowAdapter() {
                  @Override
                  public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                     // Cuando el JFrame se está cerrando, vuelve a habilitar el JFrame principal
                      principalRef.setEnabled(true);
                  }
              });
-        // Añade el JComboBox al contenedor (puede ser un JPanel o un contenedor similar)
         getContentPane().add(comboBoxDiaSemana);
 
-        // Carga los datos inicialmente
         mostrarDatosEnJTable();
         mostrarDatosEnJTable2();
     }
 
-        // Método para mostrar los datos en la JTable según la selección en el JComboBox
     private void mostrarDatosEnJTable() {
         String diaSeleccionado = (String) comboBoxDiaSemana.getSelectedItem();
         DefaultTableModel model = new DefaultTableModel();
@@ -148,16 +138,14 @@ public class A301 extends javax.swing.JFrame {
         int rowHeight = 100;
         jTable2.setRowHeight(rowHeight);
         
-// Configurar el renderer personalizado para las columnas "Pizarra" y "Ordenadores"
 DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        label.setHorizontalAlignment(JLabel.CENTER); // Centrar la imagen en la celda
+        label.setHorizontalAlignment(JLabel.CENTER);
         if (value instanceof ImageIcon) {
             ImageIcon icon = (ImageIcon) value;
-            // Escalar la imagen al tamaño máximo deseado
-            int maxSize = 50; // Tamaño máximo en píxeles
+            int maxSize = 50;
             int width = icon.getIconWidth();
             int height = icon.getIconHeight();
             if (width > maxSize || height > maxSize) {
@@ -171,19 +159,17 @@ DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
                 icon = new ImageIcon(icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
             }
             label.setIcon(icon);
-            label.setText(""); // Limpiar el texto para que solo se muestre el icono
+            label.setText(""); 
         }
         return label;
     }
 };
 
-// Aplicar el renderer personalizado a las columnas "Pizarra" y "Ordenadores"
-jTable2.getColumnModel().getColumn(1).setCellRenderer(renderer); // Columna "Pizarra"
-jTable2.getColumnModel().getColumn(2).setCellRenderer(renderer); // Columna "Ordenadores"
+jTable2.getColumnModel().getColumn(1).setCellRenderer(renderer); 
+jTable2.getColumnModel().getColumn(2).setCellRenderer(renderer);
 DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 centerRenderer.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
 jTable2.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-// Deshabilitar la selección de filas en la tabla
 jTable2.setRowSelectionAllowed(false);
         
     } catch (ClassNotFoundException e) {
@@ -192,7 +178,6 @@ jTable2.setRowSelectionAllowed(false);
 }
      private static void connectToDatabase() {
         try {
-            // Establecer la conexión con la base de datos
             connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
             statement = connection.createStatement();
         } catch (SQLException e) {

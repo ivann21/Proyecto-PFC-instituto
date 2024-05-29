@@ -4,14 +4,9 @@
  */
 package instituto.busquedas.añadir;
 
-import instituto.Principal;
 import instituto.busquedas.Busqueda;
 import javax.swing.JOptionPane;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import javax.swing.JOptionPane;
 import java.sql.*;
-import java.util.Base64;
 /**
  *
  * @author icast

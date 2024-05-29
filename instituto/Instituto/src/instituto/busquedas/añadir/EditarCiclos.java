@@ -4,14 +4,9 @@
  */
 package instituto.busquedas.añadir;
 
-import instituto.Principal;
 import instituto.busquedas.Busqueda;
 import javax.swing.JOptionPane;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import javax.swing.JOptionPane;
 import java.sql.*;
-import java.util.Base64;
 /**
  *
  * @author icast
@@ -137,12 +132,9 @@ public class EditarCiclos extends javax.swing.JFrame {
     int anio = Integer.parseInt(anioComboBox.getSelectedItem().toString());
     String descripcion = descripcionTextArea.getText().trim();
 
-    // Verificar si alguno de los campos está vacío
     if (nombre.isEmpty() || descripcion.isEmpty()) {
-        // Mostrar un mensaje de error al usuario
         JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
     } else {
-        // Todos los campos están llenos, actualizar los datos en la base de datos
         try {
             Class.forName("org.hsqldb.jdbc.JDBCDriver");
             try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
@@ -154,18 +146,16 @@ public class EditarCiclos extends javax.swing.JFrame {
 
                     int filasAfectadas = stmt.executeUpdate();
                     if (filasAfectadas > 0) {
-                        // Mostrar un mensaje de éxito al usuario
                         JOptionPane.showMessageDialog(null, "Los datos se han actualizado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                         dispose();
                         if (this.getParent() != null && this.getParent().isEnabled()) {
-                            this.getParent().setEnabled(true); // Si el frame principal existe y está habilitado
+                            this.getParent().setEnabled(true);
                         }
                          if (parentPanel != null) {
                               String selectedTable = "ciclos";
                               parentPanel. mostrarDatosEnJTable(selectedTable);
                           }
                     } else {
-                        // Mostrar un mensaje de error al usuario si no se actualizaron los datos correctamente
                         JOptionPane.showMessageDialog(null, "Hubo un error al actualizar los datos", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }

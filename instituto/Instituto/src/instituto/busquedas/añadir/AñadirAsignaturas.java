@@ -4,14 +4,9 @@
  */
 package instituto.busquedas.añadir;
 
-import instituto.Principal;
 import instituto.busquedas.Busqueda;
 import javax.swing.JOptionPane;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import javax.swing.JOptionPane;
 import java.sql.*;
-import java.util.Base64;
 /**
  *
  * @author icast
@@ -127,14 +122,11 @@ public class AñadirAsignaturas extends javax.swing.JFrame {
     String nombreCiclo = cicloComboBox.getSelectedItem().toString();
     int anioCiclo = Integer.parseInt(anioComboBox.getSelectedItem().toString());
 
-    // Verificar si alguno de los campos está vacío
     if (nombre.isEmpty() || descripcion.isEmpty()) {
-        // Mostrar un mensaje de error al usuario
         JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
     } else {
         int idCicloSeleccionado = obtenerIdCiclo(nombreCiclo, anioCiclo);
         if (idCicloSeleccionado != -1) {
-            // Todos los campos están llenos, guardar los datos en la base de datos
             try {
                 Class.forName("org.hsqldb.jdbc.JDBCDriver");
                 try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
@@ -146,7 +138,6 @@ public class AñadirAsignaturas extends javax.swing.JFrame {
 
                         int filasAfectadas = stmt.executeUpdate();
                         if (filasAfectadas > 0) {
-                            // Mostrar un mensaje de éxito al usuario
                             JOptionPane.showMessageDialog(null, "Los datos se han guardado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                             dispose();
                               if (parentPanel != null) {
@@ -154,10 +145,9 @@ public class AñadirAsignaturas extends javax.swing.JFrame {
                                 parentPanel. mostrarDatosEnJTable(selectedTable);
                             }
                             if (this.getParent() != null && this.getParent().isEnabled()) {
-                                this.getParent().setEnabled(true); // Si el frame principal existe y está habilitado
+                                this.getParent().setEnabled(true);
                             }
                         } else {
-                            // Mostrar un mensaje de error al usuario si no se guardaron los datos correctamente
                             JOptionPane.showMessageDialog(null, "Hubo un error al guardar los datos", "Error", JOptionPane.ERROR_MESSAGE);
                         }
                     }
@@ -166,13 +156,12 @@ public class AñadirAsignaturas extends javax.swing.JFrame {
                 ex.printStackTrace();
             }
         } else {
-            // Mostrar un mensaje de error si no se encontró el ciclo seleccionado
             JOptionPane.showMessageDialog(null, "No se encontró el ciclo seleccionado en la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
         }
     } 
     }//GEN-LAST:event_jButton1ActionPerformed
        private int obtenerIdCiclo(String nombreCiclo, int anioCiclo) {
-    int idCiclo = -1; // Valor por defecto en caso de que no se encuentre ningún ciclo con el nombre y año especificados
+    int idCiclo = -1;
     try {
         Class.forName("org.hsqldb.jdbc.JDBCDriver");
         try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
@@ -192,7 +181,7 @@ public class AñadirAsignaturas extends javax.swing.JFrame {
     return idCiclo;
 }
         private void cargarCiclos() {
-    cicloComboBox.removeAllItems(); // Limpiar el JComboBox antes de cargar los nuevos ciclos
+    cicloComboBox.removeAllItems(); 
     try {
         Class.forName("org.hsqldb.jdbc.JDBCDriver");
         try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {

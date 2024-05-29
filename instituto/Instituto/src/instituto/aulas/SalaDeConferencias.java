@@ -37,7 +37,6 @@ public class SalaDeConferencias extends javax.swing.JFrame {
          addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                // Cuando el JFrame se está cerrando, vuelve a habilitar el JFrame principal
                 principalRef.setEnabled(true);
             }
         });
@@ -49,46 +48,36 @@ public class SalaDeConferencias extends javax.swing.JFrame {
     }
 private void insertarDatos(java.sql.Date fechaSQL) {
     try {
-        // Validar si la fecha o la hora no han sido seleccionadas
         if (fechaSQL == null || "Seleccione una hora".equals(jComboBox1.getSelectedItem())) {
             JOptionPane.showMessageDialog(null, "Por favor, seleccione una fecha y hora válidas.", "Campos Incompletos", JOptionPane.WARNING_MESSAGE);
-            return; // Salir del método si la fecha o la hora no han sido seleccionadas
+            return; 
         }
         
-        // Establecer conexión con la base de datos
         Connection conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
         
-        // Consulta SQL para insertar los datos
         String sql = "INSERT INTO PUBLIC.INSTITUTO.RESERVAS (ID_AULA, FECHA_RESERVA, ID_PROFESOR, HORA_RESERVA, HORA_FIN_RESERVA) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement statement = conn.prepareStatement(sql);
         
-        // Establecer los valores de los parámetros de la consulta
-        statement.setInt(1, idAula); // ID del aula seleccionada
-        statement.setDate(2, fechaSQL); // Fecha seleccionada
-        statement.setInt(3, idProfesor); // ID del profesor
+        statement.setInt(1, idAula); 
+        statement.setDate(2, fechaSQL); 
+        statement.setInt(3, idProfesor); 
         
-        // Obtener la hora seleccionada del JComboBox
         String horaInicio = (String) jComboBox1.getSelectedItem();
         
-        // Convertir la hora seleccionada a un objeto Time
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         java.util.Date parsedDate = sdf.parse(horaInicio);
         Time horaReservaTime = new Time(parsedDate.getTime());
         
-        // Usar horaReservaTime en tu consulta SQL
-        statement.setTime(4, horaReservaTime); // Hora de inicio de la reserva
+        statement.setTime(4, horaReservaTime); 
         
-        // Calcular la hora de fin de reserva sumando 55 minutos a la hora de inicio
         java.util.Calendar cal = java.util.Calendar.getInstance();
         cal.setTime(parsedDate);
-        cal.add(java.util.Calendar.MINUTE, 55); // Sumar 55 minutos
+        cal.add(java.util.Calendar.MINUTE, 55); 
         Time horaFinReservaTime = new Time(cal.getTimeInMillis());
-        statement.setTime(5, horaFinReservaTime); // Hora de fin de la reserva
+        statement.setTime(5, horaFinReservaTime); 
         
-        // Ejecutar la consulta
         statement.executeUpdate();
         
-        // Cerrar la conexión
         statement.close();
         conn.close();
         
@@ -102,30 +91,24 @@ private void insertarDatos(java.sql.Date fechaSQL) {
 private boolean existeReserva(int idAula, java.sql.Date fechaReserva, Time horaReserva) {
     boolean existe = false;
     try {
-        // Establecer conexión con la base de datos
         Connection conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
         
-        // Consulta SQL para verificar si ya existe una reserva para el ID de aula, fecha y hora especificadas
         String sql = "SELECT COUNT(*) AS num_reservas FROM PUBLIC.INSTITUTO.RESERVAS WHERE ID_AULA = ? AND FECHA_RESERVA = ? AND HORA_RESERVA = ?";
         PreparedStatement statement = conn.prepareStatement(sql);
         
-        // Establecer los valores de los parámetros de la consulta
-        statement.setInt(1, idAula); // ID de aula
-        statement.setDate(2, fechaReserva); // Fecha de reserva
-        statement.setTime(3, horaReserva); // Hora de reserva
+        statement.setInt(1, idAula);
+        statement.setDate(2, fechaReserva); 
+        statement.setTime(3, horaReserva); 
         
-        // Ejecutar la consulta
         ResultSet resultSet = statement.executeQuery();
         
-        // Obtener el resultado de la consulta
         if (resultSet.next()) {
             int numReservas = resultSet.getInt("num_reservas");
             if (numReservas > 0) {
-                existe = true; // Hay al menos una reserva para el ID de aula, fecha y hora especificadas
+                existe = true; 
             }
         }
         
-        // Cerrar recursos
         resultSet.close();
         statement.close();
         conn.close();
@@ -234,41 +217,34 @@ private boolean existeReserva(int idAula, java.sql.Date fechaReserva, Time horaR
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-    // Validar si la fecha seleccionada es válida
     if (fechaString == null || fechaString.isEmpty()) {
         JOptionPane.showMessageDialog(null, "Por favor, seleccione una fecha válida.", "Fecha Incompleta", JOptionPane.WARNING_MESSAGE);
-        return; // Salir del método si la fecha no ha sido seleccionada
+        return; 
     }
-     int numeroHoras = (int) jSpinner1.getValue(); // Asegúrate de que jSpinner1 es el nombre de tu JSpinner
+     int numeroHoras = (int) jSpinner1.getValue();
     if (numeroHoras < 1 || numeroHoras > 3) {
         JOptionPane.showMessageDialog(null, "Número de horas no válido. Por favor, seleccione un valor entre 1 y 3.", "Número de Horas No Válido", JOptionPane.WARNING_MESSAGE);
-        return; // Salir del método si el número de horas no es válido
+        return; 
     }
-    // Parsear la fecha
     SimpleDateFormat formato = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
 
     try {
-        java.util.Date fechaUtil = formato.parse(fechaString); // Aquí parseamos a java.util.Date
-        java.sql.Date fechaSQL = new java.sql.Date(fechaUtil.getTime()); // Aquí convertimos a java.sql.Date si es necesario
+        java.util.Date fechaUtil = formato.parse(fechaString); 
+        java.sql.Date fechaSQL = new java.sql.Date(fechaUtil.getTime()); 
 
-        // Obtener la hora seleccionada del JComboBox
         String horaInicio = (String) jComboBox1.getSelectedItem();
 
-        // Convertir la hora seleccionada a un objeto Time
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         java.util.Date parsedDate = sdf.parse(horaInicio);
         Time horaReservaTime = new Time(parsedDate.getTime());
 
-        // Verificar si ya existe una reserva para la fecha y hora especificadas
         if (existeReserva(idAula,fechaSQL, horaReservaTime)) {
             JOptionPane.showMessageDialog(null, "El aula ya está reservada para la fecha y hora seleccionadas.", "Aula Reservada", JOptionPane.WARNING_MESSAGE);
-            return; // Salir del método si ya existe una reserva para la fecha y hora especificadas
+            return; 
         }
 
-        // Insertar los datos si la fecha es válida y no hay reserva existente
         insertarDatos(fechaSQL);
 
-        // Mostrar mensaje de éxito
         JOptionPane.showMessageDialog(null, "El aula ha sido reservada correctamente.", "Reserva Exitosa", JOptionPane.INFORMATION_MESSAGE);
 
     } catch (ParseException ex) {

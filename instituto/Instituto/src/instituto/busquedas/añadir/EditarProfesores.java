@@ -4,9 +4,7 @@
  */
 package instituto.busquedas.añadir;
 
-import instituto.Principal;
 import instituto.busquedas.Busqueda;
-import javax.swing.JOptionPane;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import javax.swing.JOptionPane;
@@ -33,13 +31,10 @@ public class EditarProfesores extends javax.swing.JFrame {
     }
 public  String hashPassword(String password) {
         try {
-            // Crear un objeto MessageDigest para el algoritmo SHA-256
             MessageDigest md = MessageDigest.getInstance("SHA-256");
 
-            // Aplicar el algoritmo de hash a la contraseña
             byte[] hashedBytes = md.digest(password.getBytes());
 
-            // Convertir los bytes hasheados a una representación legible
             String hashedPassword = Base64.getEncoder().encodeToString(hashedBytes);
 
             return hashedPassword;
@@ -49,7 +44,6 @@ public  String hashPassword(String password) {
         }
     }
 private boolean verificarContrasenia(String contraseniaActual) {
-    String correo = correoTextField.getText().trim();
     try {
         Class.forName("org.hsqldb.jdbc.JDBCDriver");
         try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
@@ -58,14 +52,14 @@ private boolean verificarContrasenia(String contraseniaActual) {
                 stmt.setString(1, correos);
                 stmt.setString(2, contraseniaActual);
                 try (ResultSet rs = stmt.executeQuery()) {
-                    return rs.next(); // Si la consulta retorna algún resultado, significa que la contraseña es correcta
+                    return rs.next();
                 }
             }
         }
     } catch (ClassNotFoundException | SQLException ex) {
         ex.printStackTrace();
     }
-    return false; // Si hay algún error o no se encuentra ningún profesor con el correo y contraseña proporcionados
+    return false; 
 }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -171,9 +165,7 @@ private boolean verificarContrasenia(String contraseniaActual) {
     String contraseniaActual = jPasswordField1.getText().trim();
     String nuevaContrasenia = jPasswordField2.getText().trim();
 
-    // Verificar si alguno de los campos está vacío
     if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty() || contraseniaActual.isEmpty() || nuevaContrasenia.isEmpty()) {
-        // Mostrar un mensaje de error al usuario
         JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             String correoRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
@@ -186,41 +178,33 @@ private boolean verificarContrasenia(String contraseniaActual) {
         }
         String contraseniaHasheadaActual = hashPassword(contraseniaActual);
 
-        // Verificar si la contraseña actual es correcta
         if (verificarContrasenia(contraseniaHasheadaActual)) {
-            // Hashear la nueva contraseña
             String nuevaContraseniaHasheada = hashPassword(nuevaContrasenia);
 
-            // Todos los campos están llenos y la contraseña actual es correcta, actualizar los datos en la base de datos
             try {
                 Class.forName("org.hsqldb.jdbc.JDBCDriver");
                 try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
                     String consultaSQL = "UPDATE PUBLIC.INSTITUTO.PROFESORES SET NOMBRE=?, APELLIDO=?, CORREOELECTRONICO=?, CONTRASENIA=? WHERE CORREOELECTRONICO=?";
-                      String consultaSQLImprimible = String.format(
-                        "UPDATE PUBLIC.INSTITUTO.PROFESORES SET NOMBRE='%s', APELLIDO='%s', CORREOELECTRONICO='%s', CONTRASENIA='%s' WHERE CORREOELECTRONICO='%s'",
-                        nombre, apellido, correo, nuevaContraseniaHasheada, correo
-                    );
                     try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
                         stmt.setString(1, nombre);
                         stmt.setString(2, apellido);
                         stmt.setString(3, correo);
-                        stmt.setString(4, nuevaContraseniaHasheada); // Guardar la nueva contraseña hasheada
-                        stmt.setString(5, correos); // Condición WHERE para encontrar el profesor por correo electrónico
+                        stmt.setString(4, nuevaContraseniaHasheada); 
+                        stmt.setString(5, correos);
 
                         int filasAfectadas = stmt.executeUpdate();
                         if (filasAfectadas > 0) {
-                            // Mostrar un mensaje de éxito al usuario
+                            
                             JOptionPane.showMessageDialog(null, "Los datos se han actualizado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                             dispose();
                             if (this.getParent() != null && this.getParent().isEnabled()) {
-                                this.getParent().setEnabled(true); // Si el frame principal existe y está habilitado
+                                this.getParent().setEnabled(true); 
                             }
                              if (parentPanel != null) {
                               String selectedTable = "profesores";
                               parentPanel. mostrarDatosEnJTable(selectedTable);
                           }
                         } else {
-                            // Mostrar un mensaje de error al usuario si no se actualizaron los datos correctamente
                             JOptionPane.showMessageDialog(null, "Hubo un error al actualizar los datos", "Error", JOptionPane.ERROR_MESSAGE);
                         }
                     }
@@ -229,7 +213,6 @@ private boolean verificarContrasenia(String contraseniaActual) {
                 ex.printStackTrace();
             }
         } else {
-            // La contraseña actual ingresada no es correcta
             JOptionPane.showMessageDialog(null, "La contraseña actual es incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }

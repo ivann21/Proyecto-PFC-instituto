@@ -10,8 +10,10 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.sql.*;
 import java.util.HashMap;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.RowFilter;
+import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  *
@@ -27,6 +29,8 @@ public class ClasesAsignadas extends javax.swing.JPanel {
          this.idProfesor = idProfesor;
         initComponents();
         cargarHorariosDelProfesor();
+         jTable1.setDefaultEditor(Object.class, null);
+        jTable1.setRowHeight(30);
          columnMapping = new HashMap<>();
         columnMapping.put("nombre", "NOMBRE");
         columnMapping.put("apellido", "APELLIDO");
@@ -125,6 +129,12 @@ public class ClasesAsignadas extends javax.swing.JPanel {
         }
 
         jTable1.setModel(model);
+        
+         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        for (int i = 0; i < jTable1.getColumnCount(); i++) {
+            jTable1.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
     } catch (SQLException ex) {
         // Manejar cualquier error de SQL
         ex.printStackTrace();

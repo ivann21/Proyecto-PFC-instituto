@@ -178,27 +178,22 @@ private String sumarMinutos(String hora, int minutos) {
     String horaFin = jComboBox6.getSelectedItem().toString();
 
     try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
-        // Definir el formateador de tiempo para el formato "H:mm:ss"
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm:ss");
 
-        // Convertir las horas de inicio y fin a LocalTime para manejar el tiempo fácilmente
         LocalTime horaInicioTime = LocalTime.parse(horaInicio, formatter);
         LocalTime horaFinTime = LocalTime.parse(horaFin, formatter);
         
         while (horaInicioTime.isBefore(horaFinTime)) {
             System.out.println("Hora de inicio: " + horaInicioTime);
 
-            // Añadir 55 minutos a la horaInicio
             LocalTime horaFinClaseTime = horaInicioTime.plusMinutes(55);
             System.out.println("Hora de fin de clase: " + horaFinClaseTime);
 
-            // Ajustar horaFinClase si excede la horaFin
             if (horaFinClaseTime.isAfter(horaFinTime)) {
                 horaFinClaseTime = horaFinTime;
                 System.out.println("Ajustando hora de fin de clase: " + horaFinClaseTime);
             }
 
-            // Convertir LocalTime a String para las consultas SQL
             String horaInicioStr = horaInicioTime.format(formatter);
             String horaFinClaseStr = horaFinClaseTime.format(formatter);
 
@@ -221,7 +216,6 @@ private String sumarMinutos(String hora, int minutos) {
                 System.out.println("Consulta SQL: " + pstmt.toString());
             }
 
-            // Actualizar horaInicio para el siguiente intervalo
             horaInicioTime = horaFinClaseTime;
         }
         JOptionPane.showMessageDialog(this, "Horario añadido correctamente.");

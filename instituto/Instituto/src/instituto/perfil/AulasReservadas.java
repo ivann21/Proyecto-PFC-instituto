@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package instituto.perfil;
-import instituto.busquedas.añadir.ImageRenderer;
 import instituto.busquedas.añadir.ImageRenderer2;
 import java.sql.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,9 +12,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableCellRenderer;
 /**
  *
  * @author ivan.castellano
@@ -31,10 +28,11 @@ public class AulasReservadas extends javax.swing.JPanel {
         initComponents();
         cargarSitiosReservados();
         cargarReservas();
-         // Agregar un ActionListener al JComboBox
+        jTable1.setDefaultEditor(Object.class, null);
+        jTable1.setRowHeight(30);
         jComboBox1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                cargarReservas(); // Llamar al método cargarReservas() cuando se cambie el valor en el JComboBox
+                cargarReservas(); 
             }
         });
             jTable1.addMouseListener(new MouseAdapter() {
@@ -42,24 +40,18 @@ public class AulasReservadas extends javax.swing.JPanel {
             public void mouseClicked(MouseEvent e) {
                 int column = jTable1.columnAtPoint(e.getPoint());
                 int row = jTable1.rowAtPoint(e.getPoint());
-                if (column == jTable1.getColumnCount() - 1) { // Columna de eliminación
+                if (column == jTable1.getColumnCount() - 1) { 
                     int opcion = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que deseas eliminar esta reserva?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
                     if (opcion == JOptionPane.YES_OPTION) {
-                        // Obtener valores de la fila seleccionada
                         Date fechaReserva = (Date) tableModel.getValueAt(row, 0);
                         Time horaReserva = (Time) tableModel.getValueAt(row, 1);
-                        // Obtener el tipo de aula seleccionado del JComboBox
                         String tipoAula = (String) jComboBox1.getSelectedItem();
-                        // Obtener el id del aula
                         int idAula = obtenerIdAula(tipoAula);
                         if (idAula != -1) {
-                            // Obtener el ID de la reserva
                             int idReserva = obtenerIdReserva(idProfesor, idAula, fechaReserva, horaReserva);
                             if (idReserva != -1) {
-                                // Eliminar de la base de datos
                                 eliminarReserva
                                   (idReserva);
-                                // Eliminar de la tabla
                                 tableModel.removeRow(row);
                             } else {
                                 JOptionPane.showMessageDialog(null, "Error al obtener el ID de la reserva.");
@@ -73,59 +65,36 @@ public class AulasReservadas extends javax.swing.JPanel {
         });
     }
      private void cargarSitiosReservados() {
-       comboBoxModel = new DefaultComboBoxModel();
-       
-        try {
-            // Conectar a la base de datos
-            Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+        comboBoxModel = new DefaultComboBoxModel();
+        try (Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+             PreparedStatement pst = con.prepareStatement("SELECT DISTINCT NOMBRE FROM INSTITUTO.AULAS "
+                     + "WHERE \"ID aula\" IN (SELECT ID_AULA FROM INSTITUTO.RESERVAS WHERE ID_PROFESOR = ?)")) {
 
-            // Consulta SQL para obtener los sitios reservados del profesor
-            String query = "SELECT DISTINCT NOMBRE FROM INSTITUTO.AULAS "
-                    + "WHERE \"ID aula\" IN (SELECT ID_AULA FROM INSTITUTO.RESERVAS WHERE ID_PROFESOR = ?)";
-            PreparedStatement pst = con.prepareStatement(query);
             pst.setInt(1, idProfesor);
-            
-            // Ejecutar la consulta
-            ResultSet rs = pst.executeQuery();
-            
-            // Iterar sobre los resultados y agregarlos al modelo del JComboBox
-            while (rs.next()) {
-                String nombreAula = rs.getString("NOMBRE");
-                comboBoxModel.addElement(nombreAula);
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    comboBoxModel.addElement(rs.getString("NOMBRE"));
+                }
             }
-            
-            // Cerrar la conexión y liberar recursos
-            rs.close();
-            pst.close();
-            con.close();
+            jComboBox1.setModel(comboBoxModel);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        
-        // Establecer el modelo del JComboBox
-        jComboBox1.setModel(comboBoxModel);
     }
-     private int obtenerIdAula(String nombreAula) {
+
+    private int obtenerIdAula(String nombreAula) {
         int idAula = -1;
-        try {
-            // Conectar a la base de datos
-            Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+        try (Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+             PreparedStatement pst = con.prepareStatement("SELECT \"ID aula\" FROM INSTITUTO.AULAS WHERE NOMBRE = ?")) {
 
-            // Consulta SQL para obtener el ID del aula
-            String query = "SELECT \"ID aula\" FROM INSTITUTO.AULAS WHERE NOMBRE = ?";
-            PreparedStatement pst = con.prepareStatement(query);
             pst.setString(1, nombreAula);
-
-            // Ejecutar la consulta
-            ResultSet rs = pst.executeQuery();
-            if (rs.next()) {
-                idAula = rs.getInt(1);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    idAula = rs.getInt(1);
+                }
             }
 
-            // Cerrar la conexión y liberar recursos
-            rs.close();
-            pst.close();
-            con.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -134,107 +103,71 @@ public class AulasReservadas extends javax.swing.JPanel {
 
     private int obtenerIdReserva(int idProfesor, int idAula, Date fechaReserva, Time horaReserva) {
         int idReserva = -1;
-        try {
-            // Conectar a la base de datos
-            Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+        try (Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+             PreparedStatement pst = con.prepareStatement("SELECT ID_RESERVA FROM INSTITUTO.RESERVAS WHERE ID_PROFESOR = ? AND ID_AULA = ? AND FECHA_RESERVA = ? AND HORA_RESERVA = ?")) {
 
-            // Consulta SQL para obtener el ID de la reserva
-            String query = "SELECT ID_RESERVA FROM INSTITUTO.RESERVAS WHERE ID_PROFESOR = ? AND ID_AULA = ? AND FECHA_RESERVA = ? AND HORA_RESERVA = ?";
-            PreparedStatement pst = con.prepareStatement(query);
             pst.setInt(1, idProfesor);
             pst.setInt(2, idAula);
             pst.setDate(3, new java.sql.Date(fechaReserva.getTime()));
             pst.setTime(4, horaReserva);
 
-            // Ejecutar la consulta
-            ResultSet rs = pst.executeQuery();
-            if (rs.next()) {
-                idReserva = rs.getInt(1);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    idReserva = rs.getInt(1);
+                }
             }
 
-            // Cerrar la conexión y liberar recursos
-            rs.close();
-            pst.close();
-            con.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return idReserva;
     }
-          private void eliminarReserva(int idReserva) {
-        try {
-            // Conectar a la base de datos
-            Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
 
-            // Consulta SQL para eliminar la reserva
-            String query = "DELETE FROM INSTITUTO.RESERVAS WHERE ID_RESERVA = ?";
-            PreparedStatement pst = con.prepareStatement(query);
+    private void eliminarReserva(int idReserva) {
+        try (Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+             PreparedStatement pst = con.prepareStatement("DELETE FROM INSTITUTO.RESERVAS WHERE ID_RESERVA = ?")) {
+
             pst.setInt(1, idReserva);
-
-            // Ejecutar la eliminación
             pst.executeUpdate();
 
-            // Cerrar la conexión y liberar recursos
-            pst.close();
-            con.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-private void cargarReservas() {
-    // Obtener el tipo de aula seleccionado del JComboBox
-    String tipoAula = (String) jComboBox1.getSelectedItem();
-    ImageIcon deleteIcon = new ImageIcon(getClass().getResource("/imagenes/delete.png"));
-    
-    // Limpiar la tabla antes de cargar nuevas reservas
-    tableModel = new DefaultTableModel();
-    jTable1.setModel(tableModel);
-    tableModel.addColumn("Fecha");
-    tableModel.addColumn("Hora Inicio");
-    tableModel.addColumn("Hora Fin");
-    tableModel.addColumn("Eliminar"); // Agregar columna de "Eliminar" con imagen
-    
-    try {
-        // Conectar a la base de datos
-        Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
 
-        // Consulta SQL para obtener las reservas del profesor en el tipo de aula seleccionado
-        String query = "SELECT FECHA_RESERVA, HORA_RESERVA, HORA_FIN_RESERVA FROM INSTITUTO.RESERVAS "
-                + "WHERE ID_PROFESOR = ? AND ID_AULA IN (SELECT \"ID aula\" FROM INSTITUTO.AULAS WHERE NOMBRE = ?)";
-        PreparedStatement pst = con.prepareStatement(query);
-        pst.setInt(1, idProfesor);
-        pst.setString(2, tipoAula);
-        
-        // Ejecutar la consulta
-        ResultSet rs = pst.executeQuery();
-        
-        // Iterar sobre los resultados y agregarlos a la tabla
-        while (rs.next()) {
-            Date fecha = rs.getDate("FECHA_RESERVA");
-            Time horaInicio = rs.getTime("HORA_RESERVA");
-            Time horaFin = rs.getTime("HORA_FIN_RESERVA");
-            tableModel.addRow(new Object[]{fecha, horaInicio, horaFin, deleteIcon}); // Añadir fila con datos y icono de eliminación
-        }
-        
-        // Centrar las celdas de todas las columnas
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        for (int i = 0; i < jTable1.getColumnCount(); i++) {
-            jTable1.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
-        }
+    private void cargarReservas() {
+        String tipoAula = (String) jComboBox1.getSelectedItem();
+        ImageIcon deleteIcon = new ImageIcon(getClass().getResource("/imagenes/delete.png"));
 
-        // Configurar la columna de eliminación para mostrar el icono correctamente
-        int deleteColumnIndex = tableModel.getColumnCount() - 1;
+        tableModel = new DefaultTableModel();
+        jTable1.setModel(tableModel);
+        tableModel.addColumn("Fecha");
+        tableModel.addColumn("Hora Inicio");
+        tableModel.addColumn("Hora Fin");
+        tableModel.addColumn("Eliminar");
+
+        try (Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+             PreparedStatement pst = con.prepareStatement("SELECT FECHA_RESERVA, HORA_RESERVA, HORA_FIN_RESERVA FROM INSTITUTO.RESERVAS "
+                     + "WHERE ID_PROFESOR = ? AND ID_AULA IN (SELECT \"ID aula\" FROM INSTITUTO.AULAS WHERE NOMBRE = ?)")) {
+
+            pst.setInt(1, idProfesor);
+            pst.setString(2, tipoAula);
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    Date fecha = rs.getDate("FECHA_RESERVA");
+                    Time horaInicio = rs.getTime("HORA_RESERVA");
+                    Time horaFin = rs.getTime("HORA_FIN_RESERVA");
+                    tableModel.addRow(new Object[]{fecha, horaInicio, horaFin, deleteIcon});
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+         int deleteColumnIndex = tableModel.getColumnCount() - 1;
         jTable1.getColumnModel().getColumn(deleteColumnIndex).setCellRenderer(new ImageRenderer2(deleteIcon, 20));
-        
-        // Cerrar la conexión y liberar recursos
-        rs.close();
-        pst.close();
-        con.close();
-    } catch (SQLException e) {
-        e.printStackTrace();
     }
-}
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

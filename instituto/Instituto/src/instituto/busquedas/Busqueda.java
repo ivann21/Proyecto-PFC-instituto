@@ -46,15 +46,13 @@ import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-/**
- *
- * @author ivan.castellano
- */
+
+
 public class Busqueda extends javax.swing.JPanel {
     
     private HashMap<String, String> columnMapping;
     private int rol;
-
+    
     public Busqueda(int Rol) {
         this.rol = Rol;
         initComponents();
@@ -93,20 +91,17 @@ public class Busqueda extends javax.swing.JPanel {
     @Override
     public void actionPerformed(ActionEvent e) {
         String selectedValue = (String) jComboBox1.getSelectedItem();
-        // Limpiar el segundo ComboBox
         jComboBox2.removeAllItems();
-        txtBuscar.setText(""); // Limpiar el campo de búsqueda
+        txtBuscar.setText("");
         
         TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) jTable1.getRowSorter();
         if (sorter != null) {
             sorter.setRowFilter(null);
         }
-        // Agregar elementos  al segundo ComboBox según la selección del primero
      if (selectedValue.equals("profesores")) {
             jComboBox2.addItem("nombre");
             jComboBox2.addItem("apellido");
             jComboBox2.addItem("correo");
-            // Desactivar los JComboBox adicionales si estaban activados
             jComboBox3.setVisible(false);
             jComboBox4.setVisible(false);
             jComboBox5.setVisible(false);
@@ -119,7 +114,6 @@ public class Busqueda extends javax.swing.JPanel {
             jComboBox2.addItem("correo");
             jComboBox2.addItem("nombre ciclo");
             jComboBox2.addItem("año ciclo");
-            // Desactivar los JComboBox adicionales si estaban activados
             jComboBox3.setVisible(false);
             jComboBox4.setVisible(false);
             jComboBox5.setVisible(false);
@@ -130,7 +124,6 @@ public class Busqueda extends javax.swing.JPanel {
             jComboBox2.addItem("nombre");
             jComboBox2.addItem("nombre ciclo");
             jComboBox2.addItem("año ciclo");
-            // Desactivar los JComboBox adicionales si estaban activados
             jComboBox3.setVisible(false);
             jComboBox4.setVisible(false);
             jComboBox5.setVisible(false);
@@ -143,7 +136,6 @@ public class Busqueda extends javax.swing.JPanel {
             jComboBox2.addItem("capacidad");
             jComboBox2.addItem("pizarra");
             jComboBox2.addItem("ordenadores");
-            // Desactivar los JComboBox adicionales si estaban activados
             jComboBox3.setVisible(false);
             jComboBox4.setVisible(false);
             jComboBox5.setVisible(false);
@@ -153,7 +145,6 @@ public class Busqueda extends javax.swing.JPanel {
         } else if (selectedValue.equals("ciclos")) {
             jComboBox2.addItem("nombre");
             jComboBox2.addItem("año");
-            // Desactivar los JComboBox adicionales si estaban activados
             jComboBox3.setVisible(false);
             jComboBox4.setVisible(false);
             jComboBox5.setVisible(false);
@@ -174,8 +165,6 @@ public class Busqueda extends javax.swing.JPanel {
             jComboBox7.setVisible(false);
             jButton4.setEnabled(true);
         }
-        
-        // Mostrar datos en JTable
         mostrarDatosEnJTable(selectedValue);
     }
 });
@@ -225,7 +214,6 @@ public class Busqueda extends javax.swing.JPanel {
                 txtBuscar.setVisible(false);
                 jButton4.setEnabled(false);
             } else {
-                // Para otras opciones, hacer visible txtBuscar y jButton4, y ocultar jComboBox3, jComboBox4, y jComboBox5
                 jComboBox3.setVisible(false);
                 jComboBox4.setVisible(false);
                 jComboBox5.setVisible(false);
@@ -258,7 +246,6 @@ public void mostrarDatosEnJTable(String selectedTable) {
                     ResultSetMetaData metaData = rs.getMetaData();
                     int columnCount = metaData.getColumnCount();
 
-                    // Agregar las columnas obtenidas de la consulta SQL
                     for (int i = 1; i <= columnCount; i++) {
                         String columnName = metaData.getColumnLabel(i);
                         if (!columnName.toLowerCase().startsWith("id")) {
@@ -268,14 +255,14 @@ public void mostrarDatosEnJTable(String selectedTable) {
 
                     configureTableColumns(selectedTable, model);
 
-                    jTable1.setRowHeight(30); // Establecer el tamaño de fila personalizado
+                    jTable1.setRowHeight(30); 
 
                     while (rs.next()) {
                         Object[] rowData = new Object[columnCount];
                         for (int i = 0; i < columnCount; i++) {
                             rowData[i] = rs.getObject(i + 1);
                         }
-                        contador++; // Incrementar el contador
+                        contador++; 
                         model.addRow(rowData);
                     }
                 }
@@ -289,36 +276,36 @@ public void mostrarDatosEnJTable(String selectedTable) {
 
 private String getSQLQueryForTable(String table) {
     switch (table) {
-        case "profesores":
-            return "SELECT NOMBRE, APELLIDO, CORREOELECTRONICO FROM PUBLIC.INSTITUTO." + table;
-        case "alumnos":
-            return "SELECT ALUMNOS.NOMBRE, ALUMNOS.APELLIDO, ALUMNOS.CORREOELECTRONICO, CICLOS.NOMBRE AS NOMBRE_CICLO, CICLOS.ANIO AS ANIO_CICLO " +
-                   "FROM PUBLIC.INSTITUTO.ALUMNOS " +
-                   "INNER JOIN PUBLIC.INSTITUTO.CICLOS ON ALUMNOS.\"ID ciclos\" = CICLOS.\"ID Ciclos\"";
-       case "asignaturas":
-            return "SELECT " +
-                       "ASIGNATURAS.NOMBRE, " +
-                       "'-' AS descripcion, " + 
-                       "CICLOS.NOMBRE AS NOMBRE_CICLO, " +
-                       "CICLOS.ANIO AS ANIO_CICLO " +
-                   "FROM " +
-                       "PUBLIC.INSTITUTO.ASIGNATURAS " +
-                       "INNER JOIN PUBLIC.INSTITUTO.CICLOS " +
-                       "ON ASIGNATURAS.ID_CICLOS = CICLOS.\"ID Ciclos\"";
-        case "aulas":
-            return "SELECT NOMBRE, UBICACION, CAPACIDAD_AULA AS CAPACIDAD, PIZARRA, ORDENADORES FROM PUBLIC.INSTITUTO." + table;
-        case "ciclos":
-            return "SELECT NOMBRE, ANIO AS año FROM PUBLIC.INSTITUTO." + table;
-        case "horarios":
-            return "SELECT HORARIOS.\"dia de la semana\", HORARIOS.\"hora de inicio\", HORARIOS.\"hora de fin\", " +
-                   "ASIGNATURAS.NOMBRE AS ASIGNATURA, PROFESORES.NOMBRE AS PROFESOR, AULAS.NOMBRE AS AULA " +
-                   "FROM PUBLIC.INSTITUTO.HORARIOS " +
-                   "INNER JOIN PUBLIC.INSTITUTO.ASIGNATURAS ON HORARIOS.\"ID asignatura\" = ASIGNATURAS.\"ID Asignatura\" " +
-                   "INNER JOIN PUBLIC.INSTITUTO.PROFESORES ON HORARIOS.\"ID profesor\" = PROFESORES.\"ID profesor\" " +
-                   "INNER JOIN PUBLIC.INSTITUTO.AULAS ON HORARIOS.\"ID aula\" = AULAS.\"ID aula\"";
-        default:
-            return "";
-    }
+    case "profesores":
+        return "SELECT NOMBRE AS nombre, APELLIDO AS apellido, \"CORREOELECTRONICO\" AS\"CORREO ELECTRONICO\" FROM PUBLIC.INSTITUTO." + table;
+    case "alumnos":
+        return "SELECT ALUMNOS.NOMBRE AS nombre, ALUMNOS.APELLIDO AS apellido, ALUMNOS.CORREOELECTRONICO AS \"CORREO ELECTRONICO\", CICLOS.NOMBRE AS \"NOMBRE DEL CICLO\", CICLOS.ANIO AS \"AÑO DEL CICLO\" " +
+               "FROM PUBLIC.INSTITUTO.ALUMNOS " +
+               "INNER JOIN PUBLIC.INSTITUTO.CICLOS ON ALUMNOS.\"ID ciclos\" = CICLOS.\"ID Ciclos\"";
+    case "asignaturas":
+        return "SELECT " +
+                   "ASIGNATURAS.NOMBRE AS nombre, " +
+                   "'-' AS descripcion, " + 
+                   "CICLOS.NOMBRE AS \"NOMBRE DEL CICLO\", " +
+                   "CICLOS.ANIO AS año " +
+               "FROM " +
+                   "PUBLIC.INSTITUTO.ASIGNATURAS " +
+                   "INNER JOIN PUBLIC.INSTITUTO.CICLOS " +
+                   "ON ASIGNATURAS.ID_CICLOS = CICLOS.\"ID Ciclos\"";
+    case "aulas":
+        return "SELECT NOMBRE AS nombre, UBICACION AS ubicacion, CAPACIDAD_AULA AS capacidad, PIZARRA AS pizarra, ORDENADORES AS ordenadores FROM PUBLIC.INSTITUTO." + table;
+    case "ciclos":
+        return "SELECT NOMBRE AS nombre, ANIO AS año FROM PUBLIC.INSTITUTO." + table;
+    case "horarios":
+        return "SELECT HORARIOS.\"dia de la semana\" AS \"DIA DE LA SEMANA\", HORARIOS.\"hora de inicio\" AS \"HORA DE INICIO\", HORARIOS.\"hora de fin\" AS\"HORA DE FIN\", " +
+               "ASIGNATURAS.NOMBRE AS asignatura, PROFESORES.NOMBRE AS profesor, AULAS.NOMBRE AS aula " +
+               "FROM PUBLIC.INSTITUTO.HORARIOS " +
+               "INNER JOIN PUBLIC.INSTITUTO.ASIGNATURAS ON HORARIOS.\"ID asignatura\" = ASIGNATURAS.\"ID Asignatura\" " +
+               "INNER JOIN PUBLIC.INSTITUTO.PROFESORES ON HORARIOS.\"ID profesor\" = PROFESORES.\"ID profesor\" " +
+               "INNER JOIN PUBLIC.INSTITUTO.AULAS ON HORARIOS.\"ID aula\" = AULAS.\"ID aula\"";
+    default:
+        return "";
+}
 }
 
 private void configureTableColumns(String table, DefaultTableModel model) {
@@ -330,10 +317,10 @@ private void configureTableColumns(String table, DefaultTableModel model) {
             if (rol != 0) {
                 model.addColumn("EDITAR");
                 model.addColumn("ELIMINAR");
-                setColumnWidths(jTable1, new int[]{150, 150, 270, 350, 100, 80, 80});
+                setColumnWidths(jTable1, new int[]{150, 150, 270, 350, 142, 80, 80});
                 setColumnCenterAlignment(jTable1, new int[]{4, 5});
             } else {
-                setColumnWidths(jTable1, new int[]{150, 150, 270, 350,100});
+                setColumnWidths(jTable1, new int[]{150, 150, 270, 350,142});
                 setColumnCenterAlignment(jTable1, new int[]{4});
             }
             break;
@@ -370,13 +357,13 @@ private void configureTableColumns(String table, DefaultTableModel model) {
                 model.addColumn("DESCRIPCIÓN");
                 model.addColumn("EDITAR");
                 model.addColumn("ELIMINAR");
-                setColumnWidths(jTable1, new int[]{170, 150, 80, 80, 80});
+                setColumnWidths(jTable1, new int[]{190, 150, 80, 80, 80});
                 setColumnCenterAlignment(jTable1, new int[]{1, 2});
                 int descriptionColumnIndex = model.getColumnCount() - 3;
                 jTable1.getColumnModel().getColumn(descriptionColumnIndex).setCellRenderer(new ImageRenderer(descriptionIcon, 20));
             } else {
                 model.addColumn("DESCRIPCIÓN");
-                setColumnWidths(jTable1, new int[]{170, 80, 80});
+                setColumnWidths(jTable1, new int[]{190, 80, 80});
                 setColumnCenterAlignment(jTable1, new int[]{1});
                 int descriptionColumnIndex = model.getColumnCount() - 1;
                 jTable1.getColumnModel().getColumn(descriptionColumnIndex).setCellRenderer(new ImageRenderer(descriptionIcon, 20));
@@ -387,7 +374,7 @@ private void configureTableColumns(String table, DefaultTableModel model) {
             if (rol != 0) {
                 model.addColumn("EDITAR");
                 model.addColumn("ELIMINAR");
-                setColumnWidths(jTable1, new int[]{150, 150, 150, 400, 150, 150, 80, 80});
+                setColumnWidths(jTable1, new int[]{190, 150, 150, 400, 150, 150, 80, 80});
                 setColumnCenterAlignment(jTable1, new int[]{0, 1, 2,3,4,5});
             } else {
                 setColumnWidths(jTable1, new int[]{150, 150, 150, 400});
@@ -399,23 +386,21 @@ private void configureTableColumns(String table, DefaultTableModel model) {
             if (rol != 0) {
                 model.addColumn("EDITAR");
                 model.addColumn("ELIMINAR");
-                setColumnWidths(jTable1, new int[]{150, 150});
-                setColumnCenterAlignment(jTable1, new int[]{1});
+                setColumnWidths(jTable1, new int[]{100, 150,150});
+                setColumnCenterAlignment(jTable1, new int[]{0,1,2});
             } else {
                 setColumnWidths(jTable1, new int[]{100});
                 setColumnCenterAlignment(jTable1, new int[]{0,1,2});
             }
             break;
     }
-    // Establecer el renderizador personalizado para las columnas "editar" y "eliminar"
     if (isEditableAndDeletable(table) && rol !=0) {
-        int editColumnIndex = model.getColumnCount() - 2; // Índice de la columna "editar"
-        int deleteColumnIndex = model.getColumnCount() - 1; // Índice de la columna "eliminar"
+        int editColumnIndex = model.getColumnCount() - 2;
+        int deleteColumnIndex = model.getColumnCount() - 1; 
         jTable1.getColumnModel().getColumn(editColumnIndex).setCellRenderer(new ImageRenderer(editIcon, 20));
         jTable1.getColumnModel().getColumn(deleteColumnIndex).setCellRenderer(new ImageRenderer(deleteIcon, 20));
     }
 }
-
 private void setColumnWidths(JTable table, int[] widths) {
     for (int i = 0; i < widths.length; i++) {
         if (i < table.getColumnModel().getColumnCount()) {
@@ -456,20 +441,18 @@ private boolean isEditableAndDeletable(String table) {
 }
 
 private void addTableMouseListener(String selectedTable) {
-    // Eliminar todos los MouseListeners existentes
     for (MouseListener listener : jTable1.getMouseListeners()) {
         jTable1.removeMouseListener(listener);
     }
     
-    // Añadir el nuevo MouseListener
     jTable1.addMouseListener(new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent e) {
-            int column = jTable1.getColumnModel().getColumnIndexAtX(e.getX()); // Obtener el índice de la columna clicada
-            int row = e.getY() / jTable1.getRowHeight(); // Obtener el índice de la fila clicada
+            int row = jTable1.rowAtPoint(e.getPoint()); // Obtener la fila del punto de clic
+            int column = jTable1.columnAtPoint(e.getPoint()); // Obtener la columna del punto de clic
 
             if (row < jTable1.getRowCount() && row >= 0 && column < jTable1.getColumnCount() && column >= 0) {
-                if (rol != 0) { // Si el usuario tiene el rol diferente de 0
+                if (rol != 0) { 
                     if (column == jTable1.getColumnCount() - 2) {
                         System.out.println("Edit icon clicked");
                         System.out.println(row);
@@ -483,18 +466,18 @@ private void addTableMouseListener(String selectedTable) {
                         } else if (opcion == JOptionPane.NO_OPTION) {
                             System.out.println("Operación de eliminación cancelada.");
                         }
-                    } else if (column == jTable1.getColumnCount() - 5 && selectedTable.equals("asignaturas")) { // Columna de descripción para la tabla de asignaturas
+                    } else if (column == jTable1.getColumnCount() - 5 && selectedTable.equals("asignaturas")) {
                         System.out.println("Description icon clicked");
                         abrirPanelDescripcion(selectedTable, row);
-                    } else if (column == jTable1.getColumnCount() - 3 && selectedTable.equals("ciclos")) { // Columna de descripción para la tabla de ciclos
+                    } else if (column == jTable1.getColumnCount() - 3 && selectedTable.equals("ciclos")) {
                         System.out.println("Description icon clicked");
                         abrirPanelDescripcion(selectedTable, row);
                     }
                 } else {
-                    if (column == jTable1.getColumnCount() - 3 && selectedTable.equals("asignaturas")) { // Columna de descripción para la tabla de asignaturas
+                    if (column == jTable1.getColumnCount() - 3 && selectedTable.equals("asignaturas")) {
                         System.out.println("Description icon clicked");
                         abrirPanelDescripcion(selectedTable, row);
-                    }else if (column == jTable1.getColumnCount() - 1 && selectedTable.equals("ciclos")) { // Columna de descripción para la tabla de ciclos
+                    }else if (column == jTable1.getColumnCount() - 1 && selectedTable.equals("ciclos")) {
                         System.out.println("Description icon clicked");
                         abrirPanelDescripcion(selectedTable, row);
                     }
@@ -508,7 +491,6 @@ private void abrirPanelDescripcion(String selectedTable, int row) {
     String descripcion = "";
     int id = -1;
     
-    // Obtener el ID de la asignatura o ciclo
     try {
         if (selectedTable.equals("ciclos")) {
             String nombreCiclo = (String) jTable1.getValueAt(row, 0);
@@ -524,7 +506,6 @@ private void abrirPanelDescripcion(String selectedTable, int row) {
         e.printStackTrace();
     }
     
-    // Realizar la consulta para obtener la descripción
     if (id != -1) {
         try {
             Class.forName("org.hsqldb.jdbc.JDBCDriver");
@@ -551,7 +532,6 @@ private void abrirPanelDescripcion(String selectedTable, int row) {
         }
     }
     
-    // Mostrar la descripción en un cuadro de diálogo
     if (!descripcion.isEmpty()) {
         JOptionPane.showMessageDialog(null, descripcion, "Descripción", JOptionPane.INFORMATION_MESSAGE);
     } else {
@@ -597,7 +577,7 @@ private void abrirEditarFrame(String selectedTable, int row) {
 }
 
 private Object[] getProfesorData(int row) {
-    // Recuperar y devolver los datos del profesor de la fila
+   
     return new Object[] {
         jTable1.getValueAt(row, 0), // Nombre
         jTable1.getValueAt(row, 1), // Apellido
@@ -606,7 +586,7 @@ private Object[] getProfesorData(int row) {
 }
 
 private Object[] getAlumnoData(int row) {
-    // Recuperar y devolver los datos del alumno de la fila
+    
     return new Object[] {
         jTable1.getValueAt(row, 0), // Nombre
         jTable1.getValueAt(row, 1), // Apellido
@@ -617,7 +597,7 @@ private Object[] getAlumnoData(int row) {
 }
 
 private Object[] getAsignaturaData(int row) {
-    // Recuperar y devolver los datos de la asignatura de la fila
+    
     return new Object[] {
         jTable1.getValueAt(row, 0), // Nombre
         jTable1.getValueAt(row, 2), // Ciclo
@@ -626,7 +606,7 @@ private Object[] getAsignaturaData(int row) {
 }
 
 private Object[] getAulaData(int row) {
-    // Recuperar y devolver los datos del aula de la fila
+    
     return new Object[] {
         jTable1.getValueAt(row, 0), // Nombre
         jTable1.getValueAt(row, 1), // Ubicación
@@ -637,7 +617,7 @@ private Object[] getAulaData(int row) {
 }
 
 private Object[] getCicloData(int row) {
-    // Recuperar y devolver los datos del ciclo de la fila
+    
     return new Object[] {
         jTable1.getValueAt(row, 0), // Nombre
         jTable1.getValueAt(row, 1)  // Año
@@ -645,7 +625,7 @@ private Object[] getCicloData(int row) {
 }
 
 private Object[] getHorarioData(int row) {
-    // Recuperar y devolver los datos del horario de la fila
+    
     return new Object[] {
         jTable1.getValueAt(row, 0), // Día de la semana
         jTable1.getValueAt(row, 1), // Hora de inicio
@@ -657,14 +637,19 @@ private Object[] getHorarioData(int row) {
 }
 private void eliminarFila(String selectedTable, int row) {
     try {
-        int selectedRow = jTable1.convertRowIndexToModel(row); // Convertir el índice de la vista a modelo
+      DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) jTable1.getRowSorter();
+        
+        int selectedRowInView = row;
+        int selectedRowInModel = jTable1.convertRowIndexToModel(selectedRowInView);
+        System.out.println(selectedRowInModel);
         int id = -1;
 
         switch (selectedTable) {
             case "profesores":
-                String nombreProf = (String) jTable1.getModel().getValueAt(selectedRow, 0);
-                String apellidoProf = (String) jTable1.getModel().getValueAt(selectedRow, 1);
-                String correoProf = (String) jTable1.getModel().getValueAt(selectedRow, 2);
+                String nombreProf = (String) jTable1.getModel().getValueAt(selectedRowInModel, 0);
+                String apellidoProf = (String) jTable1.getModel().getValueAt(selectedRowInModel, 1);
+                String correoProf = (String) jTable1.getModel().getValueAt(selectedRowInModel, 2);
                 id = buscarIDProfesores(nombreProf, apellidoProf, correoProf);
                 if (id != -1) {
                     eliminarProfesor(id);
@@ -672,9 +657,9 @@ private void eliminarFila(String selectedTable, int row) {
                 break;
 
             case "alumnos":
-                String nombreAlum = (String) jTable1.getModel().getValueAt(selectedRow, 0);
-                String apellidoAlum = (String) jTable1.getModel().getValueAt(selectedRow, 1);
-                String correoAlum = (String) jTable1.getModel().getValueAt(selectedRow, 2);
+                String nombreAlum = (String) jTable1.getModel().getValueAt(selectedRowInModel, 0);
+                String apellidoAlum = (String) jTable1.getModel().getValueAt(selectedRowInModel, 1);
+                String correoAlum = (String) jTable1.getModel().getValueAt(selectedRowInModel, 2);
                 id = buscarIDAlumno(nombreAlum, apellidoAlum, correoAlum);
                 if (id != -1) {
                     eliminarAlumno(id);
@@ -682,9 +667,9 @@ private void eliminarFila(String selectedTable, int row) {
                 break;
 
             case "asignaturas":
-                String nombreAsig = (String) jTable1.getModel().getValueAt(selectedRow, 0);
-                String nombreCiclo2 = (String) jTable1.getModel().getValueAt(selectedRow, 2);
-                int aniociclo = (int) jTable1.getModel().getValueAt(selectedRow, 3);
+                String nombreAsig = (String) jTable1.getModel().getValueAt(selectedRowInModel, 0);
+                String nombreCiclo2 = (String) jTable1.getModel().getValueAt(selectedRowInModel, 2);
+                int aniociclo = (int) jTable1.getModel().getValueAt(selectedRowInModel, 3);
                 id = buscarIDAsignatura(nombreAsig,nombreCiclo2,aniociclo);
                 if (id != -1) {
                     eliminarAsignatura(id);
@@ -692,8 +677,8 @@ private void eliminarFila(String selectedTable, int row) {
                 break;
 
             case "aulas":
-                String nombreAula = (String) jTable1.getModel().getValueAt(selectedRow, 0);
-                String ubicacionAula = (String) jTable1.getModel().getValueAt(selectedRow, 1);
+                String nombreAula = (String) jTable1.getModel().getValueAt(selectedRowInModel, 0);
+                String ubicacionAula = (String) jTable1.getModel().getValueAt(selectedRowInModel, 1);
                 id = buscarIDAula(nombreAula, ubicacionAula);
                 if (id != -1) {
                     eliminarAula(id);
@@ -701,8 +686,8 @@ private void eliminarFila(String selectedTable, int row) {
                 break;
 
             case "ciclos":
-                String nombreCiclo = (String) jTable1.getModel().getValueAt(selectedRow, 0);
-                int anioCiclo = (int) jTable1.getModel().getValueAt(selectedRow, 1);
+                String nombreCiclo = (String) jTable1.getModel().getValueAt(selectedRowInModel, 0);
+                int anioCiclo = (int) jTable1.getModel().getValueAt(selectedRowInModel, 1);
                 id = buscarIDCiclo(nombreCiclo, anioCiclo);
                 if (id != -1) {
                     eliminarCiclo(id);
@@ -710,12 +695,12 @@ private void eliminarFila(String selectedTable, int row) {
                 break;
 
             case "horarios":
-                String diaSemana = (String) jTable1.getModel().getValueAt(selectedRow, 0);
-                Time horaInicio = (Time) jTable1.getModel().getValueAt(selectedRow, 1);
-                Time horaFin = (Time) jTable1.getModel().getValueAt(selectedRow, 2);
-                String nombreAsignatura = (String) jTable1.getModel().getValueAt(selectedRow, 3);
-                String nombreProfesor = (String) jTable1.getModel().getValueAt(selectedRow, 4);
-                String nombreAula2 = (String) jTable1.getModel().getValueAt(selectedRow, 5);
+                String diaSemana = (String) jTable1.getModel().getValueAt(selectedRowInModel, 0);
+                Time horaInicio = (Time) jTable1.getModel().getValueAt(selectedRowInModel, 1);
+                Time horaFin = (Time) jTable1.getModel().getValueAt(selectedRowInModel, 2);
+                String nombreAsignatura = (String) jTable1.getModel().getValueAt(selectedRowInModel, 3);
+                String nombreProfesor = (String) jTable1.getModel().getValueAt(selectedRowInModel, 4);
+                String nombreAula2 = (String) jTable1.getModel().getValueAt(selectedRowInModel, 5);
                 id = buscarIDHorario(diaSemana, horaInicio, horaFin, nombreAsignatura, nombreProfesor, nombreAula2);
                 if (id != -1) {
                     eliminarHorario(id);
@@ -727,10 +712,9 @@ private void eliminarFila(String selectedTable, int row) {
                 break;
         }
 
-        // Eliminar la fila del JTable si se encontró un ID
         if (id != -1) {
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-            model.removeRow(row);
+           model.removeRow(selectedRowInView);
+           mostrarDatosEnJTable(selectedTable);
         } else {
             JOptionPane.showMessageDialog(null, "No se pudo encontrar el ID", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -739,312 +723,93 @@ private void eliminarFila(String selectedTable, int row) {
     }
 }
 
-public void eliminarAlumno(int idAlumno) throws SQLException {
-    Connection conn = null;
-    PreparedStatement stmt = null;
-
-    try {
-        conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-        String query = "DELETE FROM PUBLIC.INSTITUTO.ALUMNOS WHERE \"ID alumno\" = ?";
-        stmt = conn.prepareStatement(query);
-        stmt.setInt(1, idAlumno);
+public void eliminarRegistro(String tabla, String columnaId, int id) throws SQLException {
+    try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+         PreparedStatement stmt = conn.prepareStatement("DELETE FROM PUBLIC.INSTITUTO." + tabla + " WHERE \"" + columnaId + "\" = ?")) {
+        stmt.setInt(1, id);
         stmt.executeUpdate();
-    } finally {
-        if (stmt != null) {
-            stmt.close();
+    }
+}
+
+public int buscarID(String tabla, String columnaId, String[] columnas, String[] valores) throws SQLException {
+    try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+         PreparedStatement stmt = conn.prepareStatement("SELECT \"" + columnaId + "\" FROM PUBLIC.INSTITUTO." + tabla + " WHERE " + String.join(" = ? AND ", columnas) + " = ?")) {
+        for (int i = 0; i < columnas.length; i++) {
+            stmt.setString(i + 1, valores[i]);
         }
-        if (conn != null) {
-            conn.close();
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(columnaId);
+            }
         }
     }
+    return -1;
+}
+
+public void eliminarAlumno(int idAlumno) throws SQLException {
+    eliminarRegistro("ALUMNOS", "ID alumno", idAlumno);
 }
 
 public void eliminarAsignatura(int idAsignatura) throws SQLException {
-    Connection conn = null;
-    PreparedStatement stmt = null;
-
-    try {
-        conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-        String query = "DELETE FROM PUBLIC.INSTITUTO.ASIGNATURAS WHERE \"ID Asignatura\" = ?";
-        stmt = conn.prepareStatement(query);
-        stmt.setInt(1, idAsignatura);
-        stmt.executeUpdate();
-    } finally {
-        if (stmt != null) {
-            stmt.close();
-        }
-        if (conn != null) {
-            conn.close();
-        }
-    }
+    eliminarRegistro("ASIGNATURAS", "ID Asignatura", idAsignatura);
 }
 
 public void eliminarAula(int idAula) throws SQLException {
-    Connection conn = null;
-    PreparedStatement stmt = null;
-
-    try {
-        conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-        String query = "DELETE FROM PUBLIC.INSTITUTO.AULAS WHERE \"ID aula\" = ?";
-        stmt = conn.prepareStatement(query);
-        stmt.setInt(1, idAula);
-        stmt.executeUpdate();
-    } finally {
-        if (stmt != null) {
-            stmt.close();
-        }
-        if (conn != null) {
-            conn.close();
-        }
-    }
+    eliminarRegistro("AULAS", "ID aula", idAula);
 }
 
 public void eliminarCiclo(int idCiclo) throws SQLException {
-    Connection conn = null;
-    PreparedStatement stmt = null;
-
-    try {
-        conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-        String query = "DELETE FROM PUBLIC.INSTITUTO.CICLOS WHERE \"ID Ciclos\" = ?";
-        stmt = conn.prepareStatement(query);
-        stmt.setInt(1, idCiclo);
-        stmt.executeUpdate();
-    } finally {
-        if (stmt != null) {
-            stmt.close();
-        }
-        if (conn != null) {
-            conn.close();
-        }
-    }
+    eliminarRegistro("CICLOS", "ID Ciclos", idCiclo);
 }
 
 public void eliminarHorario(int idHorario) throws SQLException {
-    Connection conn = null;
-    PreparedStatement stmt = null;
-
-    try {
-        conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-        String query = "DELETE FROM PUBLIC.INSTITUTO.HORARIOS WHERE \"ID horario\" = ?";
-        stmt = conn.prepareStatement(query);
-        stmt.setInt(1, idHorario);
-        stmt.executeUpdate();
-    } finally {
-        if (stmt != null) {
-            stmt.close();
-        }
-        if (conn != null) {
-            conn.close();
-        }
-    }
+    eliminarRegistro("HORARIOS", "ID horario", idHorario);
 }
 
 public void eliminarProfesor(int idProfesor) throws SQLException {
-    Connection conn = null;
-    PreparedStatement stmt = null;
-
-    try {
-        // Conectar con la base de datos
-        conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-
-        // Preparar la sentencia SQL para eliminar el registro del profesor
-        String query = "DELETE FROM PUBLIC.INSTITUTO.PROFESORES WHERE \"ID profesor\" = ?";
-        stmt = conn.prepareStatement(query);
-        stmt.setInt(1, idProfesor);
-
-        // Ejecutar la sentencia SQL para eliminar el registro
-        stmt.executeUpdate();
-    } finally {
-        // Cerrar el PreparedStatement y la conexión
-        if (stmt != null) {
-            stmt.close();
-        }
-        if (conn != null) {
-            conn.close();
-        }
-    }
+    eliminarRegistro("PROFESORES", "ID profesor", idProfesor);
 }
 
 public int buscarIDHorario(String diaSemana, Time horaInicio, Time horaFin, String nombreAsignatura, String nombreProfesor, String nombreAula) throws SQLException {
-    int idHorario = -1; // Valor predeterminado en caso de que no se encuentre ningún ID
-
-    Connection conn = null;
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-
-    try {
-        conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-        String query = "SELECT \"ID horario\" FROM PUBLIC.INSTITUTO.HORARIOS " +
-                       "WHERE \"dia de la semana\" = ? AND \"hora de inicio\" = ? AND \"hora de fin\" = ? " +
-                       "AND \"ID asignatura\" = (SELECT \"ID Asignatura\" FROM PUBLIC.INSTITUTO.ASIGNATURAS WHERE NOMBRE = ? LIMIT 1) " +
-                       "AND \"ID profesor\" = (SELECT \"ID profesor\" FROM PUBLIC.INSTITUTO.PROFESORES WHERE NOMBRE = ? LIMIT 1) " +
-                       "AND \"ID aula\" = (SELECT \"ID aula\" FROM PUBLIC.INSTITUTO.AULAS WHERE NOMBRE = ? LIMIT 1)";
-        stmt = conn.prepareStatement(query);
-        stmt.setString(1, diaSemana);
-        stmt.setTime(2, horaInicio);
-        stmt.setTime(3, horaFin);
-        stmt.setString(4, nombreAsignatura);
-        stmt.setString(5, nombreProfesor);
-        stmt.setString(6, nombreAula);
-        rs = stmt.executeQuery();
-
-        if (rs.next()) {
-            idHorario = rs.getInt("ID horario");
-        }
-    } finally {
-        if (rs != null) rs.close();
-        if (stmt != null) stmt.close();
-        if (conn != null) conn.close();
-    }
-
-    return idHorario;
+    String[] columnas = {"\"dia de la semana\"", "\"hora de inicio\"", "\"hora de fin\"", "\"ID asignatura\"", "\"ID profesor\"", "\"ID aula\""};
+    String[] valores = {diaSemana, horaInicio.toString(), horaFin.toString(), nombreAsignatura, nombreProfesor, nombreAula};
+    return buscarID("HORARIOS", "ID horario", columnas, valores);
 }
 
 public int buscarIDProfesores(String nombreProf, String apellidoProf, String correoProf) throws SQLException {
-    int idProfesor = -1; // Valor predeterminado en caso de que no se encuentre ningún ID
-
-    Connection conn = null;
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-
-    try {
-        conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-        String query = "SELECT \"ID profesor\" FROM PUBLIC.INSTITUTO.PROFESORES WHERE NOMBRE = ? AND APELLIDO = ? AND CORREOELECTRONICO = ?";
-        stmt = conn.prepareStatement(query);
-        stmt.setString(1, nombreProf);
-        stmt.setString(2, apellidoProf);
-        stmt.setString(3, correoProf);
-        rs = stmt.executeQuery();
-
-        if (rs.next()) {
-            idProfesor = rs.getInt("ID profesor");
-        }
-    } finally {
-        if (rs != null) rs.close();
-        if (stmt != null) stmt.close();
-        if (conn != null) conn.close();
-    }
-
-    return idProfesor;
+    String[] columnas = {"NOMBRE", "APELLIDO", "CORREOELECTRONICO"};
+    String[] valores = {nombreProf, apellidoProf, correoProf};
+    return buscarID("PROFESORES", "ID profesor", columnas, valores);
 }
 
 public int buscarIDAlumno(String nombreAlum, String apellidoAlum, String correoAlum) throws SQLException {
-    int idAlumno = -1; // Valor predeterminado en caso de que no se encuentre ningún ID
-
-    Connection conn = null;
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-
-    try {
-        conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-        String query = "SELECT \"ID alumno\" FROM PUBLIC.INSTITUTO.ALUMNOS WHERE NOMBRE = ? AND APELLIDO = ? AND CORREOELECTRONICO = ?";
-        stmt = conn.prepareStatement(query);
-        stmt.setString(1, nombreAlum);
-        stmt.setString(2, apellidoAlum);
-        stmt.setString(3, correoAlum);
-        rs = stmt.executeQuery();
-
-        if (rs.next()) {
-            idAlumno = rs.getInt("ID alumno");
-        }
-    } finally {
-        if (rs != null) rs.close();
-        if (stmt != null) stmt.close();
-        if (conn != null) conn.close();
-    }
-
-    return idAlumno;
+    String[] columnas = {"NOMBRE", "APELLIDO", "CORREOELECTRONICO"};
+    String[] valores = {nombreAlum, apellidoAlum, correoAlum};
+    return buscarID("ALUMNOS", "ID alumno", columnas, valores);
 }
 
 public int buscarIDAsignatura(String nombreAsig, String nombreCiclo, int añoCiclo) throws SQLException {
-    int idAsignatura = -1; // Valor predeterminado en caso de que no se encuentre ningún ID
-
-    Connection conn = null;
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-
-    try {
-        conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-        String query = "SELECT ASIGNATURAS.\"ID Asignatura\" " +
-                       "FROM PUBLIC.INSTITUTO.ASIGNATURAS AS ASIGNATURAS " +
-                       "INNER JOIN PUBLIC.INSTITUTO.CICLOS AS CICLOS ON ASIGNATURAS.ID_CICLOS = CICLOS.\"ID Ciclos\" " +
-                       "WHERE ASIGNATURAS.NOMBRE = ? AND CICLOS.NOMBRE = ? AND CICLOS.ANIO = ?";
-        stmt = conn.prepareStatement(query);
-        stmt.setString(1, nombreAsig);
-        stmt.setString(2, nombreCiclo);
-        stmt.setInt(3, añoCiclo);
-        rs = stmt.executeQuery();
-
-        if (rs.next()) {
-            idAsignatura = rs.getInt("ID Asignatura");
-        }
-    } finally {
-        if (rs != null) rs.close();
-        if (stmt != null) stmt.close();
-        if (conn != null) conn.close();
-    }
-
-    return idAsignatura;
+    String[] columnas = {"NOMBRE", "NOMBRE", "ANIO"};
+    String[] valores = {nombreAsig, nombreCiclo, String.valueOf(añoCiclo)};
+    return buscarID("ASIGNATURAS AS ASIGNATURAS INNER JOIN CICLOS AS CICLOS ON ASIGNATURAS.ID_CICLOS = CICLOS.\"ID Ciclos\"", "ASIGNATURAS.\"ID Asignatura\"", columnas, valores);
 }
 
 public int buscarIDAula(String nombreAula, String ubicacionAula) throws SQLException {
-    int idAula = -1; // Valor predeterminado en caso de que no se encuentre ningún ID
-
-    Connection conn = null;
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-
-    try {
-        conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-        String query = "SELECT \"ID aula\" FROM PUBLIC.INSTITUTO.AULAS WHERE NOMBRE = ? AND UBICACION = ?";
-        stmt = conn.prepareStatement(query);
-        stmt.setString(1, nombreAula);
-        stmt.setString(2, ubicacionAula);
-        rs = stmt.executeQuery();
-
-        if (rs.next()) {
-            idAula = rs.getInt("ID aula");
-        }
-    } finally {
-        if (rs != null) rs.close();
-        if (stmt != null) stmt.close();
-        if (conn != null) conn.close();
-    }
-
-    return idAula;
+    String[] columnas = {"NOMBRE", "UBICACION"};
+    String[] valores = {nombreAula, ubicacionAula};
+    return buscarID("AULAS", "ID aula", columnas, valores);
 }
 
 public int buscarIDCiclo(String nombreCiclo, int anioCiclo) throws SQLException {
-    int idCiclo = -1; // Valor predeterminado en caso de que no se encuentre ningún ID
-
-    Connection conn = null;
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-
-    try {
-        conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-        String query = "SELECT \"ID Ciclos\" FROM PUBLIC.INSTITUTO.CICLOS WHERE NOMBRE = ? AND ANIO = ?";
-        stmt = conn.prepareStatement(query);
-        stmt.setString(1, nombreCiclo);
-        stmt.setInt(2, anioCiclo);
-        rs = stmt.executeQuery();
-
-        if (rs.next()) {
-            idCiclo = rs.getInt("ID Ciclos");
-        }
-    } finally {
-        if (rs != null) rs.close();
-        if (stmt != null) stmt.close();
-        if (conn != null) conn.close();
-    }
-
-    return idCiclo;
+    String[] columnas = {"NOMBRE", "ANIO"};
+    String[] valores = {nombreCiclo, String.valueOf(anioCiclo)};
+    return buscarID("CICLOS", "ID Ciclos", columnas, valores);
 }
 
 private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
     TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) jTable1.getRowSorter();
-
+    
     if (sorter != null) {
         if (textoABuscar == null || textoABuscar.isEmpty() || textoABuscar.equalsIgnoreCase("seleccione una hora") || textoABuscar.equalsIgnoreCase("seleccione un dia") || textoABuscar.equalsIgnoreCase("¿tiene pizarra?") || textoABuscar.equalsIgnoreCase("¿tiene ordenadores?")) {
             sorter.setRowFilter(null);
@@ -1074,7 +839,7 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
                     }
                 });
             } else {
-                String regex = "(?i)" + textoABuscar; // Ignorar mayúsculas y minúsculas
+                String regex = "(?i)" + textoABuscar; 
                 sorter.setRowFilter(RowFilter.regexFilter(regex, columnIndex));
             }
         }

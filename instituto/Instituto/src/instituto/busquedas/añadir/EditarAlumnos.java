@@ -4,14 +4,9 @@
  */
 package instituto.busquedas.añadir;
 
-import instituto.Principal;
 import instituto.busquedas.Busqueda;
 import javax.swing.JOptionPane;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import javax.swing.JOptionPane;
 import java.sql.*;
-import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 /**
@@ -147,9 +142,7 @@ public class EditarAlumnos extends javax.swing.JFrame {
        String nombreCiclo = cicloComboBox.getSelectedItem().toString();
        int anioCiclo = Integer.parseInt(anioComboBox.getSelectedItem().toString());
 
-       // Verificar si alguno de los campos está vacío
        if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty() ) {
-           // Mostrar un mensaje de error al usuario
            JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
        } else {
             String correoRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
@@ -162,12 +155,10 @@ public class EditarAlumnos extends javax.swing.JFrame {
             }
            int idCicloSeleccionado = obtenerIdCiclo(nombreCiclo, anioCiclo);
            if (idCicloSeleccionado != -1) {
-               // Todos los campos están llenos, actualizar los datos en la base de datos
                try {
                    Class.forName("org.hsqldb.jdbc.JDBCDriver");
                    try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
                        if (idAlumno != -1) {
-                           // Realizar la actualización en la base de datos
                            String consultaSQL = "UPDATE PUBLIC.INSTITUTO.ALUMNOS SET NOMBRE=?, APELLIDO=?, CORREOELECTRONICO=?, \"ID ciclos\"=? WHERE \"ID alumno\"=?";
                            try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
                                stmt.setString(1, nombre);
@@ -178,23 +169,20 @@ public class EditarAlumnos extends javax.swing.JFrame {
 
                                int filasAfectadas = stmt.executeUpdate();
                                if (filasAfectadas > 0) {
-                                   // Mostrar un mensaje de éxito al usuario
                                    JOptionPane.showMessageDialog(null, "Los datos se han actualizado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                                    dispose();
                                    if (this.getParent() != null && this.getParent().isEnabled()) {
-                                       this.getParent().setEnabled(true); // Si el frame principal existe y está habilitado
+                                       this.getParent().setEnabled(true); 
                                    }
                                     if (parentPanel != null) {
                                         String selectedTable = "alumnos";
                                         parentPanel. mostrarDatosEnJTable(selectedTable);
                                     }
                                } else {
-                                   // Mostrar un mensaje de error al usuario si no se actualizó ningún dato
                                    JOptionPane.showMessageDialog(null, "No se pudo actualizar los datos", "Error", JOptionPane.ERROR_MESSAGE);
                                }
                            }
                        } else {
-                           // Mostrar un mensaje de error si no se encontró el alumno
                            JOptionPane.showMessageDialog(null, "No se encontró el alumno en la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
                        }
                    }
@@ -202,13 +190,12 @@ public class EditarAlumnos extends javax.swing.JFrame {
                    ex.printStackTrace();
                }
            } else {
-               // Mostrar un mensaje de error si no se encontró el ciclo seleccionado
                JOptionPane.showMessageDialog(null, "No se encontró el ciclo seleccionado en la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
            }
        }
     }//GEN-LAST:event_jButton1ActionPerformed
     private int obtenerIdAlumno(String nombre, String apellido, String correo) {
-        int idAlumno = -1; // Valor por defecto en caso de que no se encuentre ningún alumno con los datos especificados
+        int idAlumno = -1; 
         try {
             Class.forName("org.hsqldb.jdbc.JDBCDriver");
             try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
@@ -230,7 +217,7 @@ public class EditarAlumnos extends javax.swing.JFrame {
     }                            
 
     private int obtenerIdCiclo(String nombreCiclo, int anioCiclo) {
-    int idCiclo = -1; // Valor por defecto en caso de que no se encuentre ningún ciclo con el nombre y año especificados
+    int idCiclo = -1;
     try {
         Class.forName("org.hsqldb.jdbc.JDBCDriver");
         try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
@@ -250,7 +237,7 @@ public class EditarAlumnos extends javax.swing.JFrame {
     return idCiclo;
 }
    private void cargarCiclos() {
-    cicloComboBox.removeAllItems(); // Limpiar el JComboBox antes de cargar los nuevos ciclos
+    cicloComboBox.removeAllItems(); 
     try {
         Class.forName("org.hsqldb.jdbc.JDBCDriver");
         try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {

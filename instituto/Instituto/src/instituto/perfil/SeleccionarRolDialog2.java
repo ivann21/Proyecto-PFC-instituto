@@ -90,7 +90,6 @@ public class SeleccionarRolDialog2 extends javax.swing.JDialog {
     try {
         Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
 
-        // Obtener el ID del rol seleccionado
         String query = "SELECT ID_ROL FROM INSTITUTO.ROLES WHERE NOMBRE_ROL = ?";
         PreparedStatement pst = con.prepareStatement(query);
         pst.setString(1, rolSeleccionado);
@@ -102,7 +101,6 @@ public class SeleccionarRolDialog2 extends javax.swing.JDialog {
         }
         
         if (idRol != -1) {
-            // Verificar si el profesor ya tiene un rol asignado
             query = "SELECT COUNT(*) FROM INSTITUTO.ASIGNACION_ROLES WHERE ID_PROFESOR = ?";
             pst = con.prepareStatement(query);
             pst.setInt(1, idProfesor);
@@ -112,14 +110,12 @@ public class SeleccionarRolDialog2 extends javax.swing.JDialog {
             int count = rs.getInt(1);
             
             if (count > 0) {
-                // Si el profesor ya tiene un rol asignado, realizar una actualización (alter) en lugar de una inserción
                 query = "UPDATE INSTITUTO.ASIGNACION_ROLES SET ID_ROL = ? WHERE ID_PROFESOR = ?";
                 pst = con.prepareStatement(query);
                 pst.setInt(1, idRol);
                 pst.setInt(2, idProfesor);
                 pst.executeUpdate();
             } else {
-                // Si el profesor no tiene un rol asignado, realizar la inserción
                 query = "INSERT INTO INSTITUTO.ASIGNACION_ROLES (ID_PROFESOR, ID_ROL) VALUES (?, ?)";
                 pst = con.prepareStatement(query);
                 pst.setInt(1, idProfesor);

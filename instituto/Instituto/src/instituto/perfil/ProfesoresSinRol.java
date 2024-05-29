@@ -51,10 +51,8 @@ public class ProfesoresSinRol extends javax.swing.JFrame {
         DefaultTableModel tableModel = (DefaultTableModel) jTable1.getModel();
         ImageIcon addIcon = new ImageIcon(getClass().getResource("/imagenes/add.png"));
         try {
-            // Conectar a la base de datos
             Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
 
-            // Consulta SQL para obtener los profesores sin rol asignado
             String query = "SELECT P.NOMBRE, P.APELLIDO FROM INSTITUTO.PROFESORES P WHERE P.\"ID profesor\" NOT IN "
                     + "(SELECT ID_PROFESOR FROM INSTITUTO.ASIGNACION_ROLES)";
 
@@ -69,12 +67,10 @@ public class ProfesoresSinRol extends javax.swing.JFrame {
                 tableModel.addRow(new Object[]{nombreProfesor, apellidoProfesor, addIcon});
             }
 
-            // Cerrar la conexión y liberar recursos
             rs.close();
             pst.close();
             con.close();
 
-            // Si no hay profesores sin rol, cierra la ventana
             if (tableModel.getRowCount() == 0) {
                 dispose();
                 if (parentPanel != null) {
@@ -85,11 +81,9 @@ public class ProfesoresSinRol extends javax.swing.JFrame {
             e.printStackTrace();
         }
 
-        // Agregar el renderizador de imagen
-        int addColumnIndex = tableModel.getColumnCount() - 1; // Icono para la columna "Asignar Rol"
+        int addColumnIndex = tableModel.getColumnCount() - 1; 
         jTable1.getColumnModel().getColumn(addColumnIndex).setCellRenderer(new ImageRenderer2(addIcon, 20));
 
-        // Agregar el listener de mouse para detectar clics en la columna de imagen
         jTable1.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -109,23 +103,16 @@ public class ProfesoresSinRol extends javax.swing.JFrame {
     }
 
    private void mostrarDialogoAgregarRol(String nombreProfesor, String apellidoProfesor) {
-    // Crear y mostrar el diálogo para seleccionar el rol
     SeleccionarRolDialog2 dialog = new SeleccionarRolDialog2(this, true, nombreProfesor, apellidoProfesor);
     dialog.setLocationRelativeTo(null);
     dialog.setVisible(true);
 
-    // Actualizar la tabla si se añadió un rol
     if (dialog.isRolAgregado()) {
         DefaultTableModel tableModel = (DefaultTableModel) jTable1.getModel();
-        tableModel.setRowCount(0); // Limpiar la tabla
-        cargarProfesoresSinRol(); // Recargar los profesores sin rol
+        tableModel.setRowCount(0); 
+        cargarProfesoresSinRol(); 
     }
 }
-     private void onClose() {
-        if (onCloseCallback != null) {
-            onCloseCallback.run(); // Llama al método run del callback
-        }
-    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

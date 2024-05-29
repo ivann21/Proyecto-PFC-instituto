@@ -23,88 +23,212 @@ import javax.swing.table.TableRowSorter;
  * @author ivan.castellano
  */
 public class AsignarRoles extends javax.swing.JPanel {
+ private int rol;
+    private DefaultTableModel tableModel;
+    private String nombreProfesorSeleccionado;
+    private String apellidoProfesorSeleccionado;
 
-      private int rol;
-      private DefaultTableModel tableModel;
-      private String nombreProfesorSeleccionado;
-      private String apellidoProfesorSeleccionado;
-      
-    public AsignarRoles(int Rol) {
+    public AsignarRoles(int rol) {
         this.rol = rol;
+
         initComponents();
+
         cargarAsignaciones();
         verificarProfesoresSinRol();
-        
-         jTable1.addMouseListener(new MouseAdapter() {
+        jTable1.setDefaultEditor(Object.class, null);
+        jTable1.setRowHeight(30);
+        jTable1.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int column = jTable1.columnAtPoint(e.getPoint());
                 int row = jTable1.rowAtPoint(e.getPoint());
-                if (column == jTable1.getColumnCount() - 1) { // Columna de eliminación
-                    int opcion = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que deseas eliminar esta asignación?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-                    if (opcion == JOptionPane.YES_OPTION) {
-                        // Obtener valores de la fila seleccionada
-                        String nombreProfesor = (String) tableModel.getValueAt(row, 0);
-                        String apellidoProfesor = (String) tableModel.getValueAt(row, 1);
-                        String nombreRol = (String) tableModel.getValueAt(row, 2);
-                        // Obtener IDs correspondientes
-                        int idProfesor = obtenerIdProfesor(nombreProfesor,apellidoProfesor);
-                        int idRol = obtenerIdRol(nombreRol);
-                        if (idProfesor != -1 && idRol != -1) {
-                            // Eliminar de la base de datos
-                            eliminarAsignacion(idProfesor, idRol);
-                            tableModel.removeRow(row);
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Error al obtener el ID del profesor o del rol.");
+                if (row >= 0) {
+                    TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) jTable1.getRowSorter();
+                    int convertedRow = jTable1.convertRowIndexToModel(row);
+                    if (column == jTable1.getColumnCount() - 1) { 
+                        int opcion = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que deseas eliminar esta asignación?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+                        if (opcion == JOptionPane.YES_OPTION) {
+                            String nombreProfesor = (String) tableModel.getValueAt(convertedRow, 0);
+                            String apellidoProfesor = (String) tableModel.getValueAt(convertedRow, 1);
+                            String nombreRol = (String) tableModel.getValueAt(convertedRow, 2);
+                            System.out.println(nombreProfesor + " " + apellidoProfesor + " " + nombreRol);
+                            int idProfesor = obtenerIdProfesor(nombreProfesor, apellidoProfesor);
+                            int idRol = obtenerIdRol(nombreRol);
+                            System.out.print(idProfesor + " | " + idRol);
+                            if (idProfesor != -1 && idRol != -1) {
+                                eliminarAsignacion(idProfesor, idRol);
+                                tableModel.removeRow(convertedRow);
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Error al obtener el ID del profesor o del rol.");
+                            }
                         }
                     }
-                }
-                if(column == jTable1.getColumnCount() - 2){
-                    
-                   nombreProfesorSeleccionado = (String) tableModel.getValueAt(row, 0);
-                    apellidoProfesorSeleccionado = (String) tableModel.getValueAt(row, 1);
-                    
-                    // Abrir el diálogo de selección de rol
+
+                   if (column == jTable1.getColumnCount() - 2) {
+                    nombreProfesorSeleccionado = (String) tableModel.getValueAt(convertedRow, 0);
+                    apellidoProfesorSeleccionado = (String) tableModel.getValueAt(convertedRow, 1);
+
                     SeleccionarRolDialog2 dialog = new SeleccionarRolDialog2(null, true, nombreProfesorSeleccionado, apellidoProfesorSeleccionado);
                     dialog.setLocationRelativeTo(null);
                     dialog.setVisible(true);
                     if (dialog.isRolAgregado()) {
-                        // Actualizar la tabla
-                        cargarAsignaciones();
+                       reiniciarBusqueda();
+                       cargarAsignaciones();
+                    }
                     }
                 }
             }
         });
     }
-   private void buscarEnTabla(String textoBusqueda) {
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
-    jTable1.setRowSorter(sorter);
 
-    int columnIndex;
-    switch (jComboBox1.getSelectedIndex()) {
-        case 0: // Nombre
-            columnIndex = 0;
-            break;
-        case 1: // Apellido
-            columnIndex = 1;
-            break;
-        case 2: // Rol
-            columnIndex = 2;
-            break;
-        default:
-            columnIndex = 0;
-            break;
+   private DefaultTableModel buscarEnTabla(String textoBusqueda) {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+
+        int columnIndex;
+        switch (jComboBox1.getSelectedIndex()) {
+            case 0:
+                columnIndex = 0;
+                break;
+            case 1:
+                columnIndex = 1;
+                break;
+            case 2:
+                columnIndex = 2;
+                break;
+            default:
+                columnIndex = 0;
+                break;
+        }
+
+        RowFilter<DefaultTableModel, Object> rowFilter = RowFilter.regexFilter("(?i)" + Pattern.quote(textoBusqueda), columnIndex);
+        sorter.setRowFilter(rowFilter);
+
+        jTable1.setRowSorter(sorter);
+
+        return model;
     }
 
-    RowFilter<DefaultTableModel, Object> rowFilter = RowFilter.regexFilter("(?i)" + Pattern.quote(textoBusqueda), columnIndex);
-    sorter.setRowFilter(rowFilter);
-}
-    private void reiniciarBusqueda() {
+private void reiniciarBusqueda() {
     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
     TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
     jTable1.setRowSorter(sorter);
 }
+    
+       void cargarAsignaciones() {
+        tableModel = new DefaultTableModel();
+        jTable1.setModel(tableModel);
+        tableModel.addColumn("Nombre");
+        tableModel.addColumn("Apellido");
+        tableModel.addColumn("Nombre Rol");
+        tableModel.addColumn("Editar");
+        tableModel.addColumn("Eliminar");
+
+        try (Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT P.NOMBRE, P.APELLIDO, R.NOMBRE_ROL FROM INSTITUTO.ASIGNACION_ROLES AR "
+                     + "JOIN INSTITUTO.PROFESORES P ON AR.ID_PROFESOR = P.\"ID profesor\" "
+                     + "JOIN INSTITUTO.ROLES R ON AR.ID_ROL = R.ID_ROL")) {
+
+            ImageIcon deleteIcon = new ImageIcon(getClass().getResource("/imagenes/delete.png"));
+            ImageIcon editIcon = new ImageIcon(getClass().getResource("/imagenes/editar.png"));
+
+            while (rs.next()) {
+                String nombreProfesor = rs.getString("NOMBRE");
+                String apellidoProfesor = rs.getString("APELLIDO");
+                String nombreRol = rs.getString("NOMBRE_ROL");
+                tableModel.addRow(new Object[]{nombreProfesor, apellidoProfesor, nombreRol, editIcon, deleteIcon});
+            }
+
+            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+            centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+            for (int i = 0; i < jTable1.getColumnCount(); i++) {
+                jTable1.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+            }
+
+            int deleteColumnIndex = tableModel.getColumnCount() - 1;
+            jTable1.getColumnModel().getColumn(deleteColumnIndex).setCellRenderer(new ImageRenderer2(deleteIcon, 20));
+            int editColumnIndex = tableModel.getColumnCount() - 2;
+            jTable1.getColumnModel().getColumn(editColumnIndex).setCellRenderer(new ImageRenderer2(editIcon, 20));
+            jTable1.setRowHeight(30);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void verificarProfesoresSinRol() {
+        try (Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT P.NOMBRE FROM INSTITUTO.PROFESORES P WHERE P.\"ID profesor\" NOT IN "
+                     + "(SELECT ID_PROFESOR FROM INSTITUTO.ASIGNACION_ROLES)")) {
+
+            if (rs.next()) {
+                JOptionPane.showMessageDialog(null, "¡Hay profesores sin rol asignado!", "Aviso", JOptionPane.WARNING_MESSAGE);
+                ProfesoresSinRol frame = new ProfesoresSinRol(this, this::reloadTable);
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                frame.setVisible(true);
+                frame.setLocationRelativeTo(null);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void reloadTable() {
+        cargarAsignaciones();
+    }
+
+    private int obtenerIdProfesor(String nombreProfesor, String apellidoProfesor) {
+        int idProfesor = -1;
+        try (Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+             PreparedStatement pst = con.prepareStatement("SELECT \"ID profesor\" FROM INSTITUTO.PROFESORES WHERE NOMBRE = ? AND APELLIDO = ?")) {
+
+            pst.setString(1, nombreProfesor);
+            pst.setString(2, apellidoProfesor);
+
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    idProfesor = rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return idProfesor;
+    }
+
+    private int obtenerIdRol(String nombreRol) {
+        int idRol = -1;
+        try (Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+             PreparedStatement pst = con.prepareStatement("SELECT ID_ROL FROM INSTITUTO.ROLES WHERE NOMBRE_ROL = ?")) {
+
+            pst.setString(1, nombreRol);
+
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    idRol = rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return idRol;
+    }
+
+    private void eliminarAsignacion(int idProfesor, int idRol) {
+        try (Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+             PreparedStatement pst = con.prepareStatement("DELETE FROM INSTITUTO.ASIGNACION_ROLES WHERE ID_PROFESOR = ? AND ID_ROL = ?")) {
+
+            pst.setInt(1, idProfesor);
+            pst.setInt(2, idRol);
+            pst.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
        
     /**
      * This method is called from within the constructor to initialize the form.
@@ -197,171 +321,7 @@ public class AsignarRoles extends javax.swing.JPanel {
     }
     }//GEN-LAST:event_jButton1ActionPerformed
 
-        void cargarAsignaciones() {
-        ImageIcon deleteIcon = new ImageIcon(getClass().getResource("/imagenes/delete.png"));
-        ImageIcon editIcon = new ImageIcon(getClass().getResource("/imagenes/editar.png"));
-        // Limpiar la tabla antes de cargar nuevas asignaciones
-        tableModel = new DefaultTableModel();
-        jTable1.setModel(tableModel);
-        tableModel.addColumn("Nombre");
-        tableModel.addColumn("Apellido");
-        tableModel.addColumn("Nombre Rol");
-        tableModel.addColumn("Editar");
-        tableModel.addColumn("Eliminar");
 
-        try {
-            // Conectar a la base de datos
-            Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-
-            // Consulta SQL para obtener las asignaciones de roles
-            String query = "SELECT P.NOMBRE,P.APELLIDO, R.NOMBRE_ROL FROM INSTITUTO.ASIGNACION_ROLES AR "
-                    + "JOIN INSTITUTO.PROFESORES P ON AR.ID_PROFESOR = P.\"ID profesor\" "
-                    + "JOIN INSTITUTO.ROLES R ON AR.ID_ROL = R.ID_ROL";
-            PreparedStatement pst = con.prepareStatement(query);
-
-            // Ejecutar la consulta
-            ResultSet rs = pst.executeQuery();
-
-            // Iterar sobre los resultados y agregarlos a la tabla
-            while (rs.next()) {
-                String nombreProfesor = rs.getString("NOMBRE");
-                String apellidoProfesor = rs.getString("APELLIDO");
-                String nombreRol = rs.getString("NOMBRE_ROL");
-                tableModel.addRow(new Object[]{nombreProfesor,apellidoProfesor, nombreRol, editIcon,deleteIcon});
-            }
-
-            // Centrar las celdas de todas las columnas
-            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-            centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-            for (int i = 0; i < jTable1.getColumnCount(); i++) {
-                jTable1.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
-            }
-
-            // Configurar la columna de eliminación para mostrar el icono correctamente
-            int deleteColumnIndex = tableModel.getColumnCount() - 1;
-            jTable1.getColumnModel().getColumn(deleteColumnIndex).setCellRenderer(new ImageRenderer2(deleteIcon, 20));
-            int editColumnIndex = tableModel.getColumnCount() - 2;
-            jTable1.getColumnModel().getColumn(editColumnIndex).setCellRenderer(new ImageRenderer2(editIcon, 20));
-            jTable1.setRowHeight(30);
-            // Cerrar la conexión y liberar recursos
-            rs.close();
-            pst.close();
-            con.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-       private void verificarProfesoresSinRol() {
-    try {
-        // Conectar a la base de datos
-        Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-
-        // Consulta SQL para verificar profesores sin rol asignado
-        String query = "SELECT P.NOMBRE FROM INSTITUTO.PROFESORES P WHERE P.\"ID profesor\" NOT IN "
-                + "(SELECT ID_PROFESOR FROM INSTITUTO.ASIGNACION_ROLES)";
-
-        PreparedStatement pst = con.prepareStatement(query);
-
-        ResultSet rs = pst.executeQuery();
-
-        if (rs.next()) {
-            // Hay profesores sin rol asignado, mostrar aviso
-            JOptionPane.showMessageDialog(null, "¡Hay profesores sin rol asignado!", "Aviso", JOptionPane.WARNING_MESSAGE);
-
-            // Crear instancia del JFrame para mostrar los profesores sin rol
-          ProfesoresSinRol frame = new ProfesoresSinRol(this, this::reloadTable);
-            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            frame.setVisible(true);
-            frame.setLocationRelativeTo(null); // Centrar en la pantalla
-        }
-
-        // Cerrar la conexión y liberar recursos
-        rs.close();
-        pst.close();
-        con.close();
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-}
-       private void reloadTable() {
-        cargarAsignaciones(); // Vuelve a cargar las asignaciones de roles en la tabla
-    }
-   private int obtenerIdProfesor(String nombreProfesor, String apellidoProfesor) {
-    int idProfesor = -1;
-    try {
-        // Conectar a la base de datos
-        Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-
-        // Consulta SQL para obtener el ID del profesor
-        String query = "SELECT \"ID profesor\" FROM INSTITUTO.PROFESORES WHERE NOMBRE = ? AND APELLIDO = ?";
-        PreparedStatement pst = con.prepareStatement(query);
-        pst.setString(1, nombreProfesor);
-        pst.setString(2, apellidoProfesor);
-
-        // Ejecutar la consulta
-        ResultSet rs = pst.executeQuery();
-        if (rs.next()) {
-            idProfesor = rs.getInt(1);
-        }
-
-        // Cerrar la conexión y liberar recursos
-        rs.close();
-        pst.close();
-        con.close();
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-    return idProfesor;
-}
-    private int obtenerIdRol(String nombreRol) {
-        int idRol = -1;
-        try {
-            // Conectar a la base de datos
-            Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-
-            // Consulta SQL para obtener el ID del rol
-            String query = "SELECT ID_ROL FROM INSTITUTO.ROLES WHERE NOMBRE_ROL = ?";
-            PreparedStatement pst = con.prepareStatement(query);
-            pst.setString(1, nombreRol);
-
-            // Ejecutar la consulta
-            ResultSet rs = pst.executeQuery();
-            if (rs.next()) {
-                idRol = rs.getInt(1);
-            }
-
-            // Cerrar la conexión y liberar recursos
-            rs.close();
-            pst.close();
-            con.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return idRol;
-    }
-
-    private void eliminarAsignacion(int idProfesor, int idRol) {
-        try {
-            // Conectar a la base de datos
-            Connection con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-
-            // Consulta SQL para eliminar la asignación de rol
-            String query = "DELETE FROM INSTITUTO.ASIGNACION_ROLES WHERE ID_PROFESOR = ? AND ID_ROL = ?";
-            PreparedStatement pst = con.prepareStatement(query);
-            pst.setInt(1, idProfesor);
-            pst.setInt(2, idRol);
-
-            // Ejecutar la eliminación
-            pst.executeUpdate();
-
-            // Cerrar la conexión y liberar recursos
-            pst.close();
-            con.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

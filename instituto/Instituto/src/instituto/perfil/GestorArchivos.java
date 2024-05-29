@@ -4,6 +4,7 @@
  */
 package instituto.perfil;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,6 +12,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 public class GestorArchivos {
 
@@ -19,21 +22,36 @@ public class GestorArchivos {
     public void subirArchivo(int idUsuario, String nombreArchivoReal, byte[] contenidoArchivo) {
     String rutaCarpetaUsuario = CARPETA_ARCHIVOS + idUsuario + "/";
     File carpetaUsuario = new File(rutaCarpetaUsuario);
-
-    // Crear la carpeta del usuario si no existe
+    
     if (!carpetaUsuario.exists()) {
         carpetaUsuario.mkdirs();
     }
 
     try {
-        // Guardar el archivo en la carpeta del usuario
         Path rutaArchivo = Paths.get(rutaCarpetaUsuario + nombreArchivoReal);
         Files.write(rutaArchivo, contenidoArchivo);
-    } catch (IOException e) {
+    } catch (IOException e) { 
         e.printStackTrace();
     }
 }
-    
+
+        public byte[] descargarArchivo(int idUsuario, String nombreArchivoReal) {
+        String rutaCarpetaUsuario = CARPETA_ARCHIVOS + idUsuario + "/";
+        Path rutaArchivo = Paths.get(rutaCarpetaUsuario + nombreArchivoReal);
+
+        try {
+            if (Files.exists(rutaArchivo)) {
+                return Files.readAllBytes(rutaArchivo);
+            } else {
+                System.out.println("El archivo no existe: " + rutaArchivo.toString());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
   public List<?> obtenerArchivosUsuario(int idUsuario, boolean devolverObjetosArchivo) {
     String rutaCarpetaUsuario = CARPETA_ARCHIVOS + idUsuario + "/";
     File carpetaUsuario = new File(rutaCarpetaUsuario);
