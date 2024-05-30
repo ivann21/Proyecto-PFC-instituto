@@ -43,7 +43,7 @@ public class Laboratorio extends javax.swing.JFrame {
          }
          });
     }
-private void insertarDatos(java.sql.Date fechaSQL) {
+private void insertarDatos(java.sql.Date fechaSQL, int numeroHoras) {
     try {
         if (fechaSQL == null || "Seleccione una hora".equals(jComboBox1.getSelectedItem())) {
             JOptionPane.showMessageDialog(null, "Por favor, seleccione una fecha y hora válidas.", "Campos Incompletos", JOptionPane.WARNING_MESSAGE);
@@ -52,31 +52,40 @@ private void insertarDatos(java.sql.Date fechaSQL) {
         
         Connection conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
         
-        String sql = "INSERT INTO PUBLIC.INSTITUTO.RESERVAS (ID_AULA, FECHA_RESERVA, ID_PROFESOR, HORA_RESERVA, HORA_FIN_RESERVA) VALUES (?, ?, ?, ?, ?)";
-        PreparedStatement statement = conn.prepareStatement(sql);
-        
-        statement.setInt(1, idAula);
-        statement.setDate(2, fechaSQL); 
-        statement.setInt(3, idProfesor);
-        
         String horaInicio = (String) jComboBox1.getSelectedItem();
-        
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         java.util.Date parsedDate = sdf.parse(horaInicio);
-        Time horaReservaTime = new Time(parsedDate.getTime());
         
-        statement.setTime(4, horaReservaTime); 
+        for (int i = 0; i < numeroHoras; i++) {
+            Time horaReservaTime = new Time(parsedDate.getTime());
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.setTime(parsedDate);
+            cal.add(java.util.Calendar.MINUTE, 55);
+            Time horaFinReservaTime = new Time(cal.getTimeInMillis());
+
+            if (existeReserva(idAula, fechaSQL, horaReservaTime, horaFinReservaTime)) {
+                JOptionPane.showMessageDialog(null, "El aula ya está reservada para la fecha y hora seleccionadas.", "Aula Reservada", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            String sql = "INSERT INTO PUBLIC.INSTITUTO.RESERVAS (ID_AULA, FECHA_RESERVA, ID_PROFESOR, HORA_RESERVA, HORA_FIN_RESERVA) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement statement = conn.prepareStatement(sql);
+
+            statement.setInt(1, idAula);
+            statement.setDate(2, fechaSQL); 
+            statement.setInt(3, idProfesor);
+            statement.setTime(4, horaReservaTime); 
+            statement.setTime(5, horaFinReservaTime); 
+
+            statement.executeUpdate();
+            statement.close();
+
+            parsedDate = cal.getTime(); // Incrementa la hora para la próxima iteración
+        }
         
-        java.util.Calendar cal = java.util.Calendar.getInstance();
-        cal.setTime(parsedDate);
-        cal.add(java.util.Calendar.MINUTE, 55);
-        Time horaFinReservaTime = new Time(cal.getTimeInMillis());
-        statement.setTime(5, horaFinReservaTime); 
-        
-        statement.executeUpdate();
-        
-        statement.close();
         conn.close();
+        
+        JOptionPane.showMessageDialog(null, "El aula ha sido reservada correctamente.", "Reserva Exitosa", JOptionPane.INFORMATION_MESSAGE);
         
         System.out.println("Datos insertados correctamente.");
     } catch (SQLException ex) {
@@ -85,23 +94,30 @@ private void insertarDatos(java.sql.Date fechaSQL) {
         System.out.println("Error al convertir la hora: " + ex.getMessage());
     }
 }
-private boolean existeReserva(int idAula, java.sql.Date fechaReserva, Time horaReserva) {
+
+private boolean existeReserva(int idAula, java.sql.Date fechaReserva, Time horaInicio, Time horaFin) {
     boolean existe = false;
     try {
         Connection conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
         
-        String sql = "SELECT COUNT(*) AS num_reservas FROM PUBLIC.INSTITUTO.RESERVAS WHERE ID_AULA = ? AND FECHA_RESERVA = ? AND HORA_RESERVA = ?";
+        String sql = "SELECT COUNT(*) AS num_reservas FROM PUBLIC.INSTITUTO.RESERVAS WHERE ID_AULA = ? AND FECHA_RESERVA = ? AND ((HORA_RESERVA >= ? AND HORA_RESERVA < ?) OR (HORA_FIN_RESERVA > ? AND HORA_FIN_RESERVA <= ?) OR (HORA_RESERVA <= ? AND HORA_FIN_RESERVA >= ?))";
         PreparedStatement statement = conn.prepareStatement(sql);
         
         statement.setInt(1, idAula); 
         statement.setDate(2, fechaReserva); 
-        statement.setTime(3, horaReserva); 
+        statement.setTime(3, horaInicio); 
+        statement.setTime(4, horaFin); 
+        statement.setTime(5, horaInicio); 
+        statement.setTime(6, horaFin); 
+        statement.setTime(7, horaInicio); 
+        statement.setTime(8, horaFin); 
         
         ResultSet resultSet = statement.executeQuery();
         
         if (resultSet.next()) {
             int numReservas = resultSet.getInt("num_reservas");
             if (numReservas > 0) {
+                existe = true;
             }
         }
        
@@ -236,19 +252,38 @@ private boolean existeReserva(int idAula, java.sql.Date fechaReserva, Time horaR
 
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         java.util.Date parsedDate = sdf.parse(horaInicio);
-        Time horaReservaTime = new Time(parsedDate.getTime());
 
-        if (existeReserva(idAula,fechaSQL, horaReservaTime)) {
-            JOptionPane.showMessageDialog(null, "El aula ya está reservada para la fecha y hora seleccionadas.", "Aula Reservada", JOptionPane.WARNING_MESSAGE);
+        // Calcular la hora final de la reserva
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.setTime(parsedDate);
+        cal.add(java.util.Calendar.MINUTE, 50 * numeroHoras); 
+        java.util.Date horaFin = cal.getTime();
+
+        // Obtener la hora máxima permitida
+        java.util.Date maxHour = sdf.parse("14:31");
+
+        // Validar si la hora final excede la hora máxima permitida
+        if (horaFin.after(maxHour) || horaFin.equals(maxHour)) {
+            JOptionPane.showMessageDialog(null, "El horario seleccionado excede o coincide con el límite máximo de reserva (2:30 PM). Por favor, seleccione un horario válido.", "Horario No Válido", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        insertarDatos(fechaSQL);
+        for (int i = 0; i < numeroHoras; i++) {
+            Time horaReservaTime = new Time(parsedDate.getTime());
+            cal.setTime(parsedDate);
+            cal.add(java.util.Calendar.MINUTE, 55);
+            Time horaFinReservaTime = new Time(cal.getTimeInMillis());
+           
+            if (existeReserva(idAula, fechaSQL, horaReservaTime, horaFinReservaTime)) {
+                JOptionPane.showMessageDialog(null, "El aula ya está reservada para la fecha y hora seleccionadas.", "Aula Reservada", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        }
 
-        JOptionPane.showMessageDialog(null, "El aula ha sido reservada correctamente.", "Reserva Exitosa", JOptionPane.INFORMATION_MESSAGE);
-
+        insertarDatos(fechaSQL, numeroHoras);
     } catch (ParseException ex) {
         System.out.println("Error al convertir el String a Date: " + ex.getMessage());
+        return;
     }  
     }//GEN-LAST:event_jButton1ActionPerformed
 

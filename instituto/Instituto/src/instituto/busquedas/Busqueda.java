@@ -33,6 +33,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +52,7 @@ import javax.swing.table.TableRowSorter;
 public class Busqueda extends javax.swing.JPanel {
     
     private HashMap<String, String> columnMapping;
+    private List<Integer> idList = new ArrayList<>();
     private int rol;
     
     public Busqueda(int Rol) {
@@ -78,11 +80,13 @@ public class Busqueda extends javax.swing.JPanel {
         columnMapping.put("profesor", "PROFESOR");
         columnMapping.put("asignatura","ASIGNATURA");  
         columnMapping.put("aula","AULA");  
-        columnMapping.put("dia de la semana","dia de la semana");  
-        columnMapping.put("hora de inicio","hora de inicio");  
-        columnMapping.put("hora de fin","hora de fin");  
+        columnMapping.put("dia de la semana","DIA DE LA SEMANA");  
+        columnMapping.put("hora de inicio","HORA DE INICIO");  
+        columnMapping.put("hora de fin","HORA DE FIN");  
         columnMapping.put("pizarra","PIZARRA");  
         columnMapping.put("ordenadores","ORDENADORES");   
+        columnMapping.put("horarios","HORARIOS");   
+        
         String selectedTable = "profesores";
         mostrarDatosEnJTable(selectedTable);
         
@@ -257,13 +261,28 @@ public void mostrarDatosEnJTable(String selectedTable) {
 
                     jTable1.setRowHeight(30); 
 
-                    while (rs.next()) {
-                        Object[] rowData = new Object[columnCount];
-                        for (int i = 0; i < columnCount; i++) {
-                            rowData[i] = rs.getObject(i + 1);
+                   if (selectedTable.equals("horarios")) {
+                        while (rs.next()) {
+                            Object[] rowData = new Object[columnCount];
+                            for (int i = 0; i < columnCount; i++) {
+                                if (metaData.getColumnName(i + 1).startsWith("ID")) {
+                                    idList.add(rs.getInt(i + 1));
+                                } else {
+                                    rowData[i] = rs.getObject(i + 1);
+                                }
+                            }
+                            contador++; 
+                            model.addRow(rowData);
                         }
-                        contador++; 
-                        model.addRow(rowData);
+                    } else {
+                        while (rs.next()) {
+                            Object[] rowData = new Object[columnCount];
+                            for (int i = 0; i < columnCount; i++) {
+                                rowData[i] = rs.getObject(i + 1);
+                            }
+                            contador++; 
+                            model.addRow(rowData);
+                        }
                     }
                 }
             }
@@ -695,13 +714,7 @@ private void eliminarFila(String selectedTable, int row) {
                 break;
 
             case "horarios":
-                String diaSemana = (String) jTable1.getModel().getValueAt(selectedRowInModel, 0);
-                Time horaInicio = (Time) jTable1.getModel().getValueAt(selectedRowInModel, 1);
-                Time horaFin = (Time) jTable1.getModel().getValueAt(selectedRowInModel, 2);
-                String nombreAsignatura = (String) jTable1.getModel().getValueAt(selectedRowInModel, 3);
-                String nombreProfesor = (String) jTable1.getModel().getValueAt(selectedRowInModel, 4);
-                String nombreAula2 = (String) jTable1.getModel().getValueAt(selectedRowInModel, 5);
-                id = buscarIDHorario(diaSemana, horaInicio, horaFin, nombreAsignatura, nombreProfesor, nombreAula2);
+                 id = idList.get(row);
                 if (id != -1) {
                     eliminarHorario(id);
                 }
@@ -730,22 +743,6 @@ public void eliminarRegistro(String tabla, String columnaId, int id) throws SQLE
         stmt.executeUpdate();
     }
 }
-
-public int buscarID(String tabla, String columnaId, String[] columnas, String[] valores) throws SQLException {
-    try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
-         PreparedStatement stmt = conn.prepareStatement("SELECT \"" + columnaId + "\" FROM PUBLIC.INSTITUTO." + tabla + " WHERE " + String.join(" = ? AND ", columnas) + " = ?")) {
-        for (int i = 0; i < columnas.length; i++) {
-            stmt.setString(i + 1, valores[i]);
-        }
-        try (ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt(columnaId);
-            }
-        }
-    }
-    return -1;
-}
-
 public void eliminarAlumno(int idAlumno) throws SQLException {
     eliminarRegistro("ALUMNOS", "ID alumno", idAlumno);
 }
@@ -762,17 +759,82 @@ public void eliminarCiclo(int idCiclo) throws SQLException {
     eliminarRegistro("CICLOS", "ID Ciclos", idCiclo);
 }
 
-public void eliminarHorario(int idHorario) throws SQLException {
-    eliminarRegistro("HORARIOS", "ID horario", idHorario);
+private void eliminarHorario(int idHorario) {
+    try {
+        Class.forName("org.hsqldb.jdbc.JDBCDriver");
+
+        try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
+            String sql = "DELETE FROM PUBLIC.INSTITUTO.HORARIOS WHERE ID_HORARIO = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, idHorario);
+                int rowsAffected = statement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Horario eliminado correctamente");
+                } else {
+                    System.out.println("No se encontró ningún horario con el ID proporcionado");
+                }
+            }
+        }
+    } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+    }
 }
 
 public void eliminarProfesor(int idProfesor) throws SQLException {
     eliminarRegistro("PROFESORES", "ID profesor", idProfesor);
 }
+public int buscarID(String tabla, String columnaId, String[] columnas, String[] valores) throws SQLException {
+    String sqlQuery = "SELECT " + columnaId + " FROM PUBLIC.INSTITUTO." + tabla + " WHERE " + String.join(" = ? AND ", columnas) + " = ?";
+    System.out.println("Consulta SQL: " + sqlQuery); // Imprimir la consulta SQL
+    
+    try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+         PreparedStatement stmt = conn.prepareStatement(sqlQuery)) {
+        for (int i = 0; i < columnas.length; i++) {
+            stmt.setString(i + 1, valores[i]);
+        }
+        
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(columnaId);
+            }
+        } catch (java.sql.SQLDataException ex) {
+            ex.printStackTrace();
+        }
+    }
+    return -1;
+}
 
-public int buscarIDHorario(String diaSemana, Time horaInicio, Time horaFin, String nombreAsignatura, String nombreProfesor, String nombreAula) throws SQLException {
+public int buscarIDHorario(String diaSemana, Time horaInicio, Time horaFin, String nombreAsignatura, String nombreCiclo, int añoCiclo, String nombreProfesor, String apellidoProfesor, String correoProfesor, String nombreAula, String ubicacionAula) throws SQLException {
+
+    int idAsignatura = buscarIDAsignatura(nombreAsignatura, nombreCiclo, añoCiclo);
+    if (idAsignatura == -1) {
+        throw new SQLException("Asignatura no encontrada: " + nombreAsignatura);
+    }
+    
+    int idProfesor = buscarIDProfesores(nombreProfesor, apellidoProfesor, correoProfesor);
+    if (idProfesor == -1) {
+        throw new SQLException("Profesor no encontrado: " + nombreProfesor);
+    }
+
+    int idAula = buscarIDAula(nombreAula, ubicacionAula);
+    if (idAula == -1) {
+        throw new SQLException("Aula no encontrada: " + nombreAula);
+    }
+
+    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+    String horaInicioStr = sdf.format(horaInicio);
+    String horaFinStr = sdf.format(horaFin);
+
     String[] columnas = {"\"dia de la semana\"", "\"hora de inicio\"", "\"hora de fin\"", "\"ID asignatura\"", "\"ID profesor\"", "\"ID aula\""};
-    String[] valores = {diaSemana, horaInicio.toString(), horaFin.toString(), nombreAsignatura, nombreProfesor, nombreAula};
+    String[] valores = {diaSemana, horaInicioStr, horaFinStr, String.valueOf(idAsignatura), String.valueOf(idProfesor), String.valueOf(idAula)};
+    
+    System.out.println("Hora de inicio: " + horaInicioStr);
+    System.out.println("Hora de fin: " + horaFinStr);
+    System.out.println("Parámetro 1 (diaSemana): " + diaSemana);
+    System.out.println("Parámetro 4 (idAsignatura): " + idAsignatura);
+    System.out.println("Parámetro 5 (idProfesor): " + idProfesor);
+    System.out.println("Parámetro 6 (idAula): " + idAula);
+    
     return buscarID("HORARIOS", "ID horario", columnas, valores);
 }
 
@@ -789,15 +851,60 @@ public int buscarIDAlumno(String nombreAlum, String apellidoAlum, String correoA
 }
 
 public int buscarIDAsignatura(String nombreAsig, String nombreCiclo, int añoCiclo) throws SQLException {
-    String[] columnas = {"NOMBRE", "NOMBRE", "ANIO"};
-    String[] valores = {nombreAsig, nombreCiclo, String.valueOf(añoCiclo)};
-    return buscarID("ASIGNATURAS AS ASIGNATURAS INNER JOIN CICLOS AS CICLOS ON ASIGNATURAS.ID_CICLOS = CICLOS.\"ID Ciclos\"", "ASIGNATURAS.\"ID Asignatura\"", columnas, valores);
+    String sqlQuery = "SELECT ASIGNATURAS.\"ID Asignatura\" " +
+                      "FROM PUBLIC.INSTITUTO.ASIGNATURAS " +
+                      "INNER JOIN PUBLIC.INSTITUTO.CICLOS " +
+                      "ON ASIGNATURAS.ID_CICLOS = CICLOS.\"ID Ciclos\" " +
+                      "WHERE ASIGNATURAS.NOMBRE = ? AND CICLOS.NOMBRE = ? AND CICLOS.ANIO = ?";
+    
+    System.out.println("Consulta SQL: " + sqlQuery); // Imprimir la consulta SQL
+
+    try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+         PreparedStatement stmt = conn.prepareStatement(sqlQuery)) {
+        
+        stmt.setString(1, nombreAsig);
+        stmt.setString(2, nombreCiclo);
+        stmt.setInt(3, añoCiclo);
+        
+        System.out.println("Parámetro 1 (nombreAsig): " + nombreAsig);
+        System.out.println("Parámetro 2 (nombreCiclo): " + nombreCiclo);
+        System.out.println("Parámetro 3 (añoCiclo): " + añoCiclo);
+        
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1); // Obtener el valor de la primera columna en el resultado
+            }
+        } catch (java.sql.SQLDataException ex) {
+            ex.printStackTrace();
+        }
+    }
+    return -1;
 }
 
+
 public int buscarIDAula(String nombreAula, String ubicacionAula) throws SQLException {
-    String[] columnas = {"NOMBRE", "UBICACION"};
-    String[] valores = {nombreAula, ubicacionAula};
-    return buscarID("AULAS", "ID aula", columnas, valores);
+    String sqlQuery = "SELECT \"ID aula\" FROM PUBLIC.INSTITUTO.AULAS WHERE NOMBRE = ? AND UBICACION = ?";
+    
+    System.out.println("Consulta SQL: " + sqlQuery); // Imprimir la consulta SQL
+
+    try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+         PreparedStatement stmt = conn.prepareStatement(sqlQuery)) {
+        
+        stmt.setString(1, nombreAula);
+        stmt.setString(2, ubicacionAula);
+        
+        System.out.println("Parámetro 1 (nombreAula): " + nombreAula);
+        System.out.println("Parámetro 2 (ubicacionAula): " + ubicacionAula);
+        
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1); // Obtener el valor de la primera columna en el resultado
+            }
+        } catch (java.sql.SQLDataException ex) {
+            ex.printStackTrace();
+        }
+    }
+    return -1;
 }
 
 public int buscarIDCiclo(String nombreCiclo, int anioCiclo) throws SQLException {

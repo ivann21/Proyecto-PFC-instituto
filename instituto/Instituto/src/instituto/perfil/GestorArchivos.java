@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package instituto.perfil;
+import java.awt.Panel;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -18,10 +19,10 @@ import javax.swing.JOptionPane;
 public class GestorArchivos {
 
     private static final String CARPETA_ARCHIVOS = "src/archivos/";
-
+    
     public void subirArchivo(int idUsuario, String nombreArchivoReal, byte[] contenidoArchivo) {
-    String rutaCarpetaUsuario = CARPETA_ARCHIVOS + idUsuario + "/";
-    File carpetaUsuario = new File(rutaCarpetaUsuario);
+     String rutaCarpetaUsuario = CARPETA_ARCHIVOS + idUsuario + "/";
+     File carpetaUsuario = new File(rutaCarpetaUsuario);
     
     if (!carpetaUsuario.exists()) {
         carpetaUsuario.mkdirs();
@@ -35,9 +36,9 @@ public class GestorArchivos {
     }
 }
 
-        public byte[] descargarArchivo(int idUsuario, String nombreArchivoReal) {
+      public byte[] descargarArchivo(int idUsuario, String nombreArchivoReal) {
         String rutaCarpetaUsuario = CARPETA_ARCHIVOS + idUsuario + "/";
-        Path rutaArchivo = Paths.get(rutaCarpetaUsuario + nombreArchivoReal);
+        Path rutaArchivo = Paths.get(rutaCarpetaUsuario, nombreArchivoReal);
 
         try {
             if (Files.exists(rutaArchivo)) {
@@ -91,7 +92,6 @@ public class GestorArchivos {
    public boolean eliminarArchivo(int idUsuario, String nombreArchivoReal) {
         String rutaArchivo = CARPETA_ARCHIVOS + idUsuario + "/" + nombreArchivoReal;
         File archivo = new File(rutaArchivo);
-
         if (archivo.exists()) {
             return archivo.delete();
         } else {

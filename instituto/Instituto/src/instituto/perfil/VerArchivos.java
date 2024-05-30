@@ -65,7 +65,7 @@ public class VerArchivos extends javax.swing.JPanel {
                     int response = JOptionPane.showConfirmDialog(null, "¿Desea descargar el archivo?", "Confirmar descarga", JOptionPane.YES_NO_OPTION);
                     if (response == JOptionPane.YES_OPTION) {
                         String nombreArchivo = (String) table.getValueAt(row, 0);
-                         descargarArchivo(nombreArchivo);
+                         descargarYGuardarArchivo(idProfesor,nombreArchivo);
                     }
                 } else if (column == 5 && e.getClickCount() == 1) {
                     int response = JOptionPane.showConfirmDialog(null, "¿Desea eliminar el archivo?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
@@ -74,22 +74,6 @@ public class VerArchivos extends javax.swing.JPanel {
                         eliminarArchivo(nombreArchivo);
                     }
                 }
-
-                new SwingWorker<Void, Void>() {
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        Thread.sleep(1000);
-                        return null;
-                    }
-
-                    @Override
-                    protected void done() {
-                        SwingUtilities.invokeLater(() -> {
-                            mostrarArchivos();
-                            reiniciarBusqueda();
-                        });
-                    }
-                }.execute();
             }
         });
     }
@@ -104,6 +88,7 @@ public class VerArchivos extends javax.swing.JPanel {
                 System.out.println("Archivo eliminado: " + rutaArchivo);
                 JOptionPane.showMessageDialog(this, "Archivo eliminado exitosamente.");
                 mostrarArchivos();
+                reiniciarBusqueda();
             } else {
                 JOptionPane.showMessageDialog(this, "Error al eliminar el archivo.");
             }
@@ -111,33 +96,41 @@ public class VerArchivos extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(this, "El archivo no existe.");
         }
     }
-    private void descargarArchivo(String nombreArchivo) {
-      JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Guardar archivo como");
+  private void descargarYGuardarArchivo(int idUsuario, String nombreArchivoOriginal) {
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Guardar archivo como");
 
-        // Agregar filtro de extensión para archivos de imagen
-        FileNameExtensionFilter imageFilter = new FileNameExtensionFilter("Archivos de imagen", "jpg", "png", "gif");
-        fileChooser.setFileFilter(imageFilter);
+    FileNameExtensionFilter imageFilter = new FileNameExtensionFilter("Archivos de imagen", "jpg", "png", "gif");
+    fileChooser.setFileFilter(imageFilter);
 
-        int userSelection = fileChooser.showSaveDialog(this);
-        if (userSelection == JFileChooser.APPROVE_OPTION) {
-            File fileToSave = fileChooser.getSelectedFile();
-            nombreArchivo = fileToSave.getName();
+    int userSelection = fileChooser.showSaveDialog(this);
+    if (userSelection == JFileChooser.APPROVE_OPTION) {
+        File fileToSave = fileChooser.getSelectedFile();
 
-            byte[] contenidoArchivo = gestorArchivos.descargarArchivo(idProfesor, nombreArchivo);
-            if (contenidoArchivo != null) {
-                try (FileOutputStream fos = new FileOutputStream(fileToSave)) {
-                    fos.write(contenidoArchivo);
-                    JOptionPane.showMessageDialog(this, "Archivo guardado con éxito: " + fileToSave.getAbsolutePath());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "Error al guardar el archivo: " + e.getMessage());
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "El archivo no existe o no se pudo descargar.");
+        String extensionOriginal = "";
+        int i = nombreArchivoOriginal.lastIndexOf('.');
+        if (i > 0) {
+            extensionOriginal = nombreArchivoOriginal.substring(i);
+        }
+
+        if (!fileToSave.getName().contains(".")) {
+            fileToSave = new File(fileToSave.toString() + extensionOriginal);
+        }
+
+        byte[] contenidoArchivo = gestorArchivos.descargarArchivo(idUsuario, nombreArchivoOriginal);
+        if (contenidoArchivo != null) {
+            try (FileOutputStream fos = new FileOutputStream(fileToSave)) {
+                fos.write(contenidoArchivo);
+                JOptionPane.showMessageDialog(this, "Archivo guardado con éxito: " + fileToSave.getAbsolutePath());
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error al guardar el archivo: " + e.getMessage());
             }
+        } else {
+            JOptionPane.showMessageDialog(this, "El archivo no existe o no se pudo descargar.");
         }
     }
+}
 
     private void verArchivo(String nombreArchivo) {
         String rutaArchivo = CARPETA_ARCHIVOS + idProfesor + "/" + nombreArchivo;
@@ -154,7 +147,7 @@ public class VerArchivos extends javax.swing.JPanel {
         }
     }
 
-    private void mostrarArchivos() {
+    void mostrarArchivos() {
         ImageIcon downloadIcon = new ImageIcon(getClass().getResource("/imagenes/download.png"));
         ImageIcon deleteIcon = new ImageIcon(getClass().getResource("/imagenes/delete.png"));
         ImageIcon viewIcon = new ImageIcon(getClass().getResource("/imagenes/preview.png"));
@@ -331,7 +324,8 @@ public class VerArchivos extends javax.swing.JPanel {
                 }
             }
 
-            mostrarArchivos();
+             mostrarArchivos();
+             reiniciarBusqueda();
         }
     }//GEN-LAST:event_addButtonActionPerformed
 
