@@ -261,20 +261,6 @@ public void mostrarDatosEnJTable(String selectedTable) {
 
                     jTable1.setRowHeight(30); 
 
-                   if (selectedTable.equals("horarios")) {
-                        while (rs.next()) {
-                            Object[] rowData = new Object[columnCount];
-                            for (int i = 0; i < columnCount; i++) {
-                                if (metaData.getColumnName(i + 1).startsWith("ID")) {
-                                    idList.add(rs.getInt(i + 1));
-                                } else {
-                                    rowData[i] = rs.getObject(i + 1);
-                                }
-                            }
-                            contador++; 
-                            model.addRow(rowData);
-                        }
-                    } else {
                         while (rs.next()) {
                             Object[] rowData = new Object[columnCount];
                             for (int i = 0; i < columnCount; i++) {
@@ -282,7 +268,6 @@ public void mostrarDatosEnJTable(String selectedTable) {
                             }
                             contador++; 
                             model.addRow(rowData);
-                        }
                     }
                 }
             }
