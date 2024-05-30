@@ -7,6 +7,8 @@ package instituto.busquedas.añadir;
 import instituto.busquedas.Busqueda;
 import javax.swing.JOptionPane;
 import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  *
  * @author icast
@@ -14,13 +16,20 @@ import java.sql.*;
 public class EditarCiclos extends javax.swing.JFrame {
 
         private Busqueda parentPanel;
+        private String nombre;
+        private int idCiclo;
      
     public EditarCiclos(Object[] ciclosData,Busqueda parentPanel) {
         this.parentPanel = parentPanel;
         initComponents();
-         nameTextField.setText(ciclosData[0].toString());
+        nameTextField.setText(ciclosData[0].toString());
          anioComboBox.setSelectedItem(ciclosData[1].toString());
          String descripcion = obtenerDescripcionCiclo(ciclosData[0].toString(), (int) ciclosData[1]);
+            try {
+                idCiclo = buscarIDCiclo(ciclosData[0].toString(),descripcion,(int) ciclosData[1]);
+            } catch (SQLException ex) {
+                Logger.getLogger(EditarCiclos.class.getName()).log(Level.SEVERE, null, ex);
+            }
         descripcionTextArea.setText(descripcion);
     }
     private String obtenerDescripcionCiclo(String nombreCiclo, int añoCiclo) {
@@ -44,6 +53,29 @@ public class EditarCiclos extends javax.swing.JFrame {
     }
     return descripcion;
 }
+     public int buscarIDCiclo(String nombre, String descripcion, int anio) throws SQLException {
+        int id = -1; // Valor predeterminado si no se encuentra ningún ID
+        try {
+        Class.forName("org.hsqldb.jdbc.JDBCDriver");
+        try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
+        String query = "SELECT \"ID Ciclos\" FROM PUBLIC.INSTITUTO.CICLOS WHERE NOMBRE = ? AND DESCRIPCION = ? AND ANIO = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, nombre);
+            statement.setString(2, descripcion);
+            statement.setInt(3, anio);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    id = resultSet.getInt("ID Ciclos");
+                }
+            }
+        }
+    }
+    }catch (ClassNotFoundException | SQLException ex) {
+    ex.printStackTrace();
+    
+    }
+        return id;
+   }  
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -128,42 +160,43 @@ public class EditarCiclos extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-    String nombre = nameTextField.getText().trim();
-    int anio = Integer.parseInt(anioComboBox.getSelectedItem().toString());
-    String descripcion = descripcionTextArea.getText().trim();
+   String nombre = nameTextField.getText().trim();
+int anio = Integer.parseInt(anioComboBox.getSelectedItem().toString());
+String descripcion = descripcionTextArea.getText().trim();
 
-    if (nombre.isEmpty() || descripcion.isEmpty()) {
-        JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
-    } else {
-        try {
-            Class.forName("org.hsqldb.jdbc.JDBCDriver");
-            try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
-                String consultaSQL = "UPDATE PUBLIC.INSTITUTO.CICLOS SET DESCRIPCION=? WHERE NOMBRE=? AND ANIO=?";
-                try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
-                    stmt.setString(1, descripcion);
-                    stmt.setString(2, nombre);
-                    stmt.setInt(3, anio);
+if (nombre.isEmpty() || descripcion.isEmpty()) {
+    JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
+} else {
+    try {
+        Class.forName("org.hsqldb.jdbc.JDBCDriver");
+        try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
+            String consultaSQL = "UPDATE PUBLIC.INSTITUTO.CICLOS SET NOMBRE=?, ANIO=?, DESCRIPCION=? WHERE \"ID Ciclos\"=?";
+            try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
+                stmt.setString(1, nombre);
+                stmt.setInt(2, anio);
+                stmt.setString(3, descripcion);
+                stmt.setInt(4, idCiclo);
 
-                    int filasAfectadas = stmt.executeUpdate();
-                    if (filasAfectadas > 0) {
-                        JOptionPane.showMessageDialog(null, "Los datos se han actualizado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                        dispose();
-                        if (this.getParent() != null && this.getParent().isEnabled()) {
-                            this.getParent().setEnabled(true);
-                        }
-                         if (parentPanel != null) {
-                              String selectedTable = "ciclos";
-                              parentPanel. mostrarDatosEnJTable(selectedTable);
-                          }
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Hubo un error al actualizar los datos", "Error", JOptionPane.ERROR_MESSAGE);
+                int filasAfectadas = stmt.executeUpdate();
+                if (filasAfectadas > 0) {
+                    JOptionPane.showMessageDialog(null, "Los datos se han actualizado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                    dispose();
+                    if (this.getParent() != null && this.getParent().isEnabled()) {
+                        this.getParent().setEnabled(true);
                     }
+                    if (parentPanel != null) {
+                        String selectedTable = "ciclos";
+                        parentPanel.mostrarDatosEnJTable(selectedTable);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "No se encontró ningún ciclo con el ID proporcionado", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        } catch (ClassNotFoundException | SQLException ex) {
-            ex.printStackTrace();
         }
+    } catch (ClassNotFoundException | SQLException ex) {
+        ex.printStackTrace();
     }
+}
     }//GEN-LAST:event_jButton1ActionPerformed
   
     /**
