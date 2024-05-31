@@ -10,6 +10,8 @@ import java.security.NoSuchAlgorithmException;
 import javax.swing.JOptionPane;
 import java.sql.*;
 import java.util.Base64;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 /**
  *
  * @author icast
@@ -21,7 +23,9 @@ public class AñadirAulas extends javax.swing.JFrame {
     public AñadirAulas(Busqueda parentPanel) {
          this.parentPanel = parentPanel;
          initComponents();
-       
+       SpinnerModel spinnerModel = new SpinnerNumberModel(0, 0, 50, 1); 
+       capacidadSpinner.setModel(spinnerModel);
+
     }
 public  String hashPassword(String password) {
         try {
@@ -128,7 +132,7 @@ public  String hashPassword(String password) {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-    String nombre = nameTextField.getText().trim();
+     String nombre = nameTextField.getText().trim();
     String ubicacion = ubicacionComboBox.getSelectedItem().toString();
     int capacidad = (int) capacidadSpinner.getValue();
     boolean tienePizarra = pizarraCheckBox.isSelected();
@@ -136,6 +140,8 @@ public  String hashPassword(String password) {
 
     if (nombre.isEmpty() || ubicacion.isEmpty()) {
         JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
+    } else if (capacidad < 1 || capacidad > 50) { // Verificar si la capacidad está dentro del rango deseado
+        JOptionPane.showMessageDialog(null, "La capacidad debe estar entre 1 y 50", "Error", JOptionPane.ERROR_MESSAGE);
     } else {
         try {
             Class.forName("org.hsqldb.jdbc.JDBCDriver");
@@ -152,10 +158,10 @@ public  String hashPassword(String password) {
                     if (filasAfectadas > 0) {
                         JOptionPane.showMessageDialog(null, "Los datos se han guardado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                         dispose();
-                         if (parentPanel != null) {
-                                  String selectedTable = "aulas";
-                                parentPanel. mostrarDatosEnJTable(selectedTable);
-                            }
+                        if (parentPanel != null) {
+                            String selectedTable = "aulas";
+                            parentPanel.mostrarDatosEnJTable(selectedTable);
+                        }
                         if (this.getParent() != null && this.getParent().isEnabled()) {
                             this.getParent().setEnabled(true); 
                         }

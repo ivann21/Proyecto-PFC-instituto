@@ -12,6 +12,8 @@ import java.sql.*;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 public class EditarAulas extends javax.swing.JFrame {
 
     
@@ -22,6 +24,8 @@ public class EditarAulas extends javax.swing.JFrame {
         try {
             this.parentPanel = parentPanel;
             initComponents();
+            SpinnerModel spinnerModel = new SpinnerNumberModel(0, 0, 50, 1); 
+            capacidadSpinner.setModel(spinnerModel);
             nombreField.setText(aulaData[0].toString());
             ubicacionComboBox.setSelectedItem(aulaData[1].toString());
             capacidadSpinner.setValue(Integer.parseInt(aulaData[2].toString()));
@@ -162,45 +166,47 @@ public  String hashPassword(String password) {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
     String nombre = nombreField.getText().trim();
-String ubicacion = ubicacionComboBox.getSelectedItem().toString();
-int capacidad = (int) capacidadSpinner.getValue();
-boolean tienePizarra = pizarraCheckBox.isSelected();
-boolean tieneOrdenadores = ordenadoresCheckBox.isSelected();
+    String ubicacion = ubicacionComboBox.getSelectedItem().toString();
+    int capacidad = (int) capacidadSpinner.getValue();
+    boolean tienePizarra = pizarraCheckBox.isSelected();
+    boolean tieneOrdenadores = ordenadoresCheckBox.isSelected();
 
-if (nombre.isEmpty() || ubicacion.isEmpty()) {
-    JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
-} else {
-    try {
-        Class.forName("org.hsqldb.jdbc.JDBCDriver");
-        try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
-            String consultaSQL = "UPDATE PUBLIC.INSTITUTO.AULAS SET UBICACION=?, CAPACIDAD_AULA=?, PIZARRA=?, ORDENADORES=? WHERE \"ID aula\"=?";
-            try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
-                stmt.setString(1, ubicacion);
-                stmt.setInt(2, capacidad);
-                stmt.setBoolean(3, tienePizarra);
-                stmt.setBoolean(4, tieneOrdenadores);
-                stmt.setInt(5, idAula);
+    if (nombre.isEmpty() || ubicacion.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
+    } else if (capacidad < 0 || capacidad > 50) { // Validación de la capacidad
+        JOptionPane.showMessageDialog(null, "La capacidad debe estar entre 0 y 50", "Error", JOptionPane.ERROR_MESSAGE);
+    } else {
+        try {
+            Class.forName("org.hsqldb.jdbc.JDBCDriver");
+            try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
+                String consultaSQL = "UPDATE PUBLIC.INSTITUTO.AULAS SET UBICACION=?, CAPACIDAD_AULA=?, PIZARRA=?, ORDENADORES=? WHERE \"ID aula\"=?";
+                try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
+                    stmt.setString(1, ubicacion);
+                    stmt.setInt(2, capacidad);
+                    stmt.setBoolean(3, tienePizarra);
+                    stmt.setBoolean(4, tieneOrdenadores);
+                    stmt.setInt(5, idAula);
 
-                int filasAfectadas = stmt.executeUpdate();
-                if (filasAfectadas > 0) {
-                    JOptionPane.showMessageDialog(null, "Los datos se han actualizado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                    dispose();
-                    if (this.getParent() != null && this.getParent().isEnabled()) {
-                        this.getParent().setEnabled(true); 
+                    int filasAfectadas = stmt.executeUpdate();
+                    if (filasAfectadas > 0) {
+                        JOptionPane.showMessageDialog(null, "Los datos se han actualizado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                        dispose();
+                        if (this.getParent() != null && this.getParent().isEnabled()) {
+                            this.getParent().setEnabled(true); 
+                        }
+                        if (parentPanel != null) {
+                            String selectedTable = "aulas";
+                            parentPanel.mostrarDatosEnJTable(selectedTable);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No se encontró ningún aula con el ID proporcionado", "Error", JOptionPane.ERROR_MESSAGE);
                     }
-                    if (parentPanel != null) {
-                        String selectedTable = "aulas";
-                        parentPanel.mostrarDatosEnJTable(selectedTable);
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null, "No se encontró ningún aula con el ID proporcionado", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
+        } catch (ClassNotFoundException | SQLException ex) {
+            ex.printStackTrace();
         }
-    } catch (ClassNotFoundException | SQLException ex) {
-        ex.printStackTrace();
     }
-}
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

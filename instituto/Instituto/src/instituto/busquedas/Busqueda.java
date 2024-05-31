@@ -35,6 +35,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
 import java.sql.Connection;
@@ -45,6 +48,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -54,6 +58,12 @@ import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
 
 
 public class Busqueda extends javax.swing.JPanel {
@@ -197,6 +207,8 @@ public class Busqueda extends javax.swing.JPanel {
                   jComboBox6.setVisible(false);
                   jComboBox7.setVisible(false);
                   jButton4.setEnabled(false);
+                  jComboBox7.setSelectedIndex(0);
+                  jComboBox6.setSelectedIndex(0);
               }
               case "hora de inicio" -> {
                   jComboBox3.setVisible(false);
@@ -206,6 +218,8 @@ public class Busqueda extends javax.swing.JPanel {
                   jComboBox7.setVisible(false);
                   txtBuscar.setVisible(false);
                   jButton4.setEnabled(false);
+                  jComboBox7.setSelectedIndex(0);
+                  jComboBox6.setSelectedIndex(0);
               }
               case "hora de fin" -> {
                   jComboBox3.setVisible(false);
@@ -215,6 +229,8 @@ public class Busqueda extends javax.swing.JPanel {
                   jComboBox7.setVisible(false);
                   txtBuscar.setVisible(false);
                   jButton4.setEnabled(false);
+                  jComboBox7.setSelectedIndex(0);
+                  jComboBox6.setSelectedIndex(0);
               }
               case "pizarra" -> {
                   jComboBox3.setVisible(false);
@@ -222,6 +238,7 @@ public class Busqueda extends javax.swing.JPanel {
                   jComboBox5.setVisible(false);
                   jComboBox6.setVisible(true);
                   jComboBox7.setVisible(false);
+                  jComboBox7.setSelectedIndex(0);
                   txtBuscar.setVisible(false);
                   jButton4.setEnabled(false);
               }
@@ -230,6 +247,7 @@ public class Busqueda extends javax.swing.JPanel {
                   jComboBox4.setVisible(false);
                   jComboBox5.setVisible(false);
                   jComboBox6.setVisible(false);
+                  jComboBox6.setSelectedIndex(0);
                   jComboBox7.setVisible(true);
                   txtBuscar.setVisible(false);
                   jButton4.setEnabled(false);
@@ -240,6 +258,8 @@ public class Busqueda extends javax.swing.JPanel {
                   jComboBox5.setVisible(false);
                   jComboBox6.setVisible(false);
                   jComboBox7.setVisible(false);
+                  jComboBox6.setSelectedIndex(0);
+                  jComboBox7.setSelectedIndex(0);
                   txtBuscar.setVisible(true);
                   jButton4.setEnabled(true);
               }
@@ -324,9 +344,10 @@ public class Busqueda extends javax.swing.JPanel {
     private void mostrarHorariosEnTabla(Connection connection, DefaultTableModel model) throws SQLException {
         HorarioDAO horarioDAO = new HorarioDAO(connection);
         List<Horario> horarios = horarioDAO.obtenerTodosLosHorarios();
-        model.setColumnIdentifiers(new Object[]{"Día de la Semana", "Hora de Inicio", "Hora de Fin", "Asignatura", "Profesor", "Aula"});
+        model.setColumnIdentifiers(new Object[]{"ID","Día de la Semana", "Hora de Inicio", "Hora de Fin", "Asignatura", "Profesor", "Aula"});
         for (Horario horario : horarios) {
-            model.addRow(new Object[]{horario.getDiaSemana(), horario.getHoraInicio(), horario.getHoraFin(), obtenerNombreAsignatura(horario.getIdAsignatura(), connection), obtenerNombreProfesor(horario.getIdProfesor(), connection), obtenerNombreAula(horario.getIdAula(), connection)});
+            model.addRow(new Object[]{horario.getIdHorario(),horario.getDiaSemana(), horario.getHoraInicio(), horario.getHoraFin(), obtenerNombreAsignatura(horario.getIdAsignatura(), connection), obtenerNombreProfesor(horario.getIdProfesor(), connection), obtenerNombreAula(horario.getIdAula(), connection)});
+          
         }
     }
 
@@ -460,10 +481,16 @@ private void configureTableColumns(String table, DefaultTableModel model) {
             if (rol != 0) {
                 model.addColumn("EDITAR");
                 model.addColumn("ELIMINAR");
-                setColumnWidths(jTable1, new int[]{190, 150, 150, 400, 150, 150, 80, 80});
+                setColumnWidths(jTable1, new int[]{30,190, 150, 150, 400, 150, 150, 80, 80});
                 setColumnCenterAlignment(jTable1, new int[]{0, 1, 2,3,4,5});
+                jTable1.getColumnModel().getColumn(0).setMinWidth(0);
+                jTable1.getColumnModel().getColumn(0).setMaxWidth(0);
+                jTable1.getColumnModel().getColumn(0).setPreferredWidth(0);
+                jTable1.getColumnModel().getColumn(0).setResizable(false); 
+
+                jTable1.doLayout(); 
             } else {
-                setColumnWidths(jTable1, new int[]{150, 150, 150, 400});
+                setColumnWidths(jTable1, new int[]{0,150, 150, 150, 400});
                 setColumnCenterAlignment(jTable1, new int[]{2});
             }
             break;
@@ -534,8 +561,8 @@ private void addTableMouseListener(String selectedTable) {
     jTable1.addMouseListener(new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent e) {
-            int row = jTable1.rowAtPoint(e.getPoint()); // Obtener la fila del punto de clic
-            int column = jTable1.columnAtPoint(e.getPoint()); // Obtener la columna del punto de clic
+            int row = jTable1.rowAtPoint(e.getPoint());
+            int column = jTable1.columnAtPoint(e.getPoint()); 
 
             if (row < jTable1.getRowCount() && row >= 0 && column < jTable1.getColumnCount() && column >= 0) {
                 if (rol != 0) { 
@@ -715,12 +742,13 @@ private Object[] getCicloData(int row) {
 private Object[] getHorarioData(int row) {
     
     return new Object[] {
-        jTable1.getValueAt(row, 0), // Día de la semana
-        jTable1.getValueAt(row, 1), // Hora de inicio
-        jTable1.getValueAt(row, 2), // Hora de fin
-        jTable1.getValueAt(row, 3), // Asignatura
-        jTable1.getValueAt(row, 4), // Profesor
-        jTable1.getValueAt(row, 5)  // Aula
+        jTable1.getValueAt(row, 0), // ID Horario
+        jTable1.getValueAt(row, 1), // Día de la semana
+        jTable1.getValueAt(row, 2), // Hora de inicio
+        jTable1.getValueAt(row, 3), // Hora de fin
+        jTable1.getValueAt(row, 4), // Asignatura
+        jTable1.getValueAt(row, 5), // Profesor
+        jTable1.getValueAt(row, 6)  // Aula
     };
 }
 private void eliminarFila(String selectedTable, int row) {
@@ -783,7 +811,7 @@ private void eliminarFila(String selectedTable, int row) {
             }
 
             case "horarios" -> {
-                id = idList.get(row);
+               id = (int) jTable1.getModel().getValueAt(selectedRowInModel, 0);
                 if (id != -1) {
                     eliminarHorario(id);
                 }
@@ -831,7 +859,7 @@ private void eliminarHorario(int idHorario) {
         Class.forName("org.hsqldb.jdbc.JDBCDriver");
 
         try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
-            String sql = "DELETE FROM PUBLIC.INSTITUTO.HORARIOS WHERE ID_HORARIO = ?";
+            String sql = "DELETE FROM PUBLIC.INSTITUTO.HORARIOS WHERE \"ID horario\" = ?";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, idHorario);
                 int rowsAffected = statement.executeUpdate();
@@ -852,7 +880,7 @@ public void eliminarProfesor(int idProfesor) throws SQLException {
 }
 public int buscarID(String tabla, String columnaId, String[] columnas, String[] valores) throws SQLException {
     String sqlQuery = "SELECT \"" + columnaId + "\" FROM PUBLIC.INSTITUTO." + tabla + " WHERE " + String.join(" = ? AND ", columnas) + " = ?";
-    System.out.println("Consulta SQL: " + sqlQuery); // Imprimir la consulta SQL
+    System.out.println("Consulta SQL: " + sqlQuery); 
     
     try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
          PreparedStatement stmt = conn.prepareStatement(sqlQuery)) {
@@ -924,7 +952,7 @@ public int buscarIDAsignatura(String nombreAsig, String nombreCiclo, int añoCic
                       "ON ASIGNATURAS.ID_CICLOS = CICLOS.\"ID Ciclos\" " +
                       "WHERE ASIGNATURAS.NOMBRE = ? AND CICLOS.NOMBRE = ? AND CICLOS.ANIO = ?";
     
-    System.out.println("Consulta SQL: " + sqlQuery); // Imprimir la consulta SQL
+    System.out.println("Consulta SQL: " + sqlQuery);
 
     try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
          PreparedStatement stmt = conn.prepareStatement(sqlQuery)) {
@@ -939,7 +967,7 @@ public int buscarIDAsignatura(String nombreAsig, String nombreCiclo, int añoCic
         
         try (ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
-                return rs.getInt(1); // Obtener el valor de la primera columna en el resultado
+                return rs.getInt(1);
             }
         } catch (java.sql.SQLDataException ex) {
             ex.printStackTrace();
@@ -1000,8 +1028,6 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
                         }
                     }
                 }
-                
-                // Verificar si se encontraron resultados
                 if (!filasCoincidentes.isEmpty()) {
                     sorter.setRowFilter(new RowFilter<Object, Integer>() {
                         @Override
@@ -1043,6 +1069,7 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
         jComboBox5 = new javax.swing.JComboBox<>();
         jComboBox6 = new javax.swing.JComboBox<>();
         jComboBox7 = new javax.swing.JComboBox<>();
+        jButton2 = new javax.swing.JButton();
 
         setPreferredSize(new java.awt.Dimension(1372, 627));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -1107,7 +1134,7 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
                 jButton1ActionPerformed(evt);
             }
         });
-        add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 500, -1, -1));
+        add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 500, -1, -1));
 
         jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione un dia", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes" }));
         jComboBox3.addActionListener(new java.awt.event.ActionListener() {
@@ -1148,6 +1175,14 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
             }
         });
         add(jComboBox7, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 20, 490, -1));
+
+        jButton2.setText("Generar informe");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 500, -1, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarActionPerformed
@@ -1161,14 +1196,14 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
     
     String opcionSeleccionada = (String) jComboBox2.getSelectedItem();
     String columnaSeleccionada = columnMapping.get(opcionSeleccionada);
-      buscarEnTabla(txtBuscar.getText(),columnaSeleccionada); // Primero realizar la búsqueda en la tabla
+      buscarEnTabla(txtBuscar.getText(),columnaSeleccionada); 
    
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
      String selectedTable = (String) jComboBox1.getSelectedItem();
         mostrarDatosEnJTable(selectedTable);
-        txtBuscar.setText(""); // Limpiar el campo de búsqueda
+        txtBuscar.setText(""); 
     TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) jTable1.getRowSorter();
     sorter.setRowFilter(null);
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -1277,10 +1312,215 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
     }
     }//GEN-LAST:event_jComboBox6ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+         String selectedTable = (String) jComboBox1.getSelectedItem(); 
+        switch(selectedTable) {
+            case "profesores" -> {
+               Connection conexion = null;
+                try {
+                 Class.forName("org.hsqldb.jdbcDriver");
+                 conexion = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost", "SA", "");
+                } catch (ClassNotFoundException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } 
+
+                InputStream vinculoarchivo = null;
+
+                vinculoarchivo = getClass().getResourceAsStream("/informes/Profesores.jrxml");
+
+                JasperReport jr = null;
+                try {
+                 jr = JasperCompileManager.compileReport(vinculoarchivo);
+                 JasperPrint jasperPrint = JasperFillManager.fillReport(jr, null, conexion);
+                 JasperViewer visor = new JasperViewer(jasperPrint,false) ;
+                 visor.setVisible(true);
+                } catch (JRException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } 
+            }
+            case "alumnos" -> {
+                Connection conexion = null;
+                try {
+                 Class.forName("org.hsqldb.jdbcDriver");
+                 conexion = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost", "SA", "");
+                } catch (ClassNotFoundException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } 
+
+                InputStream vinculoarchivo = null;
+
+                vinculoarchivo = getClass().getResourceAsStream("/informes/Alumnos.jrxml");
+
+                JasperReport jr = null;
+                try {
+                 jr = JasperCompileManager.compileReport(vinculoarchivo);
+                 JasperPrint jasperPrint = JasperFillManager.fillReport(jr, null, conexion);
+                 JasperViewer visor = new JasperViewer(jasperPrint,false) ;
+                 visor.setVisible(true);
+                } catch (JRException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } 
+            }
+            case "asignaturas" -> {
+                Connection conexion = null;
+                try {
+                 Class.forName("org.hsqldb.jdbcDriver");
+                 conexion = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost", "SA", "");
+                } catch (ClassNotFoundException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } 
+
+                InputStream vinculoarchivo = null;
+
+                vinculoarchivo = getClass().getResourceAsStream("/informes/Asignaturas.jrxml");
+
+                JasperReport jr = null;
+                try {
+                 jr = JasperCompileManager.compileReport(vinculoarchivo);
+                 JasperPrint jasperPrint = JasperFillManager.fillReport(jr, null, conexion);
+                 JasperViewer visor = new JasperViewer(jasperPrint,false) ;
+                 visor.setVisible(true);
+                } catch (JRException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } 
+            }
+            case "aulas" -> {
+               Connection conexion = null;
+                try {
+                 Class.forName("org.hsqldb.jdbcDriver");
+                 conexion = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost", "SA", "");
+                } catch (ClassNotFoundException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } 
+
+                InputStream vinculoarchivo = null;
+
+                vinculoarchivo = getClass().getResourceAsStream("/informes/Aulas.jrxml");
+
+              JasperReport jr = null;
+                try {
+                    Map<String, Object> miMapa = new HashMap<>();
+
+                    // Obtener el valor seleccionado en el JComboBox2
+                    String seleccionComboBox2 = (String) jComboBox2.getSelectedItem();
+
+                    // Verificar qué opción se seleccionó y agregar el parámetro correspondiente al mapa solo si txtBuscar no es null y no está vacío
+                    if ("nombre".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("nombre", txtBuscar.getText());
+                    } else if ("ubicacion".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("ubicacion", txtBuscar.getText());
+                    } else if ("capacidad".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("capacidad", txtBuscar.getText());
+                    }
+
+                    String seleccionComboBox6 = (String) jComboBox6.getSelectedItem();
+                        Boolean pizarra;
+                        if ("si".equalsIgnoreCase(seleccionComboBox6)) {
+                            pizarra = true;
+                        } else if ("no".equalsIgnoreCase(seleccionComboBox6)) {
+                            pizarra = false;
+                        } else {
+                            pizarra = null; 
+                        }
+
+                        if (pizarra != null) {
+                            miMapa.put("pizarra", pizarra);
+                        } else {
+                            miMapa.remove("pizarra"); 
+                        }
+
+                        String seleccionComboBoxOrdenadores = (String) jComboBox7.getSelectedItem();
+                        Boolean ordenadores;
+                        if ("si".equalsIgnoreCase(seleccionComboBoxOrdenadores)) {
+                            ordenadores = true;
+                        } else if ("no".equalsIgnoreCase(seleccionComboBoxOrdenadores)) {
+                            ordenadores = false;
+                        } else {
+                            ordenadores = null; 
+                        }
+                        if (ordenadores != null) {
+                            miMapa.put("ordenadores", ordenadores);
+                        } else {
+                            miMapa.remove("ordenadores");
+                        }
+
+                    // Compilar y llenar el reporte
+                    jr = JasperCompileManager.compileReport(vinculoarchivo);
+                    JasperPrint jasperPrint = JasperFillManager.fillReport(jr, miMapa, conexion);
+                    JasperViewer visor = new JasperViewer(jasperPrint, false);
+                   visor.setVisible(true);
+                } catch (JRException ex) {
+                    Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            case "ciclos" -> {
+                 Connection conexion = null;
+                try {
+                 Class.forName("org.hsqldb.jdbcDriver");
+                 conexion = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost", "SA", "");
+                } catch (ClassNotFoundException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } 
+
+                InputStream vinculoarchivo = null;
+
+                vinculoarchivo = getClass().getResourceAsStream("/informes/Ciclos.jrxml");
+
+                JasperReport jr = null;
+                try {
+                 jr = JasperCompileManager.compileReport(vinculoarchivo);
+                 JasperPrint jasperPrint = JasperFillManager.fillReport(jr, null, conexion);
+                 JasperViewer visor = new JasperViewer(jasperPrint,false) ;
+                 visor.setVisible(true);
+                } catch (JRException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } 
+            }
+            case "horarios" -> {
+                  Connection conexion = null;
+                try {
+                 Class.forName("org.hsqldb.jdbcDriver");
+                 conexion = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost", "SA", "");
+                } catch (ClassNotFoundException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } 
+
+                InputStream vinculoarchivo = null;
+
+                vinculoarchivo = getClass().getResourceAsStream("/informes/Horarios.jrxml");
+
+                JasperReport jr = null;
+                try {
+                 jr = JasperCompileManager.compileReport(vinculoarchivo);
+                 JasperPrint jasperPrint = JasperFillManager.fillReport(jr, null, conexion);
+                 JasperViewer visor = new JasperViewer(jasperPrint,false) ;
+                 visor.setVisible(true);
+                } catch (JRException ex) {
+                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                } 
+            }
+            default -> {
+            }
+        }    
+    }//GEN-LAST:event_jButton2ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton4;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JComboBox<String> jComboBox2;

@@ -5,6 +5,8 @@
 package instituto.busquedas.añadir;
 
 import instituto.busquedas.Busqueda;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.*;
 import java.sql.*;
 import java.time.LocalTime;
@@ -27,12 +29,13 @@ public class EditarHorarios extends javax.swing.JFrame {
     this.parentPanel = parentPanel;
     initComponents();
     populateComboBoxes();
-    asignaturaSeleccionada = horariosData[3].toString();
-    profesorSeleccionado = horariosData[4].toString();
-    aulaSeleccionada = horariosData[5].toString(); 
-    diaSeleccionado = horariosData[0].toString(); 
-    horaInicioSeleccionada = horariosData[1].toString();
-    horaFinSeleccionada = horariosData[2].toString();
+    idHorario = Integer.parseInt(horariosData[0].toString());
+    asignaturaSeleccionada = horariosData[4].toString();
+    profesorSeleccionado = horariosData[5].toString();
+    aulaSeleccionada = horariosData[6].toString(); 
+    diaSeleccionado = horariosData[1].toString(); 
+    horaInicioSeleccionada = horariosData[2].toString();
+    horaFinSeleccionada = horariosData[3].toString();
     
     System.out.println(asignaturaSeleccionada + " - " + profesorSeleccionado + " - " + aulaSeleccionada + " - " + diaSeleccionado + " - " + horaInicioSeleccionada + " - " + horaFinSeleccionada);
     
@@ -42,16 +45,19 @@ public class EditarHorarios extends javax.swing.JFrame {
     jComboBox4.setSelectedItem(diaSeleccionado); 
     jComboBox5.setSelectedItem(horaInicioSeleccionada); 
     jComboBox6.setSelectedItem(horaFinSeleccionada); 
-
-    String asignatura = asignaturaSeleccionada.split(" ")[0];
-    String profesor = profesorSeleccionado.split(" ")[0];
-    String aula = aulaSeleccionada.split(" ")[0];
-    String dia = diaSeleccionado;
-    LocalTime horaInicio = LocalTime.parse(horaInicioSeleccionada);
-    LocalTime horaFin = LocalTime.parse(horaFinSeleccionada);
-    idHorario = obtenerIdHorario(asignatura, profesor, aula, dia, horaInicio, horaFin);
+    jComboBox5.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                updateComboBox2();
+            }
+        });
 }
-
+private void updateComboBox2() {
+    int selectedIndex = jComboBox5.getSelectedIndex();
+    if (selectedIndex >= 0 && selectedIndex < jComboBox6.getItemCount()) {
+        jComboBox6.setSelectedIndex(selectedIndex);
+        jComboBox6.setEnabled(false); 
+    }
+}
 private void setSelectedItem(JComboBox<String> comboBox, String selectedItem) {
     for (int i = 0; i < comboBox.getItemCount(); i++) {
         String item = comboBox.getItemAt(i);
@@ -82,16 +88,6 @@ private String[] getItems(String tableName) {
     }
     return items.toArray(new String[0]);
 }
-
-    private String[] getHours() {
-        List<String> hours = new ArrayList<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        LocalTime start = LocalTime.of(8, 30);
-        for (int i = 0; i < 12; i++) {
-            hours.add(start.plusMinutes(i * 55).format(formatter));
-        }
-        return hours.toArray(new String[0]);
-    }
     private boolean isDuplicate(Connection conn, int aulaId, String dia, LocalTime horaInicio, LocalTime horaFin, int horarioId) throws SQLException {
     String query = "SELECT COUNT(*) FROM PUBLIC.INSTITUTO.HORARIOS WHERE \"ID aula\" = ? AND \"dia de la semana\" = ? AND ((\"hora de inicio\" >= ? AND \"hora de inicio\" < ?) OR (\"hora de fin\" > ? AND \"hora de fin\" <= ?)) AND \"ID horario\" <> ?";
     try (PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -109,34 +105,6 @@ private String[] getItems(String tableName) {
         }
     }
     return false;
-}
-  private int obtenerIdHorario(String nombreAsignatura, String nombreProfesor, String nombreAula, String dia, LocalTime horaInicio, LocalTime horaFin) {
-    int idHorario = -1;
-    try {
-        Class.forName("org.hsqldb.jdbc.JDBCDriver");
-        try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
-            String consultaSQL = "SELECT \"ID horario\" FROM PUBLIC.INSTITUTO.HORARIOS " +
-                                 "WHERE \"ID asignatura\" = (SELECT \"ID Asignatura\" FROM PUBLIC.INSTITUTO.ASIGNATURAS WHERE NOMBRE = ? LIMIT 1) "  +
-                                 "AND \"ID profesor\" = (SELECT \"ID profesor\" FROM PUBLIC.INSTITUTO.PROFESORES WHERE NOMBRE = ? LIMIT 1) " +
-                                 "AND \"ID aula\" = (SELECT \"ID aula\" FROM PUBLIC.INSTITUTO.AULAS WHERE NOMBRE = ? LIMIT 1)" +
-                                 "AND \"dia de la semana\" = ? AND \"hora de inicio\" = ? AND \"hora de fin\" = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
-                stmt.setString(1, nombreAsignatura);
-                stmt.setString(2, nombreProfesor);
-                stmt.setString(3, nombreAula);
-                stmt.setString(4, dia);
-                stmt.setTime(5, Time.valueOf(horaInicio));
-                stmt.setTime(6, Time.valueOf(horaFin));
-                ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    idHorario = rs.getInt("ID horario");
-                }
-            }
-        }
-    } catch (ClassNotFoundException | SQLException ex) {
-        ex.printStackTrace();
-    }
-    return idHorario;
 }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -160,8 +128,6 @@ private String[] getItems(String tableName) {
         jLabel6 = new javax.swing.JLabel();
         jComboBox6 = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
-        jLabel7 = new javax.swing.JLabel();
-        jComboBox7 = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Editar Horarios");
@@ -202,6 +168,7 @@ private String[] getItems(String tableName) {
         getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 140, -1, -1));
 
         jComboBox6.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "09:25:00", "10:20:00", "11:15:00", "12:35:00", "13:30:00", "14:25:00" }));
+        jComboBox6.setEnabled(false);
         getContentPane().add(jComboBox6, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 160, 244, -1));
 
         jButton1.setText("editar");
@@ -211,12 +178,6 @@ private String[] getItems(String tableName) {
             }
         });
         getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 200, -1, -1));
-
-        jLabel7.setText("Año");
-        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 26, -1, -1));
-
-        jComboBox7.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2" }));
-        getContentPane().add(jComboBox7, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 48, 40, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -312,13 +273,11 @@ private String[] getItems(String tableName) {
     private javax.swing.JComboBox<String> jComboBox4;
     private javax.swing.JComboBox<String> jComboBox5;
     private javax.swing.JComboBox<String> jComboBox6;
-    private javax.swing.JComboBox<String> jComboBox7;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     // End of variables declaration//GEN-END:variables
 }

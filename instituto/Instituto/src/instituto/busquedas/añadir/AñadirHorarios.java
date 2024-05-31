@@ -23,7 +23,19 @@ public class AñadirHorarios extends javax.swing.JFrame {
         this.parentPanel = parentPanel;
         initComponents();
          populateComboBoxes();
+          jComboBox5.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                updateComboBox2();
+            }
+        });
+}
+private void updateComboBox2() {
+    int selectedIndex = jComboBox5.getSelectedIndex();
+    if (selectedIndex >= 0 && selectedIndex < jComboBox6.getItemCount()) {
+        jComboBox6.setSelectedIndex(selectedIndex);
+        jComboBox6.setEnabled(false); 
     }
+}
      private void populateComboBoxes() {
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(getItems("ASIGNATURAS")));
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(getItems("PROFESORES")));
@@ -156,6 +168,7 @@ private String sumarMinutos(String hora, int minutos) {
         getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(297, 134, -1, -1));
 
         jComboBox6.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "09:25:00", "10:20:00", "11:15:00", "12:35:00", "13:30:00", "14:25:00" }));
+        jComboBox6.setEnabled(false);
         getContentPane().add(jComboBox6, new org.netbeans.lib.awtextra.AbsoluteConstraints(297, 156, 244, -1));
 
         jButton1.setText("añadir");
