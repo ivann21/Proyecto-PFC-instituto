@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Cherry" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="13acf49e-4913-4d1b-bccc-113817ad15d1">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="HSQLDB"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter"/>
 	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false"/>
 	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false"/>
 	<style name="Column header" forecolor="#666666" fontName="Times New Roman" fontSize="14" isBold="true"/>
@@ -18,18 +18,28 @@
 	<parameter name="capacidad" class="java.lang.String"/>
 	<parameter name="pizarra" class="java.lang.Boolean"/>
 	<parameter name="ordenadores" class="java.lang.Boolean"/>
+	<parameter name="imagenpizarraTrue" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="imagenpizarraFalse" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="imagenordenadorTrue" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="imagenordenadorFalse" class="java.lang.String" isForPrompting="false"/>
 	<queryString>
 		<![CDATA[SELECT "NOMBRE",
-       "UBICACION" AS UBICACION,
-       "CAPACIDAD_AULA" AS CAPACIDAD,
-       "PIZARRA" AS PIZARRA,
-       "ORDENADORES" AS ORDENADORES
+       "UBICACION",
+       "CAPACIDAD_AULA",
+       "PIZARRA",
+       "ORDENADORES"
 FROM "INSTITUTO"."AULAS"
-WHERE ($P{nombre} IS NULL OR "NOMBRE" LIKE CONCAT('%', $P{nombre}, '%'))
-  AND ($P{ubicacion} IS NULL OR "UBICACION" LIKE CONCAT('%', $P{ubicacion}, '%'))
-  AND ($P{capacidad} IS NULL OR "CAPACIDAD_AULA"LIKE CONCAT('%', $P{capacidad}, '%'))
-  AND ($P{pizarra} IS NULL OR "PIZARRA" = $P{pizarra})
-  AND ($P{ordenadores} IS NULL OR "ORDENADORES" = $P{ordenadores})]]>
+WHERE 
+      ($P{nombre} IS NULL  
+       OR LOWER("INSTITUTO"."AULAS"."NOMBRE") LIKE LOWER(CONCAT('%', $P{nombre}, '%')))
+  AND ($P{ubicacion} IS NULL  
+       OR LOWER("INSTITUTO"."AULAS"."UBICACION") LIKE LOWER(CONCAT('%', $P{ubicacion}, '%')))
+  AND ($P{capacidad} IS NULL  
+       OR CAST("INSTITUTO"."AULAS"."CAPACIDAD_AULA" AS VARCHAR(10)) LIKE CONCAT('%', $P{capacidad}, '%'))
+  AND ($P{pizarra} IS NULL  
+       OR "INSTITUTO"."AULAS"."PIZARRA" = $P{pizarra}) 
+  AND ($P{ordenadores} IS NULL  
+       OR "INSTITUTO"."AULAS"."ORDENADORES" = $P{ordenadores})]]>
 	</queryString>
 	<field name="NOMBRE" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="NOMBRE"/>
@@ -41,9 +51,9 @@ WHERE ($P{nombre} IS NULL OR "NOMBRE" LIKE CONCAT('%', $P{nombre}, '%'))
 		<property name="com.jaspersoft.studio.field.label" value="UBICACION"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="AULAS"/>
 	</field>
-	<field name="CAPACIDAD" class="java.lang.Integer">
+	<field name="CAPACIDAD_AULA" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="CAPACIDAD_AULA"/>
-		<property name="com.jaspersoft.studio.field.label" value="CAPACIDAD"/>
+		<property name="com.jaspersoft.studio.field.label" value="CAPACIDAD_AULA"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="AULAS"/>
 	</field>
 	<field name="PIZARRA" class="java.lang.Boolean">
@@ -62,7 +72,7 @@ WHERE ($P{nombre} IS NULL OR "NOMBRE" LIKE CONCAT('%', $P{nombre}, '%'))
 	<title>
 		<band height="132" splitType="Stretch">
 			<frame>
-				<reportElement mode="Opaque" x="0" y="0" width="570" height="95" backcolor="#000000" uuid="6c6ca4e1-17cd-4913-93d6-5e670ea9ae8a"/>
+				<reportElement mode="Opaque" x="0" y="0" width="450" height="95" backcolor="#242222" uuid="6c6ca4e1-17cd-4913-93d6-5e670ea9ae8a"/>
 				<staticText>
 					<reportElement style="Title" x="10" y="0" width="440" height="66" uuid="a2a2cac8-5a7d-4487-8c54-dab235ce4e21"/>
 					<textElement>
@@ -72,7 +82,7 @@ WHERE ($P{nombre} IS NULL OR "NOMBRE" LIKE CONCAT('%', $P{nombre}, '%'))
 				</staticText>
 			</frame>
 			<frame>
-				<reportElement mode="Opaque" x="2" y="100" width="568" height="32" forecolor="#000000" backcolor="#CC0000" uuid="e3c14156-5b51-4201-918b-97fdc012e5d4"/>
+				<reportElement mode="Opaque" x="2" y="100" width="568" height="32" forecolor="#000000" backcolor="#F28C1F" uuid="e3c14156-5b51-4201-918b-97fdc012e5d4"/>
 				<textField pattern="EEEEE dd MMMMM yyyy">
 					<reportElement x="420" y="10" width="144" height="20" forecolor="#FFFFFF" uuid="5c3301e7-a737-4c59-8a2f-a6c79fd1adb8"/>
 					<textElement textAlignment="Right">
@@ -81,13 +91,17 @@ WHERE ($P{nombre} IS NULL OR "NOMBRE" LIKE CONCAT('%', $P{nombre}, '%'))
 					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 				</textField>
 			</frame>
+			<image>
+				<reportElement x="475" y="12" width="75" height="70" uuid="493d04b9-ed14-49f8-889a-7ef757dede7b"/>
+				<imageExpression><![CDATA["src/informes/imagenes/aulasImagen.png"]]></imageExpression>
+			</image>
 		</band>
 	</title>
 	<pageHeader>
 		<band splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
-		<band height="55" splitType="Stretch">
+		<band height="56" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="20" width="96" height="26" uuid="34f5bcb1-cca2-4449-8217-792938ba8a93"/>
 				<textElement>
@@ -131,27 +145,13 @@ WHERE ($P{nombre} IS NULL OR "NOMBRE" LIKE CONCAT('%', $P{nombre}, '%'))
 	<detail>
 		<band height="27" splitType="Stretch">
 			<frame>
-				<reportElement style="Row" mode="Opaque" x="0" y="0" width="555" height="20" uuid="b50221b5-8254-440b-8c6f-1f0b138c9259"/>
-				<textField>
-					<reportElement x="452" y="3" width="97" height="14" uuid="1e7d0b7c-b424-4c2a-9388-594b8d52913d"/>
-					<textElement>
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{ORDENADORES} ?"ordenadorestrue.png" : "ordenadoresfalse.png"]]></textFieldExpression>
-				</textField>
-				<textField>
-					<reportElement x="325" y="3" width="97" height="15" uuid="b5405945-4a55-42d7-9211-b336882acd42"/>
-					<textElement>
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{PIZARRA} ? "pizarratrue.png" : "pizarrafalse.png"]]></textFieldExpression>
-				</textField>
+				<reportElement style="Row" mode="Opaque" x="0" y="0" width="555" height="26" uuid="b50221b5-8254-440b-8c6f-1f0b138c9259"/>
 				<textField>
 					<reportElement x="204" y="3" width="97" height="15" uuid="0c467b32-f938-46d9-a2c4-443ddd726f6d"/>
 					<textElement>
 						<font size="9"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{CAPACIDAD}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{CAPACIDAD_AULA}]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="95" y="3" width="97" height="15" uuid="26a1365f-276a-4cfd-ace7-1048d5983a33"/>
@@ -167,6 +167,14 @@ WHERE ($P{nombre} IS NULL OR "NOMBRE" LIKE CONCAT('%', $P{nombre}, '%'))
 					</textElement>
 					<textFieldExpression><![CDATA[$F{NOMBRE}]]></textFieldExpression>
 				</textField>
+				<image>
+					<reportElement x="360" y="3" width="30" height="17" uuid="cca5b5e9-3bf5-417e-8507-5be7dd4a4360"/>
+					<imageExpression><![CDATA[$F{ORDENADORES}? $P{imagenordenadorTrue}:$P{imagenordenadorFalse}]]></imageExpression>
+				</image>
+				<image>
+					<reportElement x="490" y="5" width="30" height="17" uuid="b95c3ff8-dea5-4385-b462-b717908880e0"/>
+					<imageExpression><![CDATA[$F{PIZARRA}? $P{imagenpizarraTrue}:$P{imagenpizarraFalse}]]></imageExpression>
+				</image>
 			</frame>
 		</band>
 	</detail>
@@ -183,7 +191,7 @@ WHERE ($P{nombre} IS NULL OR "NOMBRE" LIKE CONCAT('%', $P{nombre}, '%'))
 	<pageFooter>
 		<band height="25" splitType="Stretch">
 			<frame>
-				<reportElement mode="Opaque" x="0" y="1" width="555" height="24" forecolor="#D0B48E" backcolor="#000000" uuid="729c3539-f946-4d0e-a0a7-bda2815ea1b0"/>
+				<reportElement mode="Opaque" x="0" y="1" width="555" height="24" forecolor="#D0B48E" backcolor="#242222" uuid="729c3539-f946-4d0e-a0a7-bda2815ea1b0"/>
 				<textField evaluationTime="Report">
 					<reportElement style="Column header" x="513" y="0" width="40" height="20" forecolor="#FFFFFF" uuid="4834e99c-7f6c-485a-b098-50e5187f2ab4"/>
 					<textElement verticalAlignment="Middle">

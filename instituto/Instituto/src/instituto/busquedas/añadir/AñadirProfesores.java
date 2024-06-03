@@ -6,6 +6,13 @@ package instituto.busquedas.añadir;
 
 import instituto.Principal;
 import instituto.busquedas.Busqueda;
+import java.awt.Image;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import javax.swing.JOptionPane;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -14,6 +21,8 @@ import java.sql.*;
 import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 /**
  *
  * @author icast
@@ -21,6 +30,7 @@ import java.util.regex.Pattern;
 public class AñadirProfesores extends javax.swing.JFrame {
  
      private Busqueda parentPanel;
+     private String rutaImagen = "";
         
     public AñadirProfesores(Busqueda parentPanel) {
         this.parentPanel = parentPanel;
@@ -41,6 +51,49 @@ public  String hashPassword(String password) {
             return null;
         }
     }
+private void seleccionarImagen() {
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    int returnValue = fileChooser.showOpenDialog(this);
+
+    if (returnValue == JFileChooser.APPROVE_OPTION) {
+        File file = fileChooser.getSelectedFile();
+        rutaImagen = file.getAbsolutePath(); // Guardar la ruta de la imagen seleccionada
+
+        // Mostrar la imagen en el JLabel
+        ImageIcon icon = new ImageIcon(rutaImagen);
+        Image image = icon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+        jLabel6.setIcon(new ImageIcon(image));
+    }
+}
+private void guardarImagen(int idProfesor) {
+    if (rutaImagen.isEmpty()) {
+       System.out.println("no imagen");
+        return;
+    }
+
+    String nombreArchivo = idProfesor + ".png"; // Usamos el ID del profesor como nombre de archivo
+    String rutaDestino = "src/imagenes/" + nombreArchivo; // Carpeta de imágenes en el proyecto
+
+    try {
+        // Copiar la imagen al directorio de imágenes del proyecto
+        InputStream inputStream = new FileInputStream(rutaImagen);
+        OutputStream outputStream = new FileOutputStream(rutaDestino);
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = inputStream.read(buffer)) > 0) {
+            outputStream.write(buffer, 0, length);
+        }
+        outputStream.close();
+        inputStream.close();
+
+        // Actualizar la ruta de la imagen
+        rutaImagen = rutaDestino;
+    } catch (IOException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al guardar la imagen: " + e.getMessage());
+    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -59,12 +112,15 @@ public  String hashPassword(String password) {
         correoLabel = new javax.swing.JLabel();
         correoTextField = new javax.swing.JTextField();
         jPasswordField1 = new javax.swing.JPasswordField();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Añadir Profesores");
         setResizable(false);
 
-        jButton1.setText("añadir");
+        jButton1.setText("añadir campos y foto");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -79,12 +135,33 @@ public  String hashPassword(String password) {
 
         correoLabel.setText("correo");
 
+        jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
+        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/profile_picture (1).png"))); // NOI18N
+        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(5, 5, -1, -1));
+
+        jButton2.setText("añadir foto");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap(12, Short.MAX_VALUE)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(34, 34, 34)
+                        .addComponent(jButton2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(nameLabel)
@@ -98,86 +175,126 @@ public  String hashPassword(String password) {
                             .addComponent(correoLabel)
                             .addComponent(contraseñaLabel)
                             .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, 302, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addGap(18, 18, 18))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(nameLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(nameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(apellidoLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(apellidoTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(correoLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(correoTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(nameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(apellidoLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(apellidoTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(correoLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(correoTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(contraseñaLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(contraseñaLabel)
+                    .addComponent(jButton2))
+                .addGap(9, 9, 9)
                 .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-   String nombre = nameTextField.getText().trim();
-String apellido = apellidoTextField.getText().trim();
-String correo = correoTextField.getText().trim();
-String contrasenia = jPasswordField1.getText().trim();
+    String nombre = nameTextField.getText().trim();
+    String apellido = apellidoTextField.getText().trim();
+    String correo = correoTextField.getText().trim();
+    String contrasenia = jPasswordField1.getText().trim();
 
-if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty() || contrasenia.isEmpty()) {
-    JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
-} else {
+    if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty() || contrasenia.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
+    } else {
+        String correoRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        Pattern pattern = Pattern.compile(correoRegex);
+        Matcher matcher = pattern.matcher(correo);
+        
+        if (!matcher.matches()) {
+            JOptionPane.showMessageDialog(null, "Por favor, ingrese un correo electrónico válido.", "Correo No Válido", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (correoExistente(correo)) {
+            JOptionPane.showMessageDialog(null, "El correo electrónico ya está en uso", "Correo Duplicado", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        String contraseniaHasheada = hashPassword(contrasenia);
+        try {
+            Class.forName("org.hsqldb.jdbc.JDBCDriver");
+            try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
+                String consultaSQL = "INSERT INTO PUBLIC.INSTITUTO.PROFESORES (NOMBRE, APELLIDO, CORREOELECTRONICO, CONTRASENIA) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement stmt = connection.prepareStatement(consultaSQL, Statement.RETURN_GENERATED_KEYS)) {
+                    stmt.setString(1, nombre);
+                    stmt.setString(2, apellido);
+                    stmt.setString(3, correo);
+                    stmt.setString(4, contraseniaHasheada);
 
-    String correoRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
-    Pattern pattern = Pattern.compile(correoRegex);
-    Matcher matcher = pattern.matcher(correo);
+                    int filasAfectadas = stmt.executeUpdate();
+                    if (filasAfectadas > 0) {
+                        try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                            if (generatedKeys.next()) {
+                                int idProfesor = generatedKeys.getInt(1);
 
-    if (!matcher.matches()) {
-        JOptionPane.showMessageDialog(null, "Por favor, ingrese un correo electrónico válido.", "Correo No Válido", JOptionPane.WARNING_MESSAGE);
-        return;
+                                // Guardar la imagen con el ID del profesor
+                                guardarImagen(idProfesor);
+
+                                JOptionPane.showMessageDialog(null, "Los datos se han guardado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                                dispose();
+                                if (parentPanel != null) {
+                                    String selectedTable = "profesores";
+                                    parentPanel.mostrarDatosEnJTable(selectedTable);
+                                }
+                                if (this.getParent() != null && this.getParent().isEnabled()) {
+                                    this.getParent().setEnabled(true);
+                                }
+                            }
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Hubo un error al guardar los datos", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        } catch (ClassNotFoundException | SQLException ex) {
+            ex.printStackTrace();
+        }
     }
-    String contraseniaHasheada = hashPassword(contrasenia);
+    }//GEN-LAST:event_jButton1ActionPerformed
+private boolean correoExistente(String correo) {
     try {
         Class.forName("org.hsqldb.jdbc.JDBCDriver");
         try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
-            String consultaSQL = "INSERT INTO PUBLIC.INSTITUTO.PROFESORES (NOMBRE, APELLIDO, CORREOELECTRONICO, CONTRASENIA) VALUES (?, ?, ?, ?)";
+            String consultaSQL = "SELECT COUNT(*) AS cantidad FROM PUBLIC.INSTITUTO.PROFESORES WHERE CORREOELECTRONICO=?";
             try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
-                stmt.setString(1, nombre);
-                stmt.setString(2, apellido);
-                stmt.setString(3, correo);
-                stmt.setString(4, contraseniaHasheada);
-
-                int filasAfectadas = stmt.executeUpdate();
-                if (filasAfectadas > 0) {
-                    JOptionPane.showMessageDialog(null, "Los datos se han guardado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                    dispose();
-                    if (parentPanel != null) {
-                        String selectedTable = "profesores";
-                        parentPanel.mostrarDatosEnJTable(selectedTable);
+                stmt.setString(1, correo);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        int cantidad = rs.getInt("cantidad");
+                        return cantidad > 0; // Si la cantidad es mayor que 0, el correo existe
                     }
-                    if (this.getParent() != null && this.getParent().isEnabled()) {
-                        this.getParent().setEnabled(true);
-                    }
-
-                } else {
-                    JOptionPane.showMessageDialog(null, "Hubo un error al guardar los datos", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
     } catch (ClassNotFoundException | SQLException ex) {
         ex.printStackTrace();
-    }//GEN-LAST:event_jButton1ActionPerformed
     }
-    }
+    return false;
+}
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+       seleccionarImagen();
+    }//GEN-LAST:event_jButton2ActionPerformed
+   
     /**
      * @param args the command line arguments
      */
@@ -221,6 +338,9 @@ if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty() || contrasenia.is
     private javax.swing.JLabel correoLabel;
     private javax.swing.JTextField correoTextField;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JLabel nameLabel;
     private javax.swing.JTextField nameTextField;

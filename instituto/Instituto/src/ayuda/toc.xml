@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<toc version="1.0">
+ <tocitem text="Mapa" target="Mapa" />
+ <tocitem text="ver" target="ver">
+ <tocitem text="ver datos" target="datos" />
+ <tocitem text="archivos" target="archivos" />
+ <tocitem text="aulas reservadas" target="aulas" />
+ <tocitem text="tus clases" target="clases" />
+ </tocitem>
+ <tocitem text="modos" target="modo" />
+  <tocitem text="perfil" target="perfil" />
+</toc> 

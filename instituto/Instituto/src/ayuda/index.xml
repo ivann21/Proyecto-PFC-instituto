@@ -1,0 +1,12 @@
+
+<?xml version='1.0' encoding='UTF-8' ?>
+<index version="1.0">
+  <mapID target="Mapa" url="Mapa" />
+ <mapID target="datos" url="datos" />
+ <mapID target="archivos" url="archivos" />
+ <mapID target="aulas" url="aulas" />
+ <mapID target="clases" url="clases" />
+ <mapID target="modo" url="modo" />
+ <mapID target="perfil" url="perfil" />
+ <mapID target="ver" url="ver" />
+</index> 

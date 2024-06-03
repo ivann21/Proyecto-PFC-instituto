@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Cherry" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="13acf49e-4913-4d1b-bccc-113817ad15d1">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="HSQLDB"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="468"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="521"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="HSQLDB"/>
 	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false"/>
 	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false"/>
 	<style name="Column header" forecolor="#666666" fontName="Times New Roman" fontSize="14" isBold="true"/>
@@ -15,14 +15,28 @@
 			<style mode="Opaque" backcolor="#F0EFEF"/>
 		</conditionalStyle>
 	</style>
+	<parameter name="nombreAsignatura" class="java.lang.String"/>
+	<parameter name="descripcionAsignatura" class="java.lang.String"/>
+	<parameter name="nombreCiclo" class="java.lang.String"/>
+	<parameter name="anioCiclo" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[SELECT ASIGNATURAS.NOMBRE AS NOMBRE_ASIGNATURA,
-       ASIGNATURAS.DESCRIPCION AS DESCRIPCION_ASIGNATURA,
-       CICLOS.NOMBRE AS NOMBRE_CICLO,
-       CICLOS.ANIO
+		<![CDATA[SELECT INSTITUTO.ASIGNATURAS.NOMBRE AS NOMBRE_ASIGNATURA,
+       INSTITUTO.ASIGNATURAS.DESCRIPCION AS DESCRIPCION_ASIGNATURA,
+       INSTITUTO.CICLOS.NOMBRE AS NOMBRE_CICLO,
+       INSTITUTO.CICLOS.ANIO
 FROM INSTITUTO.ASIGNATURAS
-JOIN INSTITUTO.CICLOS
-ON ASIGNATURAS.ID_CICLOS = CICLOS."ID Ciclos"]]>
+JOIN INSTITUTO.CICLOS ON 
+     INSTITUTO.ASIGNATURAS.ID_CICLOS = INSTITUTO.CICLOS."ID Ciclos"
+WHERE 
+      ($P{nombreAsignatura} IS NULL  
+       OR LOWER(INSTITUTO.ASIGNATURAS.NOMBRE) LIKE LOWER(CONCAT('%', $P{nombreAsignatura}, '%'))) 
+  AND ($P{descripcionAsignatura} IS NULL  
+       OR LOWER(INSTITUTO.ASIGNATURAS.DESCRIPCION) LIKE LOWER(CONCAT('%', $P{descripcionAsignatura}, '%'))) 
+  AND ($P{nombreCiclo} IS NULL  
+       OR LOWER(INSTITUTO.CICLOS.NOMBRE) LIKE LOWER(CONCAT('%', $P{nombreCiclo}, '%'))) 
+  AND ($P{anioCiclo} IS NULL  
+       OR CAST(INSTITUTO.CICLOS.ANIO AS VARCHAR(10)) LIKE CONCAT('%', $P{anioCiclo}, '%'))
+]]>
 	</queryString>
 	<field name="NOMBRE_ASIGNATURA" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="NOMBRE"/>
@@ -50,7 +64,7 @@ ON ASIGNATURAS.ID_CICLOS = CICLOS."ID Ciclos"]]>
 	<title>
 		<band height="132" splitType="Stretch">
 			<frame>
-				<reportElement mode="Opaque" x="0" y="0" width="570" height="95" backcolor="#000000" uuid="6c6ca4e1-17cd-4913-93d6-5e670ea9ae8a"/>
+				<reportElement mode="Opaque" x="0" y="0" width="460" height="95" backcolor="#242222" uuid="6c6ca4e1-17cd-4913-93d6-5e670ea9ae8a"/>
 				<staticText>
 					<reportElement style="Title" x="10" y="0" width="440" height="66" uuid="a2a2cac8-5a7d-4487-8c54-dab235ce4e21"/>
 					<textElement>
@@ -69,6 +83,10 @@ ON ASIGNATURAS.ID_CICLOS = CICLOS."ID Ciclos"]]>
 					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 				</textField>
 			</frame>
+			<image>
+				<reportElement x="480" y="10" width="73" height="70" uuid="2e8dbe43-4055-4b20-b02e-f8cb05005a27"/>
+				<imageExpression><![CDATA["src/informes/imagenes/libros.png"]]></imageExpression>
+			</image>
 		</band>
 	</title>
 	<pageHeader>
@@ -157,7 +175,7 @@ ON ASIGNATURAS.ID_CICLOS = CICLOS."ID Ciclos"]]>
 	<pageFooter>
 		<band height="25" splitType="Stretch">
 			<frame>
-				<reportElement mode="Opaque" x="0" y="1" width="555" height="24" forecolor="#D0B48E" backcolor="#000000" uuid="729c3539-f946-4d0e-a0a7-bda2815ea1b0"/>
+				<reportElement mode="Opaque" x="0" y="1" width="555" height="24" forecolor="#D0B48E" backcolor="#242222" uuid="729c3539-f946-4d0e-a0a7-bda2815ea1b0"/>
 				<textField evaluationTime="Report">
 					<reportElement style="Column header" x="513" y="0" width="40" height="20" forecolor="#FFFFFF" uuid="4834e99c-7f6c-485a-b098-50e5187f2ab4"/>
 					<textElement verticalAlignment="Middle">

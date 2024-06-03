@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayuda - Datos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
+            background-color: #eef2f3;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            color: #0056b3;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .section img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px 0; /* Espacio alrededor de las imágenes */
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .section p {
+            font-size: 1.2em; /* Aumentar el tamaño de letra de los párrafos */
+            margin-top: 20px; /* Espacio superior en los párrafos */
+            margin-bottom: 20px; /* Espacio inferior en los párrafos */
+        }
+        .section ul {
+            font-size: 1.2em;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            padding-left: 20px;
+        }
+        .section ul li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ayuda - Datos</h1>
+    <div class="container">
+        <div class="section">
+            <h2>Introducción</h2>
+            <p>En la sección "Datos" puedes gestionar la información del instituto. Aquí puedes cargar y visualizar diferentes tablas, filtrar datos, añadir nuevos registros, editar y eliminar existentes, y generar informes.</p>
+            <img src="tabla.png" alt="Tabla">
+        </div>
+        <div class="section">
+            <h2>Cargar Tabla</h2>
+            <p>Para cargar una tabla, selecciona la tabla deseada del combobox. Las tablas disponibles son:</p>
+            <ul>
+                <li>Profesores</li>
+                <li>Alumnos</li>
+                <li>Asignaturas</li>
+                <li>Aulas</li>
+                <li>Ciclos</li>
+                <li>Horarios</li>
+            </ul>
+            <img src="cargar_tabla.png" alt="Cargar Tabla">
+        </div>
+        <div class="section">
+            <h2>Filtrar Datos</h2>
+            <p>Para filtrar datos dentro de una tabla, sigue estos pasos:</p>
+            <ol>
+                <li>Selecciona la columna en la que deseas aplicar el filtro desde el combobox de columnas.</li>
+                <li>Introduce el valor del filtro en el campo de texto.</li>
+                <li>Presiona Enter o haz clic en el botón de buscar para aplicar el filtro.</li>
+            </ol>
+            <img src="filtrar_datos.png" alt="Filtrar Datos">
+        </div>
+        <div class="section">
+            <h2>Añadir Datos</h2>
+            <p>Para añadir un nuevo registro a la tabla, haz clic en el botón "Añadir". Se abrirá un panel donde puedes ingresar los datos del nuevo registro. En los casos de alumnos y profesores, también puedes subir una imagen.</p>
+            <img src="anadir_datos.png" alt="Añadir Datos">
+        </div>
+        <div class="section">
+            <h2>Generar Informe</h2>
+            <p>Para generar un informe de los datos actuales en la tabla, haz clic en el botón "Generar Informe". Esto generará un informe con todos los valores visibles en la tabla.</p>
+            <img src="generar_informe.png" alt="Generar Informe">
+        </div>
+        <div class="section">
+            <h2>Editar y Eliminar Datos</h2>
+            <p>En cada fila de la tabla, encontrarás dos columnas al final con las opciones "Editar" y "Eliminar":</p>
+            <ul>
+                <li><strong>Editar:</strong> Haz clic en el botón de editar para modificar los datos de la fila seleccionada.</li>
+                <li><strong>Eliminar:</strong> Haz clic en el botón de eliminar para borrar la fila seleccionada.</li>
+            </ul>
+            <img src="editar_eliminar.png" alt="Editar y Eliminar Datos">
+        </div>
+    </div>
+</body>
+</html>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Cherry" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="13acf49e-4913-4d1b-bccc-113817ad15d1">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="HSQLDB"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="HSQLDB"/>
 	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false"/>
 	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false"/>
 	<style name="Column header" forecolor="#666666" fontName="Times New Roman" fontSize="14" isBold="true"/>
@@ -13,14 +13,31 @@
 			<style mode="Opaque" backcolor="#F0EFEF"/>
 		</conditionalStyle>
 	</style>
+	<parameter name="nombreAlumno" class="java.lang.String"/>
+	<parameter name="apellido" class="java.lang.String"/>
+	<parameter name="correoElectronico" class="java.lang.String"/>
+	<parameter name="nombreCiclo" class="java.lang.String"/>
+	<parameter name="anioCiclo" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[SELECT "INSTITUTO"."ALUMNOS"."NOMBRE",
-	"INSTITUTO"."ALUMNOS"."APELLIDO",
-	"INSTITUTO"."ALUMNOS"."CORREOELECTRONICO",
-	"INSTITUTO"."CICLOS"."NOMBRE",
-	"INSTITUTO"."CICLOS"."ANIO"
-FROM "INSTITUTO"."ALUMNOS" JOIN
-	"INSTITUTO"."CICLOS" ON ALUMNOS."ID ciclos" = CICLOS."ID Ciclos"]]>
+		<![CDATA[SELECT "INSTITUTO"."ALUMNOS"."NOMBRE" AS NOMBRE,
+       "INSTITUTO"."ALUMNOS"."APELLIDO" AS APELLIDO,
+       "INSTITUTO"."ALUMNOS"."CORREOELECTRONICO" AS CORREOELECTRONICO,
+       "INSTITUTO"."CICLOS"."NOMBRE" AS CICLO,
+       "INSTITUTO"."CICLOS"."ANIO" AS ANIO
+FROM "INSTITUTO"."ALUMNOS"
+JOIN "INSTITUTO"."CICLOS" ON "INSTITUTO"."ALUMNOS"."ID ciclos" = "INSTITUTO"."CICLOS"."ID Ciclos"
+WHERE 
+      ($P{nombreAlumno} IS NULL  
+       OR LOWER("INSTITUTO"."ALUMNOS"."NOMBRE") LIKE LOWER(CONCAT('%', $P{nombreAlumno}, '%')))
+  AND ($P{apellido} IS NULL  
+       OR LOWER("INSTITUTO"."ALUMNOS"."APELLIDO") LIKE LOWER(CONCAT('%', $P{apellido}, '%')))
+  AND ($P{correoElectronico} IS NULL  
+       OR LOWER("INSTITUTO"."ALUMNOS"."CORREOELECTRONICO") LIKE LOWER(CONCAT('%', $P{correoElectronico}, '%')))
+  AND ($P{nombreCiclo} IS NULL  
+       OR LOWER("INSTITUTO"."CICLOS"."NOMBRE") LIKE LOWER(CONCAT('%', $P{nombreCiclo}, '%')))
+  AND ($P{anioCiclo} IS NULL  
+       OR CAST("INSTITUTO"."CICLOS"."ANIO" AS VARCHAR(10)) LIKE CONCAT('%', $P{anioCiclo}, '%'))
+]]>
 	</queryString>
 	<field name="NOMBRE" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="NOMBRE"/>
@@ -37,9 +54,9 @@ FROM "INSTITUTO"."ALUMNOS" JOIN
 		<property name="com.jaspersoft.studio.field.label" value="CORREOELECTRONICO"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="ALUMNOS"/>
 	</field>
-	<field name="COLUMN_4" class="java.lang.String">
+	<field name="CICLO" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="NOMBRE"/>
-		<property name="com.jaspersoft.studio.field.label" value="NOMBRE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CICLO"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="CICLOS"/>
 	</field>
 	<field name="ANIO" class="java.lang.Integer">
@@ -53,7 +70,7 @@ FROM "INSTITUTO"."ALUMNOS" JOIN
 	<title>
 		<band height="132" splitType="Stretch">
 			<frame>
-				<reportElement mode="Opaque" x="0" y="0" width="570" height="95" backcolor="#000000" uuid="6c6ca4e1-17cd-4913-93d6-5e670ea9ae8a"/>
+				<reportElement mode="Opaque" x="0" y="0" width="460" height="95" backcolor="#242222" uuid="6c6ca4e1-17cd-4913-93d6-5e670ea9ae8a"/>
 				<staticText>
 					<reportElement style="Title" x="10" y="0" width="440" height="66" uuid="a2a2cac8-5a7d-4487-8c54-dab235ce4e21"/>
 					<textElement>
@@ -63,7 +80,7 @@ FROM "INSTITUTO"."ALUMNOS" JOIN
 				</staticText>
 			</frame>
 			<frame>
-				<reportElement mode="Opaque" x="2" y="100" width="568" height="32" forecolor="#000000" backcolor="#CC0000" uuid="e3c14156-5b51-4201-918b-97fdc012e5d4"/>
+				<reportElement mode="Opaque" x="2" y="100" width="568" height="32" forecolor="#000000" backcolor="#0443CC" uuid="e3c14156-5b51-4201-918b-97fdc012e5d4"/>
 				<textField pattern="EEEEE dd MMMMM yyyy">
 					<reportElement x="420" y="10" width="144" height="20" forecolor="#FFFFFF" uuid="5c3301e7-a737-4c59-8a2f-a6c79fd1adb8"/>
 					<textElement textAlignment="Right">
@@ -72,6 +89,10 @@ FROM "INSTITUTO"."ALUMNOS" JOIN
 					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 				</textField>
 			</frame>
+			<image>
+				<reportElement x="480" y="20" width="75" height="63" uuid="efad88b0-d2eb-44ac-87d3-600af96ee13a"/>
+				<imageExpression><![CDATA["src/informes/imagenes/students.png"]]></imageExpression>
+			</image>
 		</band>
 	</title>
 	<pageHeader>
@@ -149,7 +170,7 @@ FROM "INSTITUTO"."ALUMNOS" JOIN
 					<textElement>
 						<font size="9"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{COLUMN_4}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{CICLO}]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="360" y="3" width="20" height="15" uuid="07cbb05c-56c0-45b6-ad6d-060c3bc3d986"/>
@@ -174,7 +195,7 @@ FROM "INSTITUTO"."ALUMNOS" JOIN
 	<pageFooter>
 		<band height="25" splitType="Stretch">
 			<frame>
-				<reportElement mode="Opaque" x="0" y="1" width="555" height="24" forecolor="#D0B48E" backcolor="#000000" uuid="729c3539-f946-4d0e-a0a7-bda2815ea1b0"/>
+				<reportElement mode="Opaque" x="0" y="1" width="555" height="24" forecolor="#D0B48E" backcolor="#242222" uuid="729c3539-f946-4d0e-a0a7-bda2815ea1b0"/>
 				<textField evaluationTime="Report">
 					<reportElement style="Column header" x="513" y="0" width="40" height="20" forecolor="#FFFFFF" uuid="4834e99c-7f6c-485a-b098-50e5187f2ab4"/>
 					<textElement verticalAlignment="Middle">

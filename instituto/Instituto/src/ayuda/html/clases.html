@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver Mapa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #mapa {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            background-color: #f0f0f0;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+        }
+        .aula, .sala {
+            position: absolute;
+            padding: 10px;
+            background-color: rgba(0, 0, 255, 0.1);
+            border: 1px solid #000;
+            cursor: pointer;
+        }
+        #info {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fafafa;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ver Mapa</h1>
+    <p>Este es un mapa de un instituto. Haga clic en las aulas para ver los horarios y sus valores. Para la sala de conferencias, el laboratorio y la sala de reuniones, puede reservar el aula a través de un panel especial.</p>
+    <div id="mapa">
+        <div class="aula" style="top: 50px; left: 50px;" onclick="mostrarInfo('Aula 101')">Aula 101</div>
+        <div class="aula" style="top: 50px; left: 200px;" onclick="mostrarInfo('Aula 102')">Aula 102</div>
+        <div class="sala" style="top: 150px; left: 50px;" onclick="reservar('Sala de Conferencias')">Sala de Conferencias</div>
+        <div class="sala" style="top: 150px; left: 200px;" onclick="reservar('Laboratorio')">Laboratorio</div>
+        <div class="sala" style="top: 150px; left: 350px;" onclick="reservar('Sala de Reuniones')">Sala de Reuniones</div>
+    </div>
+    <div id="info" class="hidden"></div>
+
+    <script>
+        function mostrarInfo(aula) {
+            const infoDiv = document.getElementById('info');
+            infoDiv.innerHTML = `<h2>${aula}</h2><p>Horarios y valores para ${aula}.</p>`;
+            infoDiv.classList.remove('hidden');
+        }
+
+        function reservar(sala) {
+            const infoDiv = document.getElementById('info');
+            infoDiv.innerHTML = `<h2>${sala}</h2><p>Panel de reservas para ${sala}. Aquí podrá seleccionar el horario y confirmar la reserva.</p>`;
+            infoDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

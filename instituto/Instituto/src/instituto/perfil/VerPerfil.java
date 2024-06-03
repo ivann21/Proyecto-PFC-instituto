@@ -62,15 +62,13 @@ private String obtenerNombreRolProfesor(int idProfesor) {
     } catch (SQLException e) {
         e.printStackTrace();
     }
-    return null; // Retorna null si no se encuentra el nombre del rol
+    return null; 
 }
   private void mostrarDatosProfesor() {
       try {
-        // Conectar a la base de datos
         Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
         Statement statement = connection.createStatement();
 
-        // Consultar los datos del profesor
         String query = "SELECT * FROM instituto.profesores WHERE \"ID profesor\" = " + idProfesor;
         ResultSet resultSet = statement.executeQuery(query);
 
@@ -78,14 +76,12 @@ private String obtenerNombreRolProfesor(int idProfesor) {
             String nombre = resultSet.getString("NOMBRE");
             String apellido = resultSet.getString("APELLIDO");
             String correo = resultSet.getString("CORREOELECTRONICO");
-            String rutaImagenGuardada = new File("src/imagenes/" + idProfesor + ".png").getAbsolutePath(); // Ruta absoluta de la imagen guardada
+            String rutaImagenGuardada = new File("src/imagenes/" + idProfesor + ".png").getAbsolutePath();
 
-            // Actualizar los JTextField con los datos del profesor
             jTextField1.setText(nombre);
             jTextField2.setText(apellido);
             jTextField3.setText(correo);
 
-            // Cargar la imagen si existe
             File imagenGuardada = new File(rutaImagenGuardada);
             if (imagenGuardada.exists()) {
                 rutaImagen = rutaImagenGuardada;
@@ -105,32 +101,25 @@ private String obtenerNombreRolProfesor(int idProfesor) {
   
        private void guardarCambiosProfesor() {
         try {
-            // Conectar a la base de datos
             Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
 
-            // Crear la consulta de actualización
             String updateQuery = "UPDATE instituto.profesores SET NOMBRE = ?, APELLIDO = ?, CORREOELECTRONICO = ? WHERE \"ID profesor\" = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(updateQuery);
 
-            // Obtener los valores de los JTextField
             String nombre = jTextField1.getText();
             String apellido = jTextField2.getText();
             String correo = jTextField3.getText();
 
-            // Configurar los parámetros de la consulta
             preparedStatement.setString(1, nombre);
             preparedStatement.setString(2, apellido);
             preparedStatement.setString(3, correo);
             preparedStatement.setInt(4, idProfesor);
 
-            // Ejecutar la consulta de actualización
             int rowsAffected = preparedStatement.executeUpdate();
 
-            // Cerrar recursos
             preparedStatement.close();
             connection.close();
 
-            // Mostrar mensaje de confirmación
             if (rowsAffected > 0) {
                 JOptionPane.showMessageDialog(null, "Los cambios han sido guardados exitosamente.");
             } else {
@@ -149,11 +138,10 @@ private String obtenerNombreRolProfesor(int idProfesor) {
 
     if (returnValue == JFileChooser.APPROVE_OPTION) {
         File file = fileChooser.getSelectedFile();
-        String nombreArchivo = idProfesor + ".png"; // Usamos el ID del profesor como nombre de archivo
-        String rutaDestino = "src/imagenes/" + nombreArchivo; // Carpeta de imágenes en el proyecto
+        String nombreArchivo = idProfesor + ".png"; 
+        String rutaDestino = "src/imagenes/" + nombreArchivo; 
 
         try {
-            // Copiar la imagen al directorio de imágenes del proyecto
             InputStream inputStream = new FileInputStream(file);
             OutputStream outputStream = new FileOutputStream(rutaDestino);
             byte[] buffer = new byte[1024];
@@ -164,8 +152,7 @@ private String obtenerNombreRolProfesor(int idProfesor) {
             outputStream.close();
             inputStream.close();
 
-            // Mostrar la imagen en el JLabel
-            rutaImagen = rutaDestino; // Guardamos la ruta relativa en lugar de la absoluta
+            rutaImagen = rutaDestino; 
             ImageIcon icon = new ImageIcon(rutaImagen);
             Image image = icon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
             jLabel5.setIcon(new ImageIcon(image));
@@ -270,13 +257,13 @@ private String obtenerNombreRolProfesor(int idProfesor) {
          guardarCambiosProfesor();
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-      seleccionarImagen();
-    }//GEN-LAST:event_jButton1ActionPerformed
-
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        seleccionarImagen();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

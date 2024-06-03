@@ -31,10 +31,12 @@ import instituto.daos.AulaDAO;
 import instituto.daos.CicloDAO;
 import instituto.daos.HorarioDAO;
 import instituto.daos.ProfesorDAO;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -769,6 +772,7 @@ private void eliminarFila(String selectedTable, int row) {
                 id = buscarIDProfesores(nombreProf, apellidoProf, correoProf);
                 if (id != -1) {
                     eliminarProfesor(id);
+                    eliminarImagen(id);
                 }
             }
 
@@ -779,6 +783,7 @@ private void eliminarFila(String selectedTable, int row) {
                 id = buscarIDAlumno(nombreAlum, apellidoAlum, correoAlum);
                 if (id != -1) {
                     eliminarAlumno(id);
+                    eliminarImagenAlumno(id);
                 }
             }
 
@@ -830,7 +835,36 @@ private void eliminarFila(String selectedTable, int row) {
         Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
     }
 }
+private void eliminarImagen(int idProfesor) {
+    String nombreArchivo = idProfesor + ".png"; 
+    String rutaImagen = "src/imagenes/" + nombreArchivo; 
 
+    File archivo = new File(rutaImagen);
+    if (archivo.exists()) {
+        if (archivo.delete()) {
+            System.out.println("eliminado imagen");
+        } else {
+            JOptionPane.showMessageDialog(null, "Hubo un error al eliminar la imagen del profesor", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } else {
+        JOptionPane.showMessageDialog(null, "La imagen del profesor no existe", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+private void eliminarImagenAlumno(int idAlumno) {
+    String nombreArchivo = idAlumno + ".png"; 
+    String rutaImagen = "src/imagenes/alumnos/" + nombreArchivo; 
+
+    File archivo = new File(rutaImagen);
+    if (archivo.exists()) {
+        if (archivo.delete()) {
+            System.out.println("eliminado imagen");
+        } else {
+            JOptionPane.showMessageDialog(null, "Hubo un error al eliminar la imagen del profesor", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } else {
+        JOptionPane.showMessageDialog(null, "La imagen del profesor no existe", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
 public void eliminarRegistro(String tabla, String columnaId, int id) throws SQLException {
     try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
          PreparedStatement stmt = conn.prepareStatement("DELETE FROM PUBLIC.INSTITUTO." + tabla + " WHERE \"" + columnaId + "\" = ?")) {
@@ -1332,13 +1366,24 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
 
                 JasperReport jr = null;
                 try {
-                 jr = JasperCompileManager.compileReport(vinculoarchivo);
-                 JasperPrint jasperPrint = JasperFillManager.fillReport(jr, null, conexion);
-                 JasperViewer visor = new JasperViewer(jasperPrint,false) ;
-                 visor.setVisible(true);
+                    Map<String, Object> miMapa = new HashMap<>();
+
+                    String seleccionComboBox2 = (String) jComboBox2.getSelectedItem();
+
+                    if ("nombre".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("nombreProfesor", txtBuscar.getText());
+                    } else if ("apellido".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("apellidoProfesor", txtBuscar.getText());
+                    } else if ("correo".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("correoProfesor", txtBuscar.getText());
+                    }
+                    jr = JasperCompileManager.compileReport(vinculoarchivo);
+                    JasperPrint jasperPrint = JasperFillManager.fillReport(jr, miMapa, conexion);
+                    JasperViewer visor = new JasperViewer(jasperPrint, false);
+                   visor.setVisible(true);
                 } catch (JRException ex) {
-                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
-                } 
+                    Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             case "alumnos" -> {
                 Connection conexion = null;
@@ -1355,15 +1400,30 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
 
                 vinculoarchivo = getClass().getResourceAsStream("/informes/Alumnos.jrxml");
 
-                JasperReport jr = null;
+                 JasperReport jr = null;
                 try {
-                 jr = JasperCompileManager.compileReport(vinculoarchivo);
-                 JasperPrint jasperPrint = JasperFillManager.fillReport(jr, null, conexion);
-                 JasperViewer visor = new JasperViewer(jasperPrint,false) ;
-                 visor.setVisible(true);
+                    Map<String, Object> miMapa = new HashMap<>();
+
+                    String seleccionComboBox2 = (String) jComboBox2.getSelectedItem();
+
+                    if ("nombre".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("nombreAlumno", txtBuscar.getText());
+                    } else if ("apellido".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("apellido", txtBuscar.getText());
+                    } else if ("correo".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("correoElectronico", txtBuscar.getText());
+                    }else if ("nombre ciclo".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("nombreCiclo", txtBuscar.getText());
+                    }else if ("año ciclo".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("anioCiclo", txtBuscar.getText());
+                    }
+                    jr = JasperCompileManager.compileReport(vinculoarchivo);
+                    JasperPrint jasperPrint = JasperFillManager.fillReport(jr, miMapa, conexion);
+                    JasperViewer visor = new JasperViewer(jasperPrint, false);
+                   visor.setVisible(true);
                 } catch (JRException ex) {
-                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
-                } 
+                    Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             case "asignaturas" -> {
                 Connection conexion = null;
@@ -1380,15 +1440,26 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
 
                 vinculoarchivo = getClass().getResourceAsStream("/informes/Asignaturas.jrxml");
 
-                JasperReport jr = null;
+                  JasperReport jr = null;
                 try {
-                 jr = JasperCompileManager.compileReport(vinculoarchivo);
-                 JasperPrint jasperPrint = JasperFillManager.fillReport(jr, null, conexion);
-                 JasperViewer visor = new JasperViewer(jasperPrint,false) ;
-                 visor.setVisible(true);
+                    Map<String, Object> miMapa = new HashMap<>();
+
+                    String seleccionComboBox2 = (String) jComboBox2.getSelectedItem();
+
+                    if ("nombre".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("nombreAsignatura", txtBuscar.getText());
+                    } else if ("nombre ciclo".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("nombreCiclo", txtBuscar.getText());
+                    } else if ("año ciclo".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("anioCiclo", txtBuscar.getText());
+                    }
+                    jr = JasperCompileManager.compileReport(vinculoarchivo);
+                    JasperPrint jasperPrint = JasperFillManager.fillReport(jr, miMapa, conexion);
+                    JasperViewer visor = new JasperViewer(jasperPrint, false);
+                   visor.setVisible(true);
                 } catch (JRException ex) {
-                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
-                } 
+                    Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             case "aulas" -> {
                Connection conexion = null;
@@ -1409,10 +1480,11 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
                 try {
                     Map<String, Object> miMapa = new HashMap<>();
 
-                    // Obtener el valor seleccionado en el JComboBox2
                     String seleccionComboBox2 = (String) jComboBox2.getSelectedItem();
-
-                    // Verificar qué opción se seleccionó y agregar el parámetro correspondiente al mapa solo si txtBuscar no es null y no está vacío
+                    miMapa.put("imagenpizarraTrue","src/informes/imagenes/pizarra_true.png");
+                    miMapa.put("imagenpizarraFalse", "src/informes/imagenes/pizarra_false.png");
+                    miMapa.put("imagenordenadorTrue","src/informes/imagenes/ordenadores_true.png");
+                    miMapa.put("imagenordenadorFalse", "src/informes/imagenes/ordenadores_false.png");
                     if ("nombre".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
                         miMapa.put("nombre", txtBuscar.getText());
                     } else if ("ubicacion".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
@@ -1436,7 +1508,7 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
                         } else {
                             miMapa.remove("pizarra"); 
                         }
-
+                            
                         String seleccionComboBoxOrdenadores = (String) jComboBox7.getSelectedItem();
                         Boolean ordenadores;
                         if ("si".equalsIgnoreCase(seleccionComboBoxOrdenadores)) {
@@ -1452,7 +1524,6 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
                             miMapa.remove("ordenadores");
                         }
 
-                    // Compilar y llenar el reporte
                     jr = JasperCompileManager.compileReport(vinculoarchivo);
                     JasperPrint jasperPrint = JasperFillManager.fillReport(jr, miMapa, conexion);
                     JasperViewer visor = new JasperViewer(jasperPrint, false);
@@ -1478,13 +1549,51 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
 
                 JasperReport jr = null;
                 try {
-                 jr = JasperCompileManager.compileReport(vinculoarchivo);
-                 JasperPrint jasperPrint = JasperFillManager.fillReport(jr, null, conexion);
-                 JasperViewer visor = new JasperViewer(jasperPrint,false) ;
-                 visor.setVisible(true);
+                    Map<String, Object> miMapa = new HashMap<>();
+
+                    String seleccionComboBox2 = (String) jComboBox2.getSelectedItem();
+
+                    if ("nombre".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("nombreCiclo", txtBuscar.getText());
+                    } else if ("año".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("anioCiclo", txtBuscar.getText());
+                    }
+
+                        String seleccionComboBoxOrdenadores = (String) jComboBox7.getSelectedItem();
+                        Boolean ordenadores;
+                        if ("si".equalsIgnoreCase(seleccionComboBoxOrdenadores)) {
+                            ordenadores = true;
+                        } else if ("no".equalsIgnoreCase(seleccionComboBoxOrdenadores)) {
+                            ordenadores = false;
+                        } else {
+                            ordenadores = null; 
+                        }
+                        if (ordenadores != null) {
+                            miMapa.put("ordenadores", ordenadores);
+                        } else {
+                            miMapa.remove("ordenadores");
+                        }
+                        String seleccionComboBoxPizarra = (String) jComboBox6.getSelectedItem();
+                        Boolean pizarra;
+                        if ("si".equalsIgnoreCase(seleccionComboBoxPizarra)) {
+                            pizarra = true;
+                        } else if ("no".equalsIgnoreCase(seleccionComboBoxPizarra)) {
+                            pizarra = false;
+                        } else {
+                            pizarra = null; 
+                        }
+                        if (pizarra != null) {
+                            miMapa.put("pizarra", pizarra);
+                        } else {
+                            miMapa.remove("pizarra");
+                        }
+                    jr = JasperCompileManager.compileReport(vinculoarchivo);
+                    JasperPrint jasperPrint = JasperFillManager.fillReport(jr, miMapa, conexion);
+                    JasperViewer visor = new JasperViewer(jasperPrint, false);
+                   visor.setVisible(true);
                 } catch (JRException ex) {
-                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
-                } 
+                    Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             case "horarios" -> {
                   Connection conexion = null;
@@ -1501,15 +1610,36 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
 
                 vinculoarchivo = getClass().getResourceAsStream("/informes/Horarios.jrxml");
 
-                JasperReport jr = null;
+               JasperReport jr = null;
                 try {
-                 jr = JasperCompileManager.compileReport(vinculoarchivo);
-                 JasperPrint jasperPrint = JasperFillManager.fillReport(jr, null, conexion);
-                 JasperViewer visor = new JasperViewer(jasperPrint,false) ;
-                 visor.setVisible(true);
+                    Map<String, Object> miMapa = new HashMap<>();
+
+                    String seleccionComboBox2 = (String) jComboBox2.getSelectedItem();
+
+                    if ("asignatura".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("nombreAsignatura", txtBuscar.getText());
+                    } else if ("profesor".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("nombreProfesor", txtBuscar.getText());
+                    }else if ("aula".equals(seleccionComboBox2) && txtBuscar.getText() != null && !txtBuscar.getText().isEmpty()) {
+                        miMapa.put("nombreAula", txtBuscar.getText());
+                    }else if ("dia de la semana".equals(seleccionComboBox2) && jComboBox3.getSelectedItem()!= null && !jComboBox3.getSelectedItem().equals("Seleccione un dia")) {
+                        miMapa.put("diaSemana", jComboBox3.getSelectedItem());
+                    } else if ("hora de inicio".equals(seleccionComboBox2) && jComboBox4.getSelectedItem() != null && !jComboBox4.getSelectedItem().equals("Seleccione una hora")) {
+                        String horaInicioStr = jComboBox4.getSelectedItem().toString();
+                        Time horaInicio = Time.valueOf(horaInicioStr);
+                        miMapa.put("horaInicio", horaInicio);
+                    } else if ("hora de fin".equals(seleccionComboBox2) && jComboBox5.getSelectedItem() != null && !jComboBox5.getSelectedItem().equals("Seleccione una hora")) {
+                        String horaFinStr = jComboBox5.getSelectedItem().toString();
+                        Time horaFin = Time.valueOf(horaFinStr);
+                        miMapa.put("horaFin", horaFin);
+                    }
+                    jr = JasperCompileManager.compileReport(vinculoarchivo);
+                    JasperPrint jasperPrint = JasperFillManager.fillReport(jr, miMapa, conexion);
+                    JasperViewer visor = new JasperViewer(jasperPrint, false);
+                   visor.setVisible(true);
                 } catch (JRException ex) {
-                 Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
-                } 
+                    Logger.getLogger(Busqueda.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             default -> {
             }

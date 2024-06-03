@@ -6,11 +6,20 @@ package instituto.busquedas.añadir;
 
 import instituto.Principal;
 import instituto.busquedas.Busqueda;
+import java.awt.Image;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import javax.swing.JOptionPane;
 import java.sql.*;
 import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 /**
  *
  * @author icast
@@ -18,13 +27,56 @@ import java.util.regex.Pattern;
 public class AñadirAlumnos extends javax.swing.JFrame {
 
      private Busqueda parentPanel;
+     private String rutaImagen = "";
     
     public AñadirAlumnos(Busqueda parentPanel) {
         this.parentPanel = parentPanel;
         initComponents();
         cargarCiclos();
     }
+    private void seleccionarImagen() {
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    int returnValue = fileChooser.showOpenDialog(this);
 
+    if (returnValue == JFileChooser.APPROVE_OPTION) {
+        File file = fileChooser.getSelectedFile();
+        rutaImagen = file.getAbsolutePath(); // Guardar la ruta de la imagen seleccionada
+
+        // Mostrar la imagen en el JLabel
+        ImageIcon icon = new ImageIcon(rutaImagen);
+        Image image = icon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+        jLabel6.setIcon(new ImageIcon(image));
+    }
+}
+private void guardarImagen(int idProfesor) {
+    if (rutaImagen.isEmpty()) {
+       System.out.println("no imagen");
+        return;
+    }
+
+    String nombreArchivo = idProfesor + ".png"; // Usamos el ID del profesor como nombre de archivo
+    String rutaDestino = "src/imagenes/alumnos/" + nombreArchivo; // Carpeta de imágenes en el proyecto
+
+    try {
+        // Copiar la imagen al directorio de imágenes del proyecto
+        InputStream inputStream = new FileInputStream(rutaImagen);
+        OutputStream outputStream = new FileOutputStream(rutaDestino);
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = inputStream.read(buffer)) > 0) {
+            outputStream.write(buffer, 0, length);
+        }
+        outputStream.close();
+        inputStream.close();
+
+        // Actualizar la ruta de la imagen
+        rutaImagen = rutaDestino;
+    } catch (IOException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al guardar la imagen: " + e.getMessage());
+    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -45,6 +97,9 @@ public class AñadirAlumnos extends javax.swing.JFrame {
         cicloComboBox = new javax.swing.JComboBox<>();
         anioComboBox = new javax.swing.JComboBox<>();
         correoLabel2 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Añadir Alumnos");
@@ -71,12 +126,31 @@ public class AñadirAlumnos extends javax.swing.JFrame {
 
         correoLabel2.setText("año del ciclo");
 
+        jButton2.setText("cambiar foto");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
+        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/profile_picture (1).png"))); // NOI18N
+        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(5, 5, -1, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(15, 15, 15)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(22, 22, 22)
+                        .addComponent(jButton2)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(correoLabel2)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -92,7 +166,7 @@ public class AñadirAlumnos extends javax.swing.JFrame {
                         .addComponent(nameTextField, javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(correoLabel1, javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(cicloComboBox, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 304, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -100,19 +174,25 @@ public class AñadirAlumnos extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(nameLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(nameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(apellidoLabel)
-                .addGap(5, 5, 5)
-                .addComponent(apellidoTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(correoLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(correoTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(correoLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cicloComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(nameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(apellidoLabel)
+                        .addGap(5, 5, 5)
+                        .addComponent(apellidoTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(correoLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(correoTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(correoLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cicloComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton2)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
@@ -127,7 +207,7 @@ public class AñadirAlumnos extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String nombre = nameTextField.getText().trim();
+    String nombre = nameTextField.getText().trim();
     String apellido = apellidoTextField.getText().trim();
     String correo = correoTextField.getText().trim();
     String nombreCiclo = cicloComboBox.getSelectedItem().toString();
@@ -144,13 +224,17 @@ public class AñadirAlumnos extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Por favor, ingrese un correo electrónico válido.", "Correo No Válido", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        if (correoExistente(correo)) {
+          JOptionPane.showMessageDialog(null, "El correo electrónico ya está en uso", "Correo Duplicado", JOptionPane.WARNING_MESSAGE);
+          return;
+        }
         int idCicloSeleccionado = obtenerIdCiclo(nombreCiclo, anioCiclo);
         if (idCicloSeleccionado != -1) {
             try {
                 Class.forName("org.hsqldb.jdbc.JDBCDriver");
                 try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
                     String consultaSQL = "INSERT INTO PUBLIC.INSTITUTO.ALUMNOS (NOMBRE, APELLIDO, CORREOELECTRONICO, \"ID ciclos\") VALUES (?, ?, ?, ?)";
-                    try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
+                    try (PreparedStatement stmt = connection.prepareStatement(consultaSQL, Statement.RETURN_GENERATED_KEYS)) {
                         stmt.setString(1, nombre);
                         stmt.setString(2, apellido);
                         stmt.setString(3, correo);
@@ -158,16 +242,23 @@ public class AñadirAlumnos extends javax.swing.JFrame {
 
                         int filasAfectadas = stmt.executeUpdate();
                         if (filasAfectadas > 0) {
-                            JOptionPane.showMessageDialog(null, "Los datos se han guardado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                            dispose();
-                             if (parentPanel != null) {
-                                  String selectedTable = "alumnos";
-                                parentPanel. mostrarDatosEnJTable(selectedTable);
-                            }
-                            if (this.getParent() != null && this.getParent().isEnabled()) {
-                                this.getParent().setEnabled(true); 
-                            }
+                            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                                if (generatedKeys.next()) {
+                                    int idAlumno = generatedKeys.getInt(1);
 
+                                    guardarImagen(idAlumno);
+
+                                    JOptionPane.showMessageDialog(null, "Los datos se han guardado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                                    dispose();
+                                    if (parentPanel != null) {
+                                        String selectedTable = "alumnos";
+                                        parentPanel.mostrarDatosEnJTable(selectedTable);
+                                    }
+                                    if (this.getParent() != null && this.getParent().isEnabled()) {
+                                        this.getParent().setEnabled(true); 
+                                    }
+                                }
+                            }
                         } else {
                             JOptionPane.showMessageDialog(null, "Hubo un error al guardar los datos", "Error", JOptionPane.ERROR_MESSAGE);
                         }
@@ -181,6 +272,29 @@ public class AñadirAlumnos extends javax.swing.JFrame {
         }
     }
     }//GEN-LAST:event_jButton1ActionPerformed
+private boolean correoExistente(String correo) {
+    try {
+        Class.forName("org.hsqldb.jdbc.JDBCDriver");
+        try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
+            String consultaSQL = "SELECT COUNT(*) AS cantidad FROM PUBLIC.INSTITUTO.PROFESORES WHERE CORREOELECTRONICO=?";
+            try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
+                stmt.setString(1, correo);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        int cantidad = rs.getInt("cantidad");
+                        return cantidad > 0; // Si la cantidad es mayor que 0, el correo existe
+                    }
+                }
+            }
+        }
+    } catch (ClassNotFoundException | SQLException ex) {
+        ex.printStackTrace();
+    }
+    return false;
+}
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+         seleccionarImagen();
+    }//GEN-LAST:event_jButton2ActionPerformed
     private int obtenerIdCiclo(String nombreCiclo, int anioCiclo) {
     int idCiclo = -1; 
     try {
@@ -267,6 +381,9 @@ public class AñadirAlumnos extends javax.swing.JFrame {
     private javax.swing.JLabel correoLabel2;
     private javax.swing.JTextField correoTextField;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel nameLabel;
     private javax.swing.JTextField nameTextField;
     // End of variables declaration//GEN-END:variables
