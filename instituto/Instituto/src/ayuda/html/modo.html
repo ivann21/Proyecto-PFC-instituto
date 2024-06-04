@@ -3,62 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ver Mapa</title>
+    <title>Ayuda - Modos de la Aplicación</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
+            background-color: #eef2f3;
+            color: #333;
         }
-        #mapa {
-            position: relative;
-            width: 800px;
-            height: 600px;
-            background-color: #f0f0f0;
+        h1 {
+            text-align: center;
+            color: #0056b3;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 900px;
             margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
             border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .aula, .sala {
-            position: absolute;
-            padding: 10px;
-            background-color: rgba(0, 0, 255, 0.1);
-            border: 1px solid #000;
-            cursor: pointer;
+        .section {
+            margin-bottom: 30px;
         }
-        #info {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 10px;
+        .section h2 {
+            color: #0056b3;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .section p {
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .section img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px 0;
+            border-radius: 5px;
             border: 1px solid #ccc;
-            background-color: #fafafa;
-        }
-        .hidden {
-            display: none;
         }
     </style>
 </head>
 <body>
-    <h1>Ver Mapa</h1>
-    <p>Este es un mapa de un instituto. Haga clic en las aulas para ver los horarios y sus valores. Para la sala de conferencias, el laboratorio y la sala de reuniones, puede reservar el aula a través de un panel especial.</p>
-    <div id="mapa">
-        <div class="aula" style="top: 50px; left: 50px;" onclick="mostrarInfo('Aula 101')">Aula 101</div>
-        <div class="aula" style="top: 50px; left: 200px;" onclick="mostrarInfo('Aula 102')">Aula 102</div>
-        <div class="sala" style="top: 150px; left: 50px;" onclick="reservar('Sala de Conferencias')">Sala de Conferencias</div>
-        <div class="sala" style="top: 150px; left: 200px;" onclick="reservar('Laboratorio')">Laboratorio</div>
-        <div class="sala" style="top: 150px; left: 350px;" onclick="reservar('Sala de Reuniones')">Sala de Reuniones</div>
+    <h1>Ayuda - Modos de la Aplicación</h1>
+    <div class="container">
+        <div class="section">
+            <h2>Modo Cyan</h2>
+            <p>Este modo aplica un esquema de colores con tonos cyan para una experiencia visual vibrante.</p>
+            <img src="modo_cyan.png" alt="Modo Cyan">
+        </div>
+        <div class="section">
+            <h2>Modo Oscuro</h2>
+            <p>Este modo aplica un esquema de colores oscuros, ideal para condiciones de poca luz y para reducir el cansancio visual.</p>
+            <img src="modo_oscuro.png" alt="Modo Oscuro">
+        </div>
+        <div class="section">
+            <h2>Modo Claro</h2>
+            <p>Este modo aplica un esquema de colores claros, ofreciendo una visualización tradicional y luminosa.</p>
+            <img src="modo_claro.png" alt="Modo Claro">
+        </div>
     </div>
-    <div id="info" class="hidden"></div>
-
-    <script>
-        function mostrarInfo(aula) {
-            const infoDiv = document.getElementById('info');
-            infoDiv.innerHTML = `<h2>${aula}</h2><p>Horarios y valores para ${aula}.</p>`;
-            infoDiv.classList.remove('hidden');
-        }
-
-        function reservar(sala) {
-            const infoDiv = document.getElementById('info');
-            infoDiv.innerHTML = `<h2>${sala}</h2><p>Panel de reservas para ${sala}. Aquí podrá seleccionar el horario y confirmar la reserva.</p>`;
-            infoDiv.classList.remove('hidden');
-        }
-    </script>
 </body>
 </html>

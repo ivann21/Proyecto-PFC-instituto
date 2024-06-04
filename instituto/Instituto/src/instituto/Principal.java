@@ -611,6 +611,7 @@ public class Principal extends javax.swing.JFrame {
         jPanel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 20, 313, 556));
 
         jPanel7.setBackground(new java.awt.Color(51, 204, 0));
+        jPanel7.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Cancha_blanco.png"))); // NOI18N

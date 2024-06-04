@@ -847,7 +847,7 @@ private void eliminarImagen(int idProfesor) {
             JOptionPane.showMessageDialog(null, "Hubo un error al eliminar la imagen del profesor", "Error", JOptionPane.ERROR_MESSAGE);
         }
     } else {
-        JOptionPane.showMessageDialog(null, "La imagen del profesor no existe", "Error", JOptionPane.ERROR_MESSAGE);
+        System.out.println("imagen predeterminada");
     }
 }
 private void eliminarImagenAlumno(int idAlumno) {
