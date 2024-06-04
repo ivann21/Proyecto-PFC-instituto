@@ -50,7 +50,7 @@ public class ClasesAsignadas extends javax.swing.JPanel {
     @Override
     public void actionPerformed(ActionEvent e) {
         String selectedValue = (String) jComboBox2.getSelectedItem();
-        txtBuscar.setText(""); // Limpiar el campo de búsqueda
+        txtBuscar.setText(""); 
         
         TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) jTable1.getRowSorter();
         if (sorter != null) {
@@ -76,7 +76,6 @@ public class ClasesAsignadas extends javax.swing.JPanel {
                 txtBuscar.setVisible(false);
                jButton4.setEnabled(false);
             } else {
-                // Para otras opciones, hacer visible txtBuscar y jButton4, y ocultar jComboBox3, jComboBox4, y jComboBox5
                 jComboBox3.setVisible(false);
                 jComboBox4.setVisible(false);
                 jComboBox5.setVisible(false);
@@ -101,7 +100,6 @@ public class ClasesAsignadas extends javax.swing.JPanel {
         statement.setInt(1, idProfesor);
         ResultSet resultSet = statement.executeQuery();
 
-        // Crear el modelo de la tabla sin incluir la columna ID horario
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("Asignatura");
         model.addColumn("Aula");
@@ -109,13 +107,10 @@ public class ClasesAsignadas extends javax.swing.JPanel {
         model.addColumn("Hora de inicio");
         model.addColumn("Hora de fin");
 
-        // Verificar si el resultado de la consulta está vacío
         if (!resultSet.next()) {
-            // Mostrar un mensaje indicando que no hay clases asignadas
             JOptionPane.showMessageDialog(this, "No hay clases asignadas para este profesor.");
             
         } else {
-            // Iterar sobre los resultados y agregarlos al modelo de la tabla
             do {
                 Object[] row = {
                     resultSet.getString("Asignatura"),
@@ -136,26 +131,21 @@ public class ClasesAsignadas extends javax.swing.JPanel {
             jTable1.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
     } catch (SQLException ex) {
-        // Manejar cualquier error de SQL
         ex.printStackTrace();
     }
 }
 private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
     DefaultTableModel model = (DefaultTableModel) jTable1.getModel(); 
-    TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model); // Inicializa el TableRowSorter
+    TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model); 
     
-    jTable1.setRowSorter(sorter); // Asigna el TableRowSorter al jTable1
+    jTable1.setRowSorter(sorter); 
     
     if (sorter != null) {
-        // Si el texto a buscar es nulo o está vacío, eliminar el filtro y mostrar todos los datos
         if (textoABuscar == null || textoABuscar.isEmpty() || textoABuscar.equalsIgnoreCase("seleccione una hora") || textoABuscar.equalsIgnoreCase("seleccione un dia")) {
             sorter.setRowFilter(null);
         }  else {
-            // Ignorar mayúsculas y minúsculas en la búsqueda
             String regex = "(?i)" + textoABuscar;
-            // Obtener el índice de la columna en el modelo de la tabla
             int columnIndex = jTable1.getColumn(columnaSeleccionada).getModelIndex();
-            // Aplicar el filtro de búsqueda en la columna seleccionada
             sorter.setRowFilter(RowFilter.regexFilter(regex, columnIndex));
         }
     }
@@ -247,7 +237,7 @@ private void buscarEnTabla(String textoABuscar, String columnaSeleccionada) {
 
         String opcionSeleccionada = (String) jComboBox2.getSelectedItem();
         String columnaSeleccionada = columnMapping.get(opcionSeleccionada);
-        buscarEnTabla(txtBuscar.getText(),columnaSeleccionada); // Primero realizar la búsqueda en la tabla
+        buscarEnTabla(txtBuscar.getText(),columnaSeleccionada);
 
     }//GEN-LAST:event_jButton4ActionPerformed
 

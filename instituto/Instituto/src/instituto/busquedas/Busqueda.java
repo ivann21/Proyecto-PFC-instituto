@@ -862,7 +862,7 @@ private void eliminarImagenAlumno(int idAlumno) {
             JOptionPane.showMessageDialog(null, "Hubo un error al eliminar la imagen del profesor", "Error", JOptionPane.ERROR_MESSAGE);
         }
     } else {
-        JOptionPane.showMessageDialog(null, "La imagen del profesor no existe", "Error", JOptionPane.ERROR_MESSAGE);
+        System.out.println("no tiene foto");
     }
 }
 public void eliminarRegistro(String tabla, String columnaId, int id) throws SQLException {

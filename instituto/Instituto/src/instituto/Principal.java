@@ -30,6 +30,8 @@ import instituto.perfil.VerArchivos;
 import instituto.perfil.VerPerfil;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.net.URL;
 import login.Login;
 import java.sql.*;
@@ -55,6 +57,9 @@ public class Principal extends javax.swing.JFrame {
         this.idProfesor = idProfesor;
         this.idRol = idRol;
         initComponents();
+        URL url = getClass().getResource("/imagenes/logo.png");
+        Image imagen= Toolkit.getDefaultToolkit().getImage(url);
+        this.setIconImage(imagen);
          String AYUDA_HS = "ayuda/helpset.hs";
         try {
          ClassLoader cl = getClass().getClassLoader();
@@ -183,25 +188,20 @@ public class Principal extends javax.swing.JFrame {
         reuniones = new javax.swing.JButton();
         A302 = new javax.swing.JButton();
         A303 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
+        jLabel20 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem6 = new javax.swing.JMenuItem();
@@ -610,67 +610,52 @@ public class Principal extends javax.swing.JFrame {
 
         jPanel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 20, 313, 556));
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/planta (1).png"))); // NOI18N
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 410, -1, -1));
+        jPanel7.setBackground(new java.awt.Color(51, 204, 0));
+        jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/planta (1).png"))); // NOI18N
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 160, -1, -1));
-
-        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/planta (1).png"))); // NOI18N
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(930, 380, -1, 66));
-
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/planta (1).png"))); // NOI18N
-        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 170, 60, 60));
-
-        jLabel8.setForeground(new java.awt.Color(204, 204, 204));
-        jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/planta (1).png"))); // NOI18N
-        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 520, -1, -1));
+        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Cancha_blanco.png"))); // NOI18N
+        jPanel7.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 150, 320, 200));
 
         jLabel6.setBackground(new java.awt.Color(255, 255, 255));
         jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("PATIO");
-        jLabel6.setOpaque(true);
-        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 360, -1, 50));
+        jPanel7.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 70, -1, 50));
 
-        jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/planta (1).png"))); // NOI18N
-        jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(930, 250, -1, -1));
+        jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Cancha_blanco.png"))); // NOI18N
+        jPanel7.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 150, 300, 210));
 
-        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/cancha-de-baloncesto (1).png"))); // NOI18N
-        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 410, 300, 210));
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/—Pngtree—circle clipart green circle_5553152 (1) (1).png"))); // NOI18N
+        jPanel7.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, -1, -1));
 
-        jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/canchass (1) (1).png"))); // NOI18N
-        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 150, 300, 210));
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/—Pngtree—circle clipart green circle_5553152 (1) (1).png"))); // NOI18N
+        jPanel7.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 360, -1, -1));
 
-        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/plantas.png"))); // NOI18N
-        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 270, -1, -1));
+        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/—Pngtree—circle clipart green circle_5553152 (1) (1).png"))); // NOI18N
+        jPanel7.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 40, -1, -1));
 
-        jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/planta (1).png"))); // NOI18N
-        jPanel1.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 500, -1, 66));
+        jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/—Pngtree—circle clipart green circle_5553152 (1) (1).png"))); // NOI18N
+        jPanel7.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 40, -1, -1));
 
-        jLabel12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/planta (1).png"))); // NOI18N
-        jPanel1.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 490, -1, 66));
+        jLabel15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/—Pngtree—circle clipart green circle_5553152 (1) (1).png"))); // NOI18N
+        jPanel7.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 40, -1, -1));
 
-        jLabel13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/planta (1).png"))); // NOI18N
-        jPanel1.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 370, -1, 66));
+        jLabel16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/—Pngtree—circle clipart green circle_5553152 (1) (1).png"))); // NOI18N
+        jPanel7.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 30, -1, -1));
 
-        jLabel14.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/planta (1).png"))); // NOI18N
-        jPanel1.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 260, -1, -1));
+        jLabel17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/—Pngtree—circle clipart green circle_5553152 (1) (1).png"))); // NOI18N
+        jPanel7.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 80, -1, -1));
 
-        jLabel15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/planta (1).png"))); // NOI18N
-        jPanel1.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 160, -1, -1));
+        jLabel18.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/—Pngtree—circle clipart green circle_5553152 (1) (1).png"))); // NOI18N
+        jPanel7.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 360, -1, -1));
 
-        jLabel16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/planta (1).png"))); // NOI18N
-        jPanel1.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 510, -1, 66));
+        jLabel19.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/—Pngtree—circle clipart green circle_5553152 (1) (1).png"))); // NOI18N
+        jPanel7.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 150, -1, -1));
 
-        jLabel17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/planta (1).png"))); // NOI18N
-        jPanel1.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 390, -1, 66));
+        jLabel20.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/—Pngtree—circle clipart green circle_5553152 (1) (1).png"))); // NOI18N
+        jPanel7.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 360, -1, -1));
 
-        jLabel18.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/planta 2.png"))); // NOI18N
-        jPanel1.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 280, -1, -1));
-
-        jLabel19.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/planta (1).png"))); // NOI18N
-        jPanel1.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 190, -1, -1));
+        jPanel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 150, 660, 420));
 
         jPanel6.add(jPanel1, java.awt.BorderLayout.CENTER);
 
@@ -882,19 +867,6 @@ public class Principal extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField25ActionPerformed
 
-    private void A301ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A301ActionPerformed
-        A301 a = new A301(this);
-       a.setVisible(true);
-       this.setEnabled(false);
-    }//GEN-LAST:event_A301ActionPerformed
-
-    private void reunionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reunionesActionPerformed
-        SalaDeReuniones s = new SalaDeReuniones(this,idProfesor);
-        s.setLocationRelativeTo(null);
-        s.setVisible(true);
-        this.setEnabled(false);
-    }//GEN-LAST:event_reunionesActionPerformed
-
     private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
         jPanel6.removeAll();
         jPanel6.setLayout(new BorderLayout());
@@ -904,76 +876,6 @@ public class Principal extends javax.swing.JFrame {
         jPanel6.repaint();
            
     }//GEN-LAST:event_jMenuItem6ActionPerformed
-
-    private void A101ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A101ActionPerformed
-     A101 a = new A101(this);
-     a.setLocationRelativeTo(null);
-     a.setVisible(true);
-     this.setEnabled(false);
-    }//GEN-LAST:event_A101ActionPerformed
-
-    private void A102ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A102ActionPerformed
-      A102 a = new A102(this);
-      a.setLocationRelativeTo(null);
-      a.setVisible(true);
-      this.setEnabled(false);
-    }//GEN-LAST:event_A102ActionPerformed
-
-    private void A103ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A103ActionPerformed
-      A103 a = new A103(this);
-      a.setLocationRelativeTo(null);
-      a.setVisible(true);
-      this.setEnabled(false);
-    }//GEN-LAST:event_A103ActionPerformed
-
-    private void A104ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A104ActionPerformed
-     A104 a = new A104(this);
-     a.setLocationRelativeTo(null);
-     a.setVisible(true);
-     this.setEnabled(false);
-    }//GEN-LAST:event_A104ActionPerformed
-
-    private void A105ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A105ActionPerformed
-       A105 a = new A105(this);
-       a.setLocationRelativeTo(null);
-        a.setVisible(true);
-        this.setEnabled(false);
-    }//GEN-LAST:event_A105ActionPerformed
-
-    private void A106ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A106ActionPerformed
-      A106 a = new A106(this);
-      a.setLocationRelativeTo(null);
-    a.setVisible(true);
-    this.setEnabled(false);
-    }//GEN-LAST:event_A106ActionPerformed
-
-    private void A201ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A201ActionPerformed
-       A201 a = new A201(this);
-       a.setLocationRelativeTo(null);
-    a.setVisible(true);
-    this.setEnabled(false);
-    }//GEN-LAST:event_A201ActionPerformed
-
-    private void A202ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A202ActionPerformed
-     A202 a = new A202(this);
-     a.setLocationRelativeTo(null);
-    a.setVisible(true);
-    this.setEnabled(false);
-    }//GEN-LAST:event_A202ActionPerformed
-
-    private void A302ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A302ActionPerformed
-       A302 a = new A302(this);
-       a.setLocationRelativeTo(null);
-        a.setVisible(true);
-        this.setEnabled(false);
-    }//GEN-LAST:event_A302ActionPerformed
-
-    private void A303ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A303ActionPerformed
-        A303 a = new A303(this);
-        a.setLocationRelativeTo(null);
-       a.setVisible(true);
-       this.setEnabled(false);
-    }//GEN-LAST:event_A303ActionPerformed
 
     private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
        EventQueue.invokeLater(new Runnable(){
@@ -1039,13 +941,6 @@ public class Principal extends javax.swing.JFrame {
         jPanel6.repaint();
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
-    private void laboratorioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_laboratorioActionPerformed
-        Laboratorio a = new Laboratorio(this,idProfesor);
-        a.setLocationRelativeTo(null);
-        a.setVisible(true);
-        this.setEnabled(false);
-    }//GEN-LAST:event_laboratorioActionPerformed
-
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
       if(tieneReservas(idProfesor)){
         jPanel6.removeAll();
@@ -1100,6 +995,51 @@ public class Principal extends javax.swing.JFrame {
         jPanel6.repaint();
     }//GEN-LAST:event_jMenuItem15ActionPerformed
 
+    private void jMenu6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu6ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenu6ActionPerformed
+
+    private void A303ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A303ActionPerformed
+        A303 a = new A303(this);
+        a.setLocationRelativeTo(null);
+        a.setVisible(true);
+        this.setEnabled(false);
+    }//GEN-LAST:event_A303ActionPerformed
+
+    private void A302ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A302ActionPerformed
+        A302 a = new A302(this);
+        a.setLocationRelativeTo(null);
+        a.setVisible(true);
+        this.setEnabled(false);
+    }//GEN-LAST:event_A302ActionPerformed
+
+    private void reunionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reunionesActionPerformed
+        SalaDeReuniones s = new SalaDeReuniones(this,idProfesor);
+        s.setLocationRelativeTo(null);
+        s.setVisible(true);
+        this.setEnabled(false);
+    }//GEN-LAST:event_reunionesActionPerformed
+
+    private void A301ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A301ActionPerformed
+        A301 a = new A301(this);
+        a.setVisible(true);
+        this.setEnabled(false);
+    }//GEN-LAST:event_A301ActionPerformed
+
+    private void A202ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A202ActionPerformed
+        A202 a = new A202(this);
+        a.setLocationRelativeTo(null);
+        a.setVisible(true);
+        this.setEnabled(false);
+    }//GEN-LAST:event_A202ActionPerformed
+
+    private void A201ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A201ActionPerformed
+        A201 a = new A201(this);
+        a.setLocationRelativeTo(null);
+        a.setVisible(true);
+        this.setEnabled(false);
+    }//GEN-LAST:event_A201ActionPerformed
+
     private void conferenciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_conferenciasActionPerformed
         SalaDeConferencias a = new SalaDeConferencias(this,idProfesor);
         a.setLocationRelativeTo(null);
@@ -1107,9 +1047,54 @@ public class Principal extends javax.swing.JFrame {
         this.setEnabled(false);
     }//GEN-LAST:event_conferenciasActionPerformed
 
-    private void jMenu6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu6ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenu6ActionPerformed
+    private void A105ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A105ActionPerformed
+        A105 a = new A105(this);
+        a.setLocationRelativeTo(null);
+        a.setVisible(true);
+        this.setEnabled(false);
+    }//GEN-LAST:event_A105ActionPerformed
+
+    private void A104ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A104ActionPerformed
+        A104 a = new A104(this);
+        a.setLocationRelativeTo(null);
+        a.setVisible(true);
+        this.setEnabled(false);
+    }//GEN-LAST:event_A104ActionPerformed
+
+    private void laboratorioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_laboratorioActionPerformed
+        Laboratorio a = new Laboratorio(this,idProfesor);
+        a.setLocationRelativeTo(null);
+        a.setVisible(true);
+        this.setEnabled(false);
+    }//GEN-LAST:event_laboratorioActionPerformed
+
+    private void A106ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A106ActionPerformed
+        A106 a = new A106(this);
+        a.setLocationRelativeTo(null);
+        a.setVisible(true);
+        this.setEnabled(false);
+    }//GEN-LAST:event_A106ActionPerformed
+
+    private void A102ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A102ActionPerformed
+        A102 a = new A102(this);
+        a.setLocationRelativeTo(null);
+        a.setVisible(true);
+        this.setEnabled(false);
+    }//GEN-LAST:event_A102ActionPerformed
+
+    private void A103ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A103ActionPerformed
+        A103 a = new A103(this);
+        a.setLocationRelativeTo(null);
+        a.setVisible(true);
+        this.setEnabled(false);
+    }//GEN-LAST:event_A103ActionPerformed
+
+    private void A101ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_A101ActionPerformed
+        A101 a = new A101(this);
+        a.setLocationRelativeTo(null);
+        a.setVisible(true);
+        this.setEnabled(false);
+    }//GEN-LAST:event_A101ActionPerformed
 
     
     /**
@@ -1150,19 +1135,13 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JButton baños;
     private javax.swing.JButton baños2;
     private javax.swing.JButton conferencias;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -1197,6 +1176,7 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JTextField jTextField10;

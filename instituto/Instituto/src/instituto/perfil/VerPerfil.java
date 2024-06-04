@@ -4,7 +4,6 @@
  */
 package instituto.perfil;
 
-import java.awt.Color;
 import java.awt.Image;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,9 +11,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.sql.*;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -99,38 +95,48 @@ private String obtenerNombreRolProfesor(int idProfesor) {
     }
 }
   
-       private void guardarCambiosProfesor() {
-        try {
-            Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
+    private void guardarCambiosProfesor() {
+    try {
+        Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "");
 
-            String updateQuery = "UPDATE instituto.profesores SET NOMBRE = ?, APELLIDO = ?, CORREOELECTRONICO = ? WHERE \"ID profesor\" = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(updateQuery);
+        String updateQuery = "UPDATE instituto.profesores SET NOMBRE = ?, APELLIDO = ?, CORREOELECTRONICO = ? WHERE \"ID profesor\" = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(updateQuery);
 
-            String nombre = jTextField1.getText();
-            String apellido = jTextField2.getText();
-            String correo = jTextField3.getText();
+        String nombre = jTextField1.getText();
+        String apellido = jTextField2.getText();
+        String correo = jTextField3.getText();
 
-            preparedStatement.setString(1, nombre);
-            preparedStatement.setString(2, apellido);
-            preparedStatement.setString(3, correo);
-            preparedStatement.setInt(4, idProfesor);
-
-            int rowsAffected = preparedStatement.executeUpdate();
-
-            preparedStatement.close();
-            connection.close();
-
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(null, "Los cambios han sido guardados exitosamente.");
-            } else {
-                JOptionPane.showMessageDialog(null, "No se han realizado cambios.");
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error al guardar los cambios: " + e.getMessage());
+        if (!esCorreoValido(correo)) {
+            JOptionPane.showMessageDialog(null, "Por favor, introduzca un correo electrónico válido.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
+
+        preparedStatement.setString(1, nombre);
+        preparedStatement.setString(2, apellido);
+        preparedStatement.setString(3, correo);
+        preparedStatement.setInt(4, idProfesor);
+
+        int rowsAffected = preparedStatement.executeUpdate();
+
+        preparedStatement.close();
+        connection.close();
+
+        if (rowsAffected > 0) {
+            JOptionPane.showMessageDialog(null, "Los cambios han sido guardados exitosamente.");
+        } else {
+            JOptionPane.showMessageDialog(null, "No se han realizado cambios.");
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al guardar los cambios: " + e.getMessage());
     }
+}
+
+private boolean esCorreoValido(String correo) {
+    String regex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+    return correo.matches(regex);
+}
  private void seleccionarImagen() {
     JFileChooser fileChooser = new JFileChooser();
     fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

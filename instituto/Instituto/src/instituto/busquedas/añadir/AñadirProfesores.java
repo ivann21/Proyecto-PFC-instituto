@@ -58,9 +58,8 @@ private void seleccionarImagen() {
 
     if (returnValue == JFileChooser.APPROVE_OPTION) {
         File file = fileChooser.getSelectedFile();
-        rutaImagen = file.getAbsolutePath(); // Guardar la ruta de la imagen seleccionada
+        rutaImagen = file.getAbsolutePath();
 
-        // Mostrar la imagen en el JLabel
         ImageIcon icon = new ImageIcon(rutaImagen);
         Image image = icon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
         jLabel6.setIcon(new ImageIcon(image));
@@ -72,11 +71,10 @@ private void guardarImagen(int idProfesor) {
         return;
     }
 
-    String nombreArchivo = idProfesor + ".png"; // Usamos el ID del profesor como nombre de archivo
-    String rutaDestino = "src/imagenes/" + nombreArchivo; // Carpeta de imágenes en el proyecto
+    String nombreArchivo = idProfesor + ".png"; 
+    String rutaDestino = "src/imagenes/" + nombreArchivo; 
 
     try {
-        // Copiar la imagen al directorio de imágenes del proyecto
         InputStream inputStream = new FileInputStream(rutaImagen);
         OutputStream outputStream = new FileOutputStream(rutaDestino);
         byte[] buffer = new byte[1024];
@@ -87,7 +85,6 @@ private void guardarImagen(int idProfesor) {
         outputStream.close();
         inputStream.close();
 
-        // Actualizar la ruta de la imagen
         rutaImagen = rutaDestino;
     } catch (IOException e) {
         e.printStackTrace();
@@ -218,7 +215,7 @@ private void guardarImagen(int idProfesor) {
     if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty() || contrasenia.isEmpty()) {
         JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
     } else {
-        String correoRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        String correoRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
         Pattern pattern = Pattern.compile(correoRegex);
         Matcher matcher = pattern.matcher(correo);
         
@@ -247,7 +244,6 @@ private void guardarImagen(int idProfesor) {
                             if (generatedKeys.next()) {
                                 int idProfesor = generatedKeys.getInt(1);
 
-                                // Guardar la imagen con el ID del profesor
                                 guardarImagen(idProfesor);
 
                                 JOptionPane.showMessageDialog(null, "Los datos se han guardado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
@@ -281,7 +277,7 @@ private boolean correoExistente(String correo) {
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         int cantidad = rs.getInt("cantidad");
-                        return cantidad > 0; // Si la cantidad es mayor que 0, el correo existe
+                        return cantidad > 0;
                     }
                 }
             }

@@ -13,12 +13,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 public class ImageRenderer2 extends DefaultTableCellRenderer {
     private ImageIcon trueIcon;
     private ImageIcon falseIcon;
-    private int defaultSize; // Tamaño por defecto
+    private int defaultSize;
 
-    // Constructor con un solo ImageIcon para ambos casos
     public ImageRenderer2(ImageIcon icon, int defaultSize) {
         this.trueIcon = icon;
-        this.falseIcon = icon; // Utiliza la misma imagen para true y false
+        this.falseIcon = icon;
         this.defaultSize = defaultSize;
     }
 
@@ -32,13 +31,12 @@ public class ImageRenderer2 extends DefaultTableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-        // Verificar si el valor es un ImageIcon
         if (value instanceof ImageIcon) {
             ImageIcon icon = (ImageIcon) value;
             ImageIcon scaledIcon = new ImageIcon(icon.getImage().getScaledInstance(defaultSize, defaultSize, java.awt.Image.SCALE_SMOOTH));
             label.setIcon(scaledIcon);
             label.setHorizontalAlignment(JLabel.CENTER);
-            label.setText(""); // Eliminar cualquier texto que se muestre en la celda
+            label.setText(""); 
         }
 
         return label;

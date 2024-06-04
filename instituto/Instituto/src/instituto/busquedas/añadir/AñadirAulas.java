@@ -132,7 +132,7 @@ public  String hashPassword(String password) {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-     String nombre = nameTextField.getText().trim();
+    String nombre = nameTextField.getText().trim();
     String ubicacion = ubicacionComboBox.getSelectedItem().toString();
     int capacidad = (int) capacidadSpinner.getValue();
     boolean tienePizarra = pizarraCheckBox.isSelected();
@@ -140,38 +140,48 @@ public  String hashPassword(String password) {
 
     if (nombre.isEmpty() || ubicacion.isEmpty()) {
         JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
-    } else if (capacidad < 1 || capacidad > 50) { // Verificar si la capacidad está dentro del rango deseado
-        JOptionPane.showMessageDialog(null, "La capacidad debe estar entre 1 y 50", "Error", JOptionPane.ERROR_MESSAGE);
+    } else if (capacidad < 1 || capacidad > 200) { 
+        JOptionPane.showMessageDialog(null, "La capacidad debe estar entre 1 y 200", "Error", JOptionPane.ERROR_MESSAGE);
     } else {
         try {
             Class.forName("org.hsqldb.jdbc.JDBCDriver");
             try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
-                String consultaSQL = "INSERT INTO PUBLIC.INSTITUTO.AULAS (NOMBRE, UBICACION, CAPACIDAD_AULA, PIZARRA, ORDENADORES) VALUES (?, ?, ?, ?, ?)";
-                try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
-                    stmt.setString(1, nombre);
-                    stmt.setString(2, ubicacion);
-                    stmt.setInt(3, capacidad);
-                    stmt.setBoolean(4, tienePizarra);
-                    stmt.setBoolean(5, tieneOrdenadores);
-
-                    int filasAfectadas = stmt.executeUpdate();
-                    if (filasAfectadas > 0) {
-                        JOptionPane.showMessageDialog(null, "Los datos se han guardado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                        dispose();
-                        if (parentPanel != null) {
-                            String selectedTable = "aulas";
-                            parentPanel.mostrarDatosEnJTable(selectedTable);
-                        }
-                        if (this.getParent() != null && this.getParent().isEnabled()) {
-                            this.getParent().setEnabled(true); 
-                        }
+                String consultaVerificacion = "SELECT COUNT(*) FROM PUBLIC.INSTITUTO.AULAS WHERE NOMBRE = ?";
+                try (PreparedStatement stmtVerificacion = connection.prepareStatement(consultaVerificacion)) {
+                    stmtVerificacion.setString(1, nombre);
+                    ResultSet rs = stmtVerificacion.executeQuery();
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        JOptionPane.showMessageDialog(null, "El nombre del aula ya existe en la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
                     } else {
-                        JOptionPane.showMessageDialog(null, "Hubo un error al guardar los datos", "Error", JOptionPane.ERROR_MESSAGE);
+                        String consultaSQL = "INSERT INTO PUBLIC.INSTITUTO.AULAS (NOMBRE, UBICACION, CAPACIDAD_AULA, PIZARRA, ORDENADORES) VALUES (?, ?, ?, ?, ?)";
+                        try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
+                            stmt.setString(1, nombre);
+                            stmt.setString(2, ubicacion);
+                            stmt.setInt(3, capacidad);
+                            stmt.setBoolean(4, tienePizarra);
+                            stmt.setBoolean(5, tieneOrdenadores);
+
+                            int filasAfectadas = stmt.executeUpdate();
+                            if (filasAfectadas > 0) {
+                                JOptionPane.showMessageDialog(null, "Los datos se han guardado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                                dispose();
+                                if (parentPanel != null) {
+                                    String selectedTable = "aulas";
+                                    parentPanel.mostrarDatosEnJTable(selectedTable);
+                                }
+                                if (this.getParent() != null && this.getParent().isEnabled()) {
+                                    this.getParent().setEnabled(true); 
+                                }
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Hubo un error al guardar los datos", "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
                     }
                 }
             }
         } catch (ClassNotFoundException | SQLException ex) {
             ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Hubo un error con la base de datos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     }//GEN-LAST:event_jButton1ActionPerformed

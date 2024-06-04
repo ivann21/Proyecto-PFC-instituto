@@ -103,7 +103,7 @@ public class AñadirCiclos extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-     String nombre = nameTextField.getText().trim();
+    String nombre = nameTextField.getText().trim();
     int anio = Integer.parseInt(anioComboBox.getSelectedItem().toString());
     String descripcion = descripcionTextArea.getText().trim();
 
@@ -113,31 +113,41 @@ public class AñadirCiclos extends javax.swing.JFrame {
         try {
             Class.forName("org.hsqldb.jdbc.JDBCDriver");
             try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
-                String consultaSQL = "INSERT INTO PUBLIC.INSTITUTO.CICLOS (NOMBRE, ANIO, DESCRIPCION) VALUES (?, ?, ?)";
-                try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
-                    stmt.setString(1, nombre);
-                    stmt.setInt(2, anio);
-                    stmt.setString(3, descripcion);
-
-                    int filasAfectadas = stmt.executeUpdate();
-                    if (filasAfectadas > 0) {
-                        JOptionPane.showMessageDialog(null, "Los datos se han guardado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                        dispose();
-                         if (parentPanel != null) {
-                                  String selectedTable = "ciclos";
-                                parentPanel. mostrarDatosEnJTable(selectedTable);
-                            }
-                        if (this.getParent() != null && this.getParent().isEnabled()) {
-                            this.getParent().setEnabled(true); 
-                        }
-
+                String consultaVerificacion = "SELECT COUNT(*) FROM PUBLIC.INSTITUTO.CICLOS WHERE NOMBRE = ? AND ANIO = ?";
+                try (PreparedStatement stmtVerificacion = connection.prepareStatement(consultaVerificacion)) {
+                    stmtVerificacion.setString(1, nombre);
+                    stmtVerificacion.setInt(2, anio);
+                    ResultSet rs = stmtVerificacion.executeQuery();
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        JOptionPane.showMessageDialog(null, "El nombre y el año ya existen en la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
                     } else {
-                        JOptionPane.showMessageDialog(null, "Hubo un error al guardar los datos", "Error", JOptionPane.ERROR_MESSAGE);
+                        String consultaSQL = "INSERT INTO PUBLIC.INSTITUTO.CICLOS (NOMBRE, ANIO, DESCRIPCION) VALUES (?, ?, ?)";
+                        try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
+                            stmt.setString(1, nombre);
+                            stmt.setInt(2, anio);
+                            stmt.setString(3, descripcion);
+
+                            int filasAfectadas = stmt.executeUpdate();
+                            if (filasAfectadas > 0) {
+                                JOptionPane.showMessageDialog(null, "Los datos se han guardado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                                dispose();
+                                if (parentPanel != null) {
+                                    String selectedTable = "ciclos";
+                                    parentPanel.mostrarDatosEnJTable(selectedTable);
+                                }
+                                if (this.getParent() != null && this.getParent().isEnabled()) {
+                                    this.getParent().setEnabled(true); 
+                                }
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Hubo un error al guardar los datos", "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
                     }
                 }
             }
         } catch (ClassNotFoundException | SQLException ex) {
             ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Hubo un error con la base de datos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     }//GEN-LAST:event_jButton1ActionPerformed

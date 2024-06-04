@@ -23,14 +23,13 @@ public class ImageRenderer3 extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        label.setHorizontalAlignment(JLabel.CENTER); // Opcional: centrar ícono
+        label.setHorizontalAlignment(JLabel.CENTER); 
 
-        // Escalar la imagen al tamaño especificado
         Image scaledImage = icon.getImage().getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH);
         ImageIcon scaledIcon = new ImageIcon(scaledImage);
 
         label.setIcon(scaledIcon);
-        label.setText(""); // Opcional: si no deseas mostrar texto junto al ícono
+        label.setText("");
 
         return label;
     }

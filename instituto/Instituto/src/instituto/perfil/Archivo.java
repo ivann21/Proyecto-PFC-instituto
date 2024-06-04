@@ -9,14 +9,12 @@ public class Archivo {
     private String nombreReal;
     private String extension;
 
-    // Constructor
     public Archivo(String nombrePersonalizado, String nombreReal, String extension) {
         this.nombrePersonalizado = nombrePersonalizado;
         this.nombreReal = nombreReal;
         this.extension = extension;
     }
 
-    // Getters y setters
     public String getNombrePersonalizado() {
         return nombrePersonalizado;
     }

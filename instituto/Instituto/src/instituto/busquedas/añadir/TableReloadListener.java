@@ -4,10 +4,7 @@
  */
 package instituto.busquedas.añadir;
 
-/**
- *
- * @author ivan.castellano
- */
+
 public interface TableReloadListener {
     void reloadTable();
 }

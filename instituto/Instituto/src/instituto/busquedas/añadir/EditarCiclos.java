@@ -54,7 +54,7 @@ public class EditarCiclos extends javax.swing.JFrame {
     return descripcion;
 }
      public int buscarIDCiclo(String nombre, String descripcion, int anio) throws SQLException {
-        int id = -1; // Valor predeterminado si no se encuentra ningún ID
+        int id = -1;
         try {
         Class.forName("org.hsqldb.jdbc.JDBCDriver");
         try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
@@ -160,7 +160,7 @@ public class EditarCiclos extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-   String nombre = nameTextField.getText().trim();
+ String nombre = nameTextField.getText().trim();
 int anio = Integer.parseInt(anioComboBox.getSelectedItem().toString());
 String descripcion = descripcionTextArea.getText().trim();
 
@@ -170,31 +170,43 @@ if (nombre.isEmpty() || descripcion.isEmpty()) {
     try {
         Class.forName("org.hsqldb.jdbc.JDBCDriver");
         try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
-            String consultaSQL = "UPDATE PUBLIC.INSTITUTO.CICLOS SET NOMBRE=?, ANIO=?, DESCRIPCION=? WHERE \"ID Ciclos\"=?";
-            try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
-                stmt.setString(1, nombre);
-                stmt.setInt(2, anio);
-                stmt.setString(3, descripcion);
-                stmt.setInt(4, idCiclo);
-
-                int filasAfectadas = stmt.executeUpdate();
-                if (filasAfectadas > 0) {
-                    JOptionPane.showMessageDialog(null, "Los datos se han actualizado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                    dispose();
-                    if (this.getParent() != null && this.getParent().isEnabled()) {
-                        this.getParent().setEnabled(true);
-                    }
-                    if (parentPanel != null) {
-                        String selectedTable = "ciclos";
-                        parentPanel.mostrarDatosEnJTable(selectedTable);
-                    }
+            String consultaVerificacion = "SELECT COUNT(*) FROM PUBLIC.INSTITUTO.CICLOS WHERE NOMBRE = ? AND ANIO = ? AND \"ID Ciclos\" <> ?";
+            try (PreparedStatement stmtVerificacion = connection.prepareStatement(consultaVerificacion)) {
+                stmtVerificacion.setString(1, nombre);
+                stmtVerificacion.setInt(2, anio);
+                stmtVerificacion.setInt(3, idCiclo);
+                ResultSet rs = stmtVerificacion.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    JOptionPane.showMessageDialog(null, "El nombre y el año ya existen en la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(null, "No se encontró ningún ciclo con el ID proporcionado", "Error", JOptionPane.ERROR_MESSAGE);
+                    String consultaSQL = "UPDATE PUBLIC.INSTITUTO.CICLOS SET NOMBRE=?, ANIO=?, DESCRIPCION=? WHERE \"ID Ciclos\"=?";
+                    try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
+                        stmt.setString(1, nombre);
+                        stmt.setInt(2, anio);
+                        stmt.setString(3, descripcion);
+                        stmt.setInt(4, idCiclo);
+
+                        int filasAfectadas = stmt.executeUpdate();
+                        if (filasAfectadas > 0) {
+                            JOptionPane.showMessageDialog(null, "Los datos se han actualizado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                            dispose();
+                            if (this.getParent() != null && this.getParent().isEnabled()) {
+                                this.getParent().setEnabled(true);
+                            }
+                            if (parentPanel != null) {
+                                String selectedTable = "ciclos";
+                                parentPanel.mostrarDatosEnJTable(selectedTable);
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(null, "No se encontró ningún ciclo con el ID proporcionado", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
                 }
             }
         }
     } catch (ClassNotFoundException | SQLException ex) {
         ex.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Hubo un error con la base de datos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
 }
     }//GEN-LAST:event_jButton1ActionPerformed

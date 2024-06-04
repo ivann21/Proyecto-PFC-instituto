@@ -37,7 +37,7 @@ public class EditarAulas extends javax.swing.JFrame {
         }
     }
       public int obtenerIdAula(String nombre, String ubicacion, int capacidad, boolean tienePizarra, boolean tieneOrdenadores) throws SQLException {
-        int id = -1; // Valor predeterminado si no se encuentra ningún ID
+        int id = -1; 
         String query = "SELECT \"ID aula\" FROM PUBLIC.INSTITUTO.AULAS WHERE NOMBRE = ? AND UBICACION = ? AND CAPACIDAD_AULA = ? AND PIZARRA = ? AND ORDENADORES = ?";
         try {
             Class.forName("org.hsqldb.jdbc.JDBCDriver");
@@ -173,38 +173,50 @@ public  String hashPassword(String password) {
 
     if (nombre.isEmpty() || ubicacion.isEmpty()) {
         JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
-    } else if (capacidad < 0 || capacidad > 50) { // Validación de la capacidad
-        JOptionPane.showMessageDialog(null, "La capacidad debe estar entre 0 y 50", "Error", JOptionPane.ERROR_MESSAGE);
+    } else if (capacidad < 0 || capacidad > 200) { 
+        JOptionPane.showMessageDialog(null, "La capacidad debe estar entre 0 y 200", "Error", JOptionPane.ERROR_MESSAGE);
     } else {
         try {
             Class.forName("org.hsqldb.jdbc.JDBCDriver");
             try (Connection connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/", "SA", "")) {
-                String consultaSQL = "UPDATE PUBLIC.INSTITUTO.AULAS SET UBICACION=?, CAPACIDAD_AULA=?, PIZARRA=?, ORDENADORES=? WHERE \"ID aula\"=?";
-                try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
-                    stmt.setString(1, ubicacion);
-                    stmt.setInt(2, capacidad);
-                    stmt.setBoolean(3, tienePizarra);
-                    stmt.setBoolean(4, tieneOrdenadores);
-                    stmt.setInt(5, idAula);
-
-                    int filasAfectadas = stmt.executeUpdate();
-                    if (filasAfectadas > 0) {
-                        JOptionPane.showMessageDialog(null, "Los datos se han actualizado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                        dispose();
-                        if (this.getParent() != null && this.getParent().isEnabled()) {
-                            this.getParent().setEnabled(true); 
-                        }
-                        if (parentPanel != null) {
-                            String selectedTable = "aulas";
-                            parentPanel.mostrarDatosEnJTable(selectedTable);
-                        }
+                String consultaVerificacion = "SELECT COUNT(*) FROM PUBLIC.INSTITUTO.AULAS WHERE NOMBRE = ? AND \"ID aula\" <> ?";
+                try (PreparedStatement stmtVerificacion = connection.prepareStatement(consultaVerificacion)) {
+                    stmtVerificacion.setString(1, nombre);
+                    stmtVerificacion.setInt(2, idAula);
+                    ResultSet rs = stmtVerificacion.executeQuery();
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        JOptionPane.showMessageDialog(null, "El nombre del aula ya existe en la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
                     } else {
-                        JOptionPane.showMessageDialog(null, "No se encontró ningún aula con el ID proporcionado", "Error", JOptionPane.ERROR_MESSAGE);
+                        String consultaSQL = "UPDATE PUBLIC.INSTITUTO.AULAS SET NOMBRE=?, UBICACION=?, CAPACIDAD_AULA=?, PIZARRA=?, ORDENADORES=? WHERE \"ID aula\"=?";
+                        try (PreparedStatement stmt = connection.prepareStatement(consultaSQL)) {
+                            stmt.setString(1, nombre);
+                            stmt.setString(2, ubicacion);
+                            stmt.setInt(3, capacidad);
+                            stmt.setBoolean(4, tienePizarra);
+                            stmt.setBoolean(5, tieneOrdenadores);
+                            stmt.setInt(6, idAula);
+
+                            int filasAfectadas = stmt.executeUpdate();
+                            if (filasAfectadas > 0) {
+                                JOptionPane.showMessageDialog(null, "Los datos se han actualizado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                                dispose();
+                                if (this.getParent() != null && this.getParent().isEnabled()) {
+                                    this.getParent().setEnabled(true); 
+                                }
+                                if (parentPanel != null) {
+                                    String selectedTable = "aulas";
+                                    parentPanel.mostrarDatosEnJTable(selectedTable);
+                                }
+                            } else {
+                                JOptionPane.showMessageDialog(null, "No se encontró ningún aula con el ID proporcionado", "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
                     }
                 }
             }
         } catch (ClassNotFoundException | SQLException ex) {
             ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Hubo un error con la base de datos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     }//GEN-LAST:event_jButton1ActionPerformed

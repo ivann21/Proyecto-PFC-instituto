@@ -281,7 +281,7 @@ private boolean existeReserva(int idAula, java.sql.Date fechaReserva, Time horaI
 
         insertarDatos(fechaSQL, numeroHoras);
     } catch (ParseException ex) {
-        System.out.println("Error al convertir el String a Date: " + ex.getMessage());
+         JOptionPane.showMessageDialog(null, "Por favor, seleccione una hora válida.", "Campos Incompletos", JOptionPane.WARNING_MESSAGE);
         return;
     }    
     }//GEN-LAST:event_jButton1ActionPerformed

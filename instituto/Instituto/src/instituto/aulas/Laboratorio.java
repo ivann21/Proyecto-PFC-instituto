@@ -45,8 +45,8 @@ public class Laboratorio extends javax.swing.JFrame {
     }
 private void insertarDatos(java.sql.Date fechaSQL, int numeroHoras) {
     try {
-        if (fechaSQL == null || "Seleccione una hora".equals(jComboBox1.getSelectedItem())) {
-            JOptionPane.showMessageDialog(null, "Por favor, seleccione una fecha y hora válidas.", "Campos Incompletos", JOptionPane.WARNING_MESSAGE);
+        if (fechaSQL == null) {
+            JOptionPane.showMessageDialog(null, "Por favor, seleccione una fecha válida.", "Campos Incompletos", JOptionPane.WARNING_MESSAGE);
             return; 
         }
         
@@ -237,6 +237,10 @@ private boolean existeReserva(int idAula, java.sql.Date fechaReserva, Time horaI
         JOptionPane.showMessageDialog(null, "Por favor, seleccione una fecha válida.", "Fecha Incompleta", JOptionPane.WARNING_MESSAGE);
         return; 
     }
+    if("Seleccione una hora".equals(jComboBox1) ){
+             JOptionPane.showMessageDialog(null, "Por favor, seleccione una hora válida.", "Campos Incompletos", JOptionPane.WARNING_MESSAGE);
+             return;
+        }
     int numeroHoras = (int) jSpinner1.getValue(); 
     if (numeroHoras < 1 || numeroHoras > 3) {
         JOptionPane.showMessageDialog(null, "Número de horas no válido. Por favor, seleccione un valor entre 1 y 3.", "Número de Horas No Válido", JOptionPane.WARNING_MESSAGE);
@@ -282,7 +286,7 @@ private boolean existeReserva(int idAula, java.sql.Date fechaReserva, Time horaI
 
         insertarDatos(fechaSQL, numeroHoras);
     } catch (ParseException ex) {
-        System.out.println("Error al convertir el String a Date: " + ex.getMessage());
+        JOptionPane.showMessageDialog(null, "Por favor, seleccione una hora válida.", "Campos Incompletos", JOptionPane.WARNING_MESSAGE);
         return;
     }  
     }//GEN-LAST:event_jButton1ActionPerformed

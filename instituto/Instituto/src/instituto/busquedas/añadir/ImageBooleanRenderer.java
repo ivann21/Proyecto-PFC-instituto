@@ -27,7 +27,6 @@ public class ImageBooleanRenderer extends DefaultTableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-        // Si el valor es un booleano, establece la imagen correspondiente
         if (value instanceof Boolean) {
             boolean boolValue = (Boolean) value;
             if (boolValue) {
@@ -35,7 +34,7 @@ public class ImageBooleanRenderer extends DefaultTableCellRenderer {
             } else {
                 label.setIcon(new ImageIcon(falseIcon.getImage().getScaledInstance(defaultSize, defaultSize, java.awt.Image.SCALE_SMOOTH)));
             }
-            label.setText(""); // Elimina el texto
+            label.setText(""); 
         }
 
         label.setHorizontalAlignment(JLabel.CENTER);

@@ -61,11 +61,9 @@ public class EditarAlumnos extends javax.swing.JFrame {
 
     if (returnValue == JFileChooser.APPROVE_OPTION) {
         File file = fileChooser.getSelectedFile();
-        String nombreArchivo = idProfesor + ".png"; // Usamos el ID del profesor como nombre de archivo
-        String rutaDestino = "src/imagenes/alumnos/" + nombreArchivo; // Carpeta de imágenes en el proyecto
-
+        String nombreArchivo = idProfesor + ".png"; 
+        String rutaDestino = "src/imagenes/alumnos/" + nombreArchivo; 
         try {
-            // Copiar la imagen al directorio de imágenes del proyecto
             InputStream inputStream = new FileInputStream(file);
             OutputStream outputStream = new FileOutputStream(rutaDestino);
             byte[] buffer = new byte[1024];
@@ -76,8 +74,7 @@ public class EditarAlumnos extends javax.swing.JFrame {
             outputStream.close();
             inputStream.close();
 
-            // Mostrar la imagen en el JLabel
-            rutaImagen = rutaDestino; // Guardamos la ruta relativa en lugar de la absoluta
+            rutaImagen = rutaDestino;
             ImageIcon icon = new ImageIcon(rutaImagen);
             Image image = icon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
             jLabel6.setIcon(new ImageIcon(image));
@@ -88,7 +85,7 @@ public class EditarAlumnos extends javax.swing.JFrame {
     }
 }
      private int obtenerIdAlumno(String correoAlumno) {
-    int idAlumno = -1; // Valor por defecto si no se encuentra al alumno
+    int idAlumno = -1;
 
     try {
         Class.forName("org.hsqldb.jdbc.JDBCDriver");
@@ -248,7 +245,7 @@ public class EditarAlumnos extends javax.swing.JFrame {
        if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty() ) {
            JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
        } else {
-            String correoRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+            String correoRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
             Pattern pattern = Pattern.compile(correoRegex);
             Matcher matcher = pattern.matcher(correo);
 
@@ -311,7 +308,7 @@ private boolean correoExistente(String correo) {
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         int cantidad = rs.getInt("cantidad");
-                        return cantidad > 0; // Si la cantidad es mayor que 0, el correo existe
+                        return cantidad > 0;
                     }
                 }
             }

@@ -218,7 +218,7 @@ String nuevaContrasenia = jPasswordField2.getText().trim();
 if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty() || contraseniaActual.isEmpty() || nuevaContrasenia.isEmpty()) {
     JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
 } else {
-    String correoRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+    String correoRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
     Pattern pattern = Pattern.compile(correoRegex);
     Matcher matcher = pattern.matcher(correo);
 
@@ -293,7 +293,7 @@ private boolean correoExistente(String correo) {
     return false;
 }
     private int obtenerIdProfesor(String correoProfesor) {
-    int idProfesor = -1; // Valor por defecto si no se encuentra el profesor
+    int idProfesor = -1; 
 
     try {
         Class.forName("org.hsqldb.jdbc.JDBCDriver");
@@ -321,11 +321,10 @@ private boolean correoExistente(String correo) {
 
     if (returnValue == JFileChooser.APPROVE_OPTION) {
         File file = fileChooser.getSelectedFile();
-        String nombreArchivo = idProfesor + ".png"; // Usamos el ID del profesor como nombre de archivo
-        String rutaDestino = "src/imagenes/" + nombreArchivo; // Carpeta de imágenes en el proyecto
+        String nombreArchivo = idProfesor + ".png"; 
+        String rutaDestino = "src/imagenes/" + nombreArchivo; 
 
         try {
-            // Copiar la imagen al directorio de imágenes del proyecto
             InputStream inputStream = new FileInputStream(file);
             OutputStream outputStream = new FileOutputStream(rutaDestino);
             byte[] buffer = new byte[1024];
@@ -336,8 +335,7 @@ private boolean correoExistente(String correo) {
             outputStream.close();
             inputStream.close();
 
-            // Mostrar la imagen en el JLabel
-            rutaImagen = rutaDestino; // Guardamos la ruta relativa en lugar de la absoluta
+            rutaImagen = rutaDestino;
             ImageIcon icon = new ImageIcon(rutaImagen);
             Image image = icon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
             jLabel6.setIcon(new ImageIcon(image));
